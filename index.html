@@ -7,12 +7,12 @@
     <style>
         :root {
             --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
-            --dark-bg: #0a0a0a;
+            --pure-black: #000000;
         }
         body {
             margin: 0;
             font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--dark-bg);
+            background-color: var(--pure-black); /* Fundo totalmente preto */
             color: white;
             display: flex;
             flex-direction: column;
@@ -22,14 +22,15 @@
             text-align: center;
             padding: 20px;
         }
-        /* Logo aumentado para ficar mais imponente */
+        /* Logo 2x maior e imponente */
         .logo {
-            width: 250px; 
+            width: 500px; 
             height: auto;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
         h1 {
             font-size: 2.8rem;
+            margin-top: 0;
             margin-bottom: 10px;
             line-height: 1.2;
         }
@@ -41,9 +42,9 @@
         }
         p {
             font-size: 1.1rem;
-            color: #888;
+            color: #aaaaaa;
             margin-bottom: 40px;
-            max-width: 550px;
+            max-width: 600px;
         }
         .btn {
             background: var(--primary-gradient);
