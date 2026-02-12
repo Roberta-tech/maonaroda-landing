@@ -3,41 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mão na Roda | O Uber dos Serviços</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Mão na Roda - Mais que um App</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; }
+        :root {
+            --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
+            --dark-bg: #0a0a0a;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
         .gradient-text {
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #888;
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+        .btn {
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 124, 240, 0.3);
+        }
+        .btn:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+<body>
 
-    <div class="flex justify-center mb-8">
-        <img src="logo.png" 
-             alt="Logo Mão na Roda" 
-             class="w-full max-w-[200px] md:max-w-[280px] h-auto object-contain">
-    </div>
+    <img src="logo.png" alt="Mão na Roda Logo" class="logo">
 
-    <h1 class="text-4xl md:text-6xl font-bold mb-4">
-        O <span class="gradient-text">Uber dos Serviços</span> onde você estiver
-    </h1>
+    <h1>Mais que um App, uma <span class="gradient-text">Mão na Roda</span></h1>
+    <p>Onde você estiver, a solução que você precisa. Conectando profissionais e clientes em todo o Brasil.</p>
 
-    <p class="text-gray-400 text-lg md:text-xl max-w-2xl mb-10">
-        Conectando quem faz com quem precisa em todo o Brasil. Encontre profissionais qualificados por geolocalização. Seguro, rápido e na palma da sua mão.
-    </p>
-
-    <a href="https://tally.so/r/Bzk5MK" 
-       class="bg-white text-black font-bold py-4 px-8 rounded-full text-xl hover:bg-gray-200 transition-all transform hover:scale-105">
-        QUERO ACESSO ANTECIPADO
-    </a>
-
-    <footer class="mt-20 text-gray-600 text-sm">
-        © 2026 Impetus Startup. Todos os direitos reservados.
-    </footer>
+    <a href="https://tally.so/r/Bzk5MK" class="btn">QUERO ACESSO ANTECIPADO</a>
 
 </body>
 </html>
