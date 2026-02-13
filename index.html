@@ -1,30 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head><meta name="description" content="Mão na Roda - A plataforma que conecta você aos melhores profissionais e serviços em todo o Brasil. Peça um Mão na Roda agora!">
-<meta name="keywords" content="serviços, encanador, eletricista, diarista, aplicativo de serviços, mão na roda, impetus">
-<meta name="author" content="Impetus Startup">
-
-<meta property="og:title" content="Mão na Roda - Mais que um App!">
-<meta property="og:description" content="Garanta seu acesso antecipado à maior rede de serviços do Brasil.">
-<meta property="og:image" content="https://www.appmaonaroda.com.br/logo.png">
-<meta property="og:url" content="https://www.appmaonaroda.com.br">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Mão na Roda - Mais que um App!</title>
-    <style>.insta-link {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #E1306C;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(225, 48, 108, 0.4);
-    z-index: 1000;
-}
+    <meta name="description" content="Mão na Roda - A plataforma que conecta você aos melhores profissionais e serviços em todo o Brasil. Peça um Mão na Roda agora!">
+    <meta name="keywords" content="serviços, encanador, eletricista, diarista, aplicativo de serviços, mão na roda, impetus">
+    <meta name="author" content="Impetus Startup">
+
+    <meta property="og:title" content="Mão na Roda - Mais que um App!">
+    <meta property="og:description" content="Garanta seu acesso antecipado à maior rede de serviços do Brasil.">
+    <meta property="og:image" content="https://www.appmaonaroda.com.br/logo.png">
+    <meta property="og:url" content="https://www.appmaonaroda.com.br">
+
+    <style>
         :root {
             --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
             --pure-black: #000000;
@@ -44,9 +34,8 @@
             min-height: 100vh;
             text-align: center;
             padding: 40px 20px;
-        }<a href="https://instagram.com/SEU_USER_AQUI" target="_blank" class="insta-link">📸 Siga @SEU_USER_AQUI</a>
+        }
 
-        /* Container para garantir que nada fique torto */
         .content-wrapper {
             max-width: 800px;
             width: 100%;
@@ -56,11 +45,10 @@
         }
 
         .logo {
-            width: 500px; /* Grande e imponente no PC */
-            max-width: 90%; /* Não deixa vazar da tela no celular */
+            width: 500px;
+            max-width: 90%;
             height: auto;
             margin-bottom: 30px;
-            display: block;
         }
 
         h1 {
@@ -101,11 +89,26 @@
             box-shadow: 0 15px 40px rgba(0, 124, 240, 0.5);
         }
 
-        /* Ajuste específico para Celular */
+        /* Botão Flutuante do Instagram */
+        .insta-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #E1306C;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(225, 48, 108, 0.4);
+            z-index: 1000;
+        }
+
         @media (max-width: 600px) {
-            .logo { width: 300px; } /* Diminui um pouco no celular para não ficar feio */
-            h1 { font-size: 2rem; }
-            p { font-size: 1rem; }
+            .logo { width: 300px; }
+            h1 { font-size: 2.2rem; }
+            .insta-link { bottom: 10px; right: 10px; padding: 10px 18px; }
         }
     </style>
 </head>
@@ -113,13 +116,12 @@
 
     <div class="content-wrapper">
         <img src="logo.png" alt="Mão na Roda Logo" class="logo">
-
         <h1>Mais que um App, uma <span class="gradient-text">Mão na Roda!</span></h1>
-        
         <p>Onde você estiver, a solução que você precisa. Conectando profissionais e clientes em todo o Brasil.</p>
-
         <a href="https://tally.so/r/Bzk5MK" class="btn">QUERO ACESSO ANTECIPADO</a>
     </div>
+
+    <a href="https://instagram.com/maonaroda.app" target="_blank" class="insta-link">📸 Siga no Instagram</a>
 
 </body>
 </html>
