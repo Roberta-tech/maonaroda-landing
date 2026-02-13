@@ -3,17 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Mão na Roda - Mais que um App!</title>
-    <meta name="description" content="Mão na Roda - A plataforma que conecta você aos melhores profissionais e serviços em todo o Brasil. Peça um Mão na Roda agora!">
-    <meta name="keywords" content="serviços, encanador, eletricista, diarista, aplicativo de serviços, mão na roda, impetus">
-    <meta name="author" content="Impetus Startup">
-
-    <meta property="og:title" content="Mão na Roda - Mais que um App!">
-    <meta property="og:description" content="Garanta seu acesso antecipado à maior rede de serviços do Brasil.">
-    <meta property="og:image" content="https://www.appmaonaroda.com.br/logo.png">
-    <meta property="og:url" content="https://www.appmaonaroda.com.br">
-
+    
+    <meta name="description" content="Mão na Roda - Conectando você aos melhores profissionais em todo o Brasil. Peça um Mão na Roda agora!">
+    <meta name="keywords" content="serviços, aplicativo, mão na roda, profissionais, tecnologia, impetus">
+    
     <style>
         :root {
             --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
@@ -48,7 +42,7 @@
             width: 500px;
             max-width: 90%;
             height: auto;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         h1 {
@@ -90,38 +84,26 @@
         }
 
         /* Botão Flutuante do Instagram */
-        .insta-link {
+        .insta-float {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #E1306C;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             color: white;
             padding: 12px 24px;
             border-radius: 30px;
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(225, 48, 108, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         @media (max-width: 600px) {
-            .logo { width: 300px; }
+            .logo { width: 350px; }
             h1 { font-size: 2.2rem; }
-            .insta-link { bottom: 10px; right: 10px; padding: 10px 18px; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="content-wrapper">
-        <img src="logo.png" alt="Mão na Roda Logo" class="logo">
-        <h1>Mais que um App, uma <span class="gradient-text">Mão na Roda!</span></h1>
-        <p>Onde você estiver, a solução que você precisa. Conectando profissionais e clientes em todo o Brasil.</p>
-        <a href="https://tally.so/r/Bzk5MK" class="btn">QUERO ACESSO ANTECIPADO</a>
-    </div>
-
-    <a href="https://www.instagram.com/impetus.tech" target="_blank" class="insta-link">📸 Siga no Instagram</a>
-
-</body>
-</html>
+            p { font-size: 1rem; }
+            .insta-float { bottom: 15px;
