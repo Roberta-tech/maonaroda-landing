@@ -9,10 +9,13 @@
             --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
             --pure-black: #000000;
         }
+        
+        * { box-sizing: border-box; }
+
         body {
             margin: 0;
             font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--pure-black); /* Fundo totalmente preto */
+            background-color: var(--pure-black);
             color: white;
             display: flex;
             flex-direction: column;
@@ -20,56 +23,83 @@
             justify-content: center;
             min-height: 100vh;
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
-        /* Logo 2x maior e imponente */
+
+        /* Container para garantir que nada fique torto */
+        .content-wrapper {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .logo {
-            width: 500px; 
+            width: 500px; /* Grande e imponente no PC */
+            max-width: 90%; /* Não deixa vazar da tela no celular */
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            display: block;
         }
+
         h1 {
-            font-size: 2.8rem;
-            margin-top: 0;
-            margin-bottom: 10px;
-            line-height: 1.2;
+            font-size: 3rem;
+            margin: 0 0 15px 0;
+            line-height: 1.1;
         }
+
         .gradient-text {
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: bold;
         }
+
         p {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #aaaaaa;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
+            line-height: 1.6;
             max-width: 600px;
         }
+
         .btn {
             background: var(--primary-gradient);
             color: white;
             text-decoration: none;
-            padding: 18px 35px;
-            border-radius: 35px;
+            padding: 20px 40px;
+            border-radius: 50px;
             font-weight: bold;
-            font-size: 1.2rem;
-            transition: transform 0.2s;
-            box-shadow: 0 4px 20px rgba(0, 124, 240, 0.4);
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 124, 240, 0.3);
         }
+
         .btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 124, 240, 0.5);
+        }
+
+        /* Ajuste específico para Celular */
+        @media (max-width: 600px) {
+            .logo { width: 300px; } /* Diminui um pouco no celular para não ficar feio */
+            h1 { font-size: 2rem; }
+            p { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <img src="logo.png" alt="Mão na Roda Logo" class="logo">
+    <div class="content-wrapper">
+        <img src="logo.png" alt="Mão na Roda Logo" class="logo">
 
-    <h1>Mais que um App, uma <span class="gradient-text">Mão na Roda!</span></h1>
-    <p>Onde você estiver, a solução que você precisa. Conectando profissionais e clientes em todo o Brasil.</p>
+        <h1>Mais que um App, uma <span class="gradient-text">Mão na Roda!</span></h1>
+        
+        <p>Onde você estiver, a solução que você precisa. Conectando profissionais e clientes em todo o Brasil.</p>
 
-    <a href="https://tally.so/r/Bzk5MK" class="btn">QUERO ACESSO ANTECIPADO</a>
+        <a href="https://tally.so/r/Bzk5MK" class="btn">QUERO ACESSO ANTECIPADO</a>
+    </div>
 
 </body>
 </html>
