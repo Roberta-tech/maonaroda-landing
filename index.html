@@ -1,110 +1,34 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mão na Roda - Mais que um App!</title>
-    
-    <meta name="description" content="Mão na Roda - Conectando você aos melhores profissionais em todo o Brasil. Peça um Mão na Roda agora!">
-    <meta name="keywords" content="serviços, aplicativo, mão na roda, profissionais, tecnologia, impetus">
-    
-    <style>
-        :root {
-            --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
-            --pure-black: #000000;
-        }
-        
-        * { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mão na Roda | Soluções Inteligentes</title>
+<style>
+:root { --pure-black: #000000; --main-gold: #D4AF37; --pure-white: #ffffff; --soft-gray: #1a1a1a; }
+body { background-color: var(--pure-black); color: var(--pure-white); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+.container { padding: 40px 20px; max-width: 450px; width: 100%; }
+.logo { font-size: 2.8rem; font-weight: bold; color: var(--main-gold); margin-bottom: 5px; }
+h2 { font-weight: 300; font-size: 1.1rem; margin-bottom: 30px; color: #aaa; }
+form { background: var(--soft-gray); padding: 30px; border-radius: 15px; border: 1px solid #333; }
+input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; }
+button { width: 100%; padding: 18px; background-color: var(--main-gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+.footer { margin-top: 50px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="logo">MÃO NA RODA</div>
+<h2>Sua solução inteligente está chegando.</h2>
+<form id="leadForm">
+<input type="text" id="name" placeholder="Nome Completo" required>
+<input type="email" id="email" placeholder="E-mail" required>
+<input type="tel" id="whatsapp" placeholder="WhatsApp (com DDD)" required>
+<button type="submit" id="btnEnviar">QUERO SER AVISADO</button>
+</form>
+<div class="footer">UMA STARTUP ÍMPETUS © 2026</div>
+</div>
 
-        body {
-            margin: 0;
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--pure-black);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .content-wrapper {
-            max-width: 800px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .logo {
-            width: 500px;
-            max-width: 90%;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin: 0 0 15px 0;
-            line-height: 1.1;
-        }
-
-        .gradient-text {
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-        }
-
-        p {
-            font-size: 1.2rem;
-            color: #aaaaaa;
-            margin-bottom: 50px;
-            line-height: 1.6;
-            max-width: 600px;
-        }
-
-        .btn {
-            background: var(--primary-gradient);
-            color: white;
-            text-decoration: none;
-            padding: 20px 40px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 124, 240, 0.3);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 124, 240, 0.5);
-        }
-
-        /* Botão Flutuante do Instagram */
-        .insta-float {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        @media (max-width: 600px) {
-            .logo { width: 350px; }
-            h1 { font-size: 2.2rem; }
-            p { font-size: 1rem; }
-            .insta-float { bottom: 15px;
-                    
+</body>
+</html>
