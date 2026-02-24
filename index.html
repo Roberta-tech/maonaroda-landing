@@ -1,34 +1,61 @@
 <!DOCTYPE html>
-
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mão na Roda | Soluções Inteligentes</title>
-<style>
-:root { --pure-black: #000000; --main-gold: #D4AF37; --pure-white: #ffffff; --soft-gray: #1a1a1a; }
-body { background-color: var(--pure-black); color: var(--pure-white); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
-.container { padding: 40px 20px; max-width: 450px; width: 100%; }
-.logo { font-size: 2.8rem; font-weight: bold; color: var(--main-gold); margin-bottom: 5px; }
-h2 { font-weight: 300; font-size: 1.1rem; margin-bottom: 30px; color: #aaa; }
-form { background: var(--soft-gray); padding: 30px; border-radius: 15px; border: 1px solid #333; }
-input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; }
-button { width: 100%; padding: 18px; background-color: var(--main-gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-.footer { margin-top: 50px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 2px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mão na Roda - Mais que um App!</title>
+    <style>
+        :root { --primary-gradient: linear-gradient(90deg, #007cf0, #00dfd8); --pure-black: #000000; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background-color: var(--pure-black); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 40px 20px; }
+        .container { max-width: 500px; width: 100%; }
+        .logo-text { font-size: 3rem; font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        h2 { font-weight: 300; opacity: 0.8; margin-bottom: 40px; }
+        .form-card { background: #111; padding: 40px; border-radius: 20px; border: 1px solid #222; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: white; font-size: 1rem; }
+        button { width: 100%; padding: 18px; background: var(--primary-gradient); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: transform 0.2s; }
+        button:hover { transform: scale(1.02); }
+        .social-btn { margin-top: 30px; display: inline-flex; align-items: center; gap: 10px; color: #888; text-decoration: none; font-size: 0.9rem; }
+        .social-btn:hover { color: white; }
+    </style>
 </head>
 <body>
-<div class="container">
-<div class="logo">MÃO NA RODA</div>
-<h2>Sua solução inteligente está chegando.</h2>
-<form id="leadForm">
-<input type="text" id="name" placeholder="Nome Completo" required>
-<input type="email" id="email" placeholder="E-mail" required>
-<input type="tel" id="whatsapp" placeholder="WhatsApp (com DDD)" required>
-<button type="submit" id="btnEnviar">QUERO SER AVISADO</button>
-</form>
-<div class="footer">UMA STARTUP ÍMPETUS © 2026</div>
-</div>
-
+    <div class="container">
+        <div class="logo-text">MÃO NA RODA</div>
+        <h2>Sua solução inteligente está chegando.</h2>
+        <div class="form-card">
+            <form id="leadForm">
+                <input type="text" id="name" placeholder="Nome Completo" required>
+                <input type="email" id="email" placeholder="E-mail" required>
+                <input type="tel" id="whatsapp" placeholder="WhatsApp (com DDD)" required>
+                <button type="submit" id="btnSubmit">QUERO SER AVISADO</button>
+            </form>
+        </div>
+        <a href="https://instagram.com/maonarodaapp" class="social-btn" target="_blank">Siga-nos no Instagram @maonarodaapp</a>
+        <div style="margin-top: 40px; font-size: 0.7rem; color: #444; letter-spacing: 2px;">UMA STARTUP ÍMPETUS © 2026</div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js";
+        const firebaseConfig = { projectId: "impetus-mvp", appId: "1:275988514199:web:95f1906a6c38f4d8e56dc8" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        document.getElementById('leadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true; btn.innerText = 'ENVIANDO...';
+            try {
+                await addDoc(collection(db, "leads"), {
+                    nome: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    whatsapp: document.getElementById('whatsapp').value,
+                    data_cadastro: new Date().toISOString()
+                });
+                alert('Sucesso! Cadastro realizado.');
+                e.target.reset();
+            } catch (error) { alert('Erro ao enviar.'); }
+            finally { btn.disabled = false; btn.innerText = 'QUERO SER AVISADO'; }
+        });
+    </script>
 </body>
 </html>
