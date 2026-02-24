@@ -6,15 +6,16 @@
     <title>Mão na Roda - Mais que um App!</title>
     
     <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <script async src="https://tally.so/widgets/embed.js"></script>
 
     <style>
         :root { --primary-blue: #00AEEF; --pure-black: #000000; --insta-pink: #E1306C; }
-        body { background-color: var(--pure-black); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+        body { background-color: var(--pure-black); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; overflow-x: hidden; }
         .container { padding: 20px; max-width: 600px; width: 100%; }
         .logo-img { width: 280px; margin-bottom: 20px; }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; line-height: 1.2; }
         h1 span { color: var(--primary-blue); }
         p { font-size: 1.1rem; opacity: 0.8; margin-bottom: 40px; }
         
@@ -29,11 +30,13 @@
             border: none;
             cursor: pointer;
             display: inline-block;
+            transition: 0.3s;
             box-shadow: 0 0 20px rgba(0, 174, 239, 0.4);
         }
+        .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 174, 239, 0.6); }
 
         .instagram-float { 
-            position: fixed; bottom: 30px; right: 30px; background-color: var(--insta-pink); color: white; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; font-weight: bold; z-index: 1000;
+            position: fixed; bottom: 30px; right: 30px; background-color: var(--insta-pink); color: white; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; font-weight: bold; z-index: 1000; transition: 0.3s;
         }
     </style>
 </head>
@@ -48,8 +51,10 @@
 
         <button 
             class="cta-button" 
-            data-tally-open="mO069v" 
-            data-tally-layout="modal">
+            data-tally-open="Bzk5MK" 
+            data-tally-layout="modal"
+            data-tally-emoji-text="👋" 
+            data-tally-emoji-animation="wave">
             QUERO ACESSO ANTECIPADO
         </button>
     </div>
