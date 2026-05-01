@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Mão na Roda - Encontre serviços em Araraquara">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mão na Roda">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Mão na Roda</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Estilo da tela de carregamento (Splash Screen) */
+    body {
+      background-color: #FFC107; /* Amarelo Impetus - mude se preferir outra cor */
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #000000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #000000;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-indicator">
+    <div class="loader"></div>
+    <div class="logo-text">Mão na Roda</div>
+    <p>Conectando Araraquara...</p>
+  </div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC43b3N7BI46tU0Xf4JzOB2FzMD4-th2ns"></script>
+
+  <script src="flutter_bootstrap.js" async></script>
+
+  <script>
+    // Remove o indicador de carregamento quando o app estiver pronto
+    window.addEventListener('load', function(ev) {
+      // O Flutter injeta o app aqui
+    });
+  </script>
+</body>
+</html>
