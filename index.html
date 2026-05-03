@@ -1,70 +1,280 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mão na Roda - Serviços Locais</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0A0A;
+            color: white;
+            overflow-x: hidden;
+        }
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Mão na Roda - Encontre serviços em Araraquara">
+        /* CABEÇALHO */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+            object-fit: cover;
+        }
+        .logo-title {
+            color: #00E5FF;
+            font-size: 22px;
+            font-weight: 900;
+            font-style: italic;
+            margin: 0;
+        }
+        .btn-header {
+            background-color: #ff0080;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-header:hover {
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.6);
+        }
 
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Mão na Roda">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+        /* HERO SECTION */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px 5%;
+            flex-wrap: wrap;
+        }
+        .hero-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        .hero-text h3 {
+            color: #00E5FF;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .hero-text h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin: 0 0 20px 0;
+            line-height: 1.1;
+        }
+        .hero-text p {
+            color: #aaa;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+        .btn-main {
+            display: inline-block;
+            background-color: #ff0080;
+            color: white;
+            text-decoration: none;
+            padding: 18px 35px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 16px;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.4);
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+        .btn-main:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.8);
+            transform: scale(1.02);
+        }
+        
+        .stores {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .store-btn {
+            display: flex;
+            align-items: center;
+            background: black;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+        }
+        .store-btn span {
+            display: block;
+            font-size: 10px;
+            color: #aaa;
+        }
+        .store-btn strong {
+            font-size: 16px;
+        }
 
-  <link rel="icon" type="image/png" href="favicon.png"/>
+        .hero-img {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            min-width: 300px;
+            margin-top: 40px;
+        }
+        .hero-img img {
+            width: 300px;
+            filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.3));
+        }
 
-  <title>Mão na Roda</title>
-  <link rel="manifest" href="manifest.json">
+        /* FEATURES */
+        .features {
+            background-color: #111;
+            padding: 80px 5%;
+            text-align: center;
+        }
+        .features h2 {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 50px;
+        }
+        .cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .card {
+            background-color: #1A1A1A;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 280px;
+            text-align: left;
+        }
+        .card h4 {
+            font-size: 18px;
+            margin: 15px 0 10px 0;
+        }
+        .card p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .icon-box {
+            background-color: rgba(255, 0, 128, 0.1);
+            color: #ff0080;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-  <style>
-    /* Estilo da tela de carregamento (Splash Screen) */
-    body {
-      background-color: #FFC107; /* Amarelo Impetus - mude se preferir outra cor */
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #000000;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .loader {
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #000000;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .logo-text {
-      font-size: 24px;
-      font-weight: bold;
-    }
-  </style>
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 40px 5%;
+            color: #aaa;
+            font-size: 12px;
+        }
+        footer a {
+            color: #00E5FF;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 800px) {
+            .hero-text h1 { font-size: 36px; text-align: center; }
+            .hero-text p { text-align: center; margin: 0 auto 30px auto; }
+            .hero-text h3 { text-align: center; }
+            .stores { justify-content: center; }
+            .btn-main { display: block; text-align: center; }
+            .btn-header { display: none; } /* Esconde botão topo no celular para ficar limpo */
+        }
+    </style>
 </head>
 <body>
-  <div id="loading-indicator">
-    <div class="loader"></div>
-    <div class="logo-text">Mão na Roda</div>
-    <p>Conectando Araraquara...</p>
-  </div>
 
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC43b3N7BI46tU0Xf4JzOB2FzMD4-th2ns"></script>
+    <header>
+        <div class="logo-container">
+            <img src="logo.oficial.png" alt="Logo Mão na Roda" class="logo-img">
+            <h2 class="logo-title">MÃO NA RODA</h2>
+        </div>
+        <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-header">Entrar na Lista VIP</a>
+    </header>
 
-  <script src="flutter_bootstrap.js" async></script>
+    <section class="hero">
+        <div class="hero-text">
+            <h3>O SEU APLICATIVO DE</h3>
+            <h1>Serviços Locais<br>na palma da mão.</h1>
+            <p>Conectamos você aos melhores profissionais da sua cidade. Elétrica, limpeza, reformas e muito mais com pagamento 100% seguro.<br><br>Garanta sua vaga no aplicativo fazendo o seu Pré-Cadastro hoje mesmo!</p>
+            
+            <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-main">FAZER PRÉ-CADASTRO AGORA</a>
+            
+            <div class="stores">
+                <div class="store-btn">
+                    <div>
+                        <span>Em breve na</span>
+                        <strong>App Store</strong>
+                    </div>
+                </div>
+                <div class="store-btn">
+                    <div>
+                        <span>Em breve no</span>
+                        <strong>Google Play</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-img">
+            <img src="logo.oficial.png" alt="Mão na Roda">
+        </div>
+    </section>
 
-  <script>
-    // Remove o indicador de carregamento quando o app estiver pronto
-    window.addEventListener('load', function(ev) {
-      // O Flutter injeta o app aqui
-    });
-  </script>
+    <section class="features">
+        <h2>POR QUE ESCOLHER O MÃO NA RODA?</h2>
+        <div class="cards">
+            <div class="card">
+                <div class="icon-box">🔒</div>
+                <h4>Pagamento Seguro</h4>
+                <p>Seu dinheiro fica protegido pela nossa taxa de custódia até o serviço ser finalizado.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box">⭐</div>
+                <h4>Profissionais Avaliados</h4>
+                <p>Todos os prestadores passam por verificação e são avaliados pelos próprios clientes.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box">📍</div>
+                <h4>Perto de Você</h4>
+                <p>Encontre rapidamente quem está disponível no seu bairro através do nosso sistema.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <strong>MÃO NA RODA © 2026</strong><br>
+        Desenvolvido por Impetus. Todos os direitos reservados.<br>
+        <a href="#">Política de Privacidade (Em breve)</a>
+    </footer>
+
 </body>
 </html>
