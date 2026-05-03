@@ -197,4 +197,131 @@
         .card:hover {
             border-color: rgba(0, 229, 255, 0.3);
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .card h4 {
+            font-size: 18px;
+            margin: 15px 0 10px 0;
+        }
+        .card p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .icon-box {
+            background-color: rgba(255, 0, 128, 0.1);
+            color: #ff0080;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 24px;
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 50px 5%;
+            color: #888;
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        footer strong { color: white; }
+        footer a {
+            color: #00E5FF;
+            text-decoration: none;
+            margin-top: 15px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        footer a:hover {
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 800px) {
+            .hero-text h1 { font-size: 38px; text-align: center; }
+            .hero-text p { text-align: center; margin: 0 auto 35px auto; font-size: 14px; }
+            .hero-text h3 { text-align: center; }
+            .stores { justify-content: center; }
+            .btn-main { display: block; text-align: center; }
+            
+            .logo-circle-frame {
+                width: 250px; /* Menor no celular para caber */
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="logo.oficial.png" alt="Logo Mão na Roda" class="logo-img-head">
+            <h2 class="logo-title">MÃO NA RODA</h2>
+        </div>
+        <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-header">Entrar na Lista VIP</a>
+    </header>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h3>O SEU APLICATIVO DE</h3>
+            <h1>Serviços Locais<br>na palma da mão.</h1>
+            <p>Conectamos você aos melhores profissionais da sua cidade. Elétrica, limpeza, reformas e muito mais com pagamento 100% seguro.<br><br>Garanta sua vaga no aplicativo fazendo o seu Pré-Cadastro hoje mesmo!</p>
+            
+            <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-main">FAZER PRÉ-CADASTRO AGORA</a>
+            
+            <div class="stores">
+                <div class="store-btn">
+                    <div>
+                        <span>Em breve na</span>
+                        <strong>App Store</strong>
+                    </div>
+                </div>
+                <div class="store-btn">
+                    <div>
+                        <span>Em breve no</span>
+                        <strong>Google Play</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-img">
+            <div class="logo-circle-frame">
+                <img src="logo.oficial.png" alt="Mão na Roda Oficial" class="logo-oficial-big">
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2>POR QUE ESCOLHER O MÃO NA RODA?</h2>
+        <div class="cards">
+            <div class="card">
+                <div class="icon-box">🔒</div>
+                <h4>Pagamento Seguro</h4>
+                <p>Seu dinheiro fica protegido pela nossa taxa de custódia até o serviço ser finalizado.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box">⭐</div>
+                <h4>Profissionais Avaliados</h4>
+                <p>Todos os prestadores passam por verificação e são avaliados pelos próprios clientes.</p>
+            </div>
+            <div class="card">
+                <div class="icon-box">📍</div>
+                <h4>Perto de Você</h4>
+                <p>Encontre rapidamente quem está disponível no seu bairro através do nosso sistema.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <strong>MÃO NA RODA © 2026</strong><br>
+        Desenvolvido por Impetus. Todos os direitos reservados.<br>
+        <a href="privacidade.html">Política de Privacidade</a>
+    </footer>
+
+</body>
+</html>
