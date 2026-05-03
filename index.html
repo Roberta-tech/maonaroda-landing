@@ -21,22 +21,26 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 5%;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: rgba(10, 10, 10, 0.9);
+            position: sticky; top: 0; z-index: 1000;
         }
         .logo-container {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .logo-img {
-            width: 50px;
-            height: 50px;
+        .logo-img-head {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+            /* Brilho Azul no header */
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
             object-fit: cover;
         }
         .logo-title {
             color: #00E5FF;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); /* Título brilha */
             font-size: 22px;
             font-weight: 900;
             font-style: italic;
@@ -49,10 +53,14 @@
             padding: 12px 25px;
             border-radius: 8px;
             font-weight: bold;
+            font-size: 14px;
             transition: 0.3s;
+            /* Brilho rosa */
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
         }
         .btn-header:hover {
-            box-shadow: 0 0 15px rgba(255, 0, 128, 0.6);
+            box-shadow: 0 0 25px rgba(255, 0, 128, 0.8), 0 0 10px rgba(255, 255, 255, 0.3);
+            transform: scale(1.03);
         }
 
         /* HERO SECTION */
@@ -60,7 +68,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 80px 5%;
+            padding: 100px 5% 80px 5%;
             flex-wrap: wrap;
         }
         .hero-text {
@@ -69,20 +77,23 @@
         }
         .hero-text h3 {
             color: #00E5FF;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
             letter-spacing: 2px;
+            font-size: 14px;
             margin-bottom: 5px;
         }
         .hero-text h1 {
-            font-size: 48px;
+            font-size: 55px;
             font-weight: 900;
             margin: 0 0 20px 0;
             line-height: 1.1;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
         .hero-text p {
             color: #aaa;
             font-size: 16px;
             line-height: 1.6;
-            margin-bottom: 40px;
+            margin-bottom: 45px;
             max-width: 500px;
         }
         .btn-main {
@@ -90,16 +101,17 @@
             background-color: #ff0080;
             color: white;
             text-decoration: none;
-            padding: 18px 35px;
+            padding: 18px 40px;
             border-radius: 12px;
             font-weight: 900;
             font-size: 16px;
-            box-shadow: 0 0 20px rgba(255, 0, 128, 0.4);
-            margin-bottom: 30px;
+            /* Brilho Neon Rosa Intenso */
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.6), 0 0 30px rgba(255, 0, 128, 0.3), 0 0 45px rgba(255, 0, 128, 0.1);
+            margin-bottom: 35px;
             transition: 0.3s;
         }
         .btn-main:hover {
-            box-shadow: 0 0 30px rgba(255, 0, 128, 0.8);
+            box-shadow: 0 0 25px rgba(255, 0, 128, 0.9), 0 0 10px rgba(255, 255, 255, 0.4);
             transform: scale(1.02);
         }
         
@@ -112,21 +124,23 @@
             display: flex;
             align-items: center;
             background: black;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 10px 20px;
             border-radius: 10px;
             color: white;
             text-decoration: none;
+            cursor: default;
         }
         .store-btn span {
             display: block;
             font-size: 10px;
-            color: #aaa;
+            color: #888;
         }
         .store-btn strong {
             font-size: 16px;
         }
 
+        /* 🛠️ MOLDURA NEON DA ENGRENAGEM PRINCIPAL */
         .hero-img {
             flex: 1;
             display: flex;
@@ -134,147 +148,53 @@
             min-width: 300px;
             margin-top: 40px;
         }
-        .hero-img img {
-            width: 300px;
-            filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.3));
+        .logo-circle-frame {
+            width: 400px; /* MAIOR */
+            height: 400px;
+            border-radius: 50%;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 🛠️ Moldura Neon Mista (Azul e Rosa) */
+            border: 4px solid #00E5FF;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 45px rgba(255, 0, 128, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.5);
+            padding: 15px;
+            overflow: hidden;
+        }
+        .logo-oficial-big {
+            width: 90%; /* Se ajusta dentro da moldura */
+            object-fit: contain;
         }
 
         /* FEATURES */
         .features {
-            background-color: #111;
-            padding: 80px 5%;
+            background-color: #0c0c0c;
+            padding: 100px 5%;
             text-align: center;
         }
         .features h2 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 900;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
         .cards {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             justify-content: center;
             flex-wrap: wrap;
         }
         .card {
             background-color: #1A1A1A;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 20px;
-            padding: 30px;
+            padding: 35px;
             width: 280px;
             text-align: left;
+            transition: 0.3s;
         }
-        .card h4 {
-            font-size: 18px;
-            margin: 15px 0 10px 0;
-        }
-        .card p {
-            color: #888;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .icon-box {
-            background-color: rgba(255, 0, 128, 0.1);
-            color: #ff0080;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        /* FOOTER */
-        footer {
-            text-align: center;
-            padding: 40px 5%;
-            color: #aaa;
-            font-size: 12px;
-        }
-        footer a {
-            color: #00E5FF;
-            text-decoration: none;
-            margin-top: 10px;
-            display: inline-block;
-        }
-
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 800px) {
-            .hero-text h1 { font-size: 36px; text-align: center; }
-            .hero-text p { text-align: center; margin: 0 auto 30px auto; }
-            .hero-text h3 { text-align: center; }
-            .stores { justify-content: center; }
-            .btn-main { display: block; text-align: center; }
-            .btn-header { display: none; } /* Esconde botão topo no celular para ficar limpo */
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo-container">
-            <img src="logo.oficial.png" alt="Logo Mão na Roda" class="logo-img">
-            <h2 class="logo-title">MÃO NA RODA</h2>
-        </div>
-        <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-header">Entrar na Lista VIP</a>
-    </header>
-
-    <section class="hero">
-        <div class="hero-text">
-            <h3>O SEU APLICATIVO DE</h3>
-            <h1>Serviços Locais<br>na palma da mão.</h1>
-            <p>Conectamos você aos melhores profissionais da sua cidade. Elétrica, limpeza, reformas e muito mais com pagamento 100% seguro.<br><br>Garanta sua vaga no aplicativo fazendo o seu Pré-Cadastro hoje mesmo!</p>
-            
-            <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-main">FAZER PRÉ-CADASTRO AGORA</a>
-            
-            <div class="stores">
-                <div class="store-btn">
-                    <div>
-                        <span>Em breve na</span>
-                        <strong>App Store</strong>
-                    </div>
-                </div>
-                <div class="store-btn">
-                    <div>
-                        <span>Em breve no</span>
-                        <strong>Google Play</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="hero-img">
-            <img src="logo.oficial.png" alt="Mão na Roda">
-        </div>
-    </section>
-
-    <section class="features">
-        <h2>POR QUE ESCOLHER O MÃO NA RODA?</h2>
-        <div class="cards">
-            <div class="card">
-                <div class="icon-box">🔒</div>
-                <h4>Pagamento Seguro</h4>
-                <p>Seu dinheiro fica protegido pela nossa taxa de custódia até o serviço ser finalizado.</p>
-            </div>
-            <div class="card">
-                <div class="icon-box">⭐</div>
-                <h4>Profissionais Avaliados</h4>
-                <p>Todos os prestadores passam por verificação e são avaliados pelos próprios clientes.</p>
-            </div>
-            <div class="card">
-                <div class="icon-box">📍</div>
-                <h4>Perto de Você</h4>
-                <p>Encontre rapidamente quem está disponível no seu bairro através do nosso sistema.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <strong>MÃO NA RODA © 2026</strong><br>
-        Desenvolvido por Impetus. Todos os direitos reservados.<br>
-        <a href="#">Política de Privacidade (Em breve)</a>
-    </footer>
-
-</body>
-</html>
+        .card:hover {
+            border-color: rgba(0, 229, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0
