@@ -1,327 +1,145 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mão na Roda - Serviços Locais</title>
+    <title>Mão na Roda - Conectando quem faz com quem precisa</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
         body {
             margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: #0A0A0A;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        /* CABEÇALHO */
-        header {
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0F172A;
+            color: #FFFFFF;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            padding: 20px 5%;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background-color: rgba(10, 10, 10, 0.9);
-            position: sticky; top: 0; z-index: 1000;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            background-color: rgba(15, 23, 42, 0.9);
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .logo-img-head {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            /* Brilho Azul no header */
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
-            object-fit: cover;
-        }
-        .logo-title {
-            color: #00E5FF;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); /* Título brilha */
-            font-size: 22px;
-            font-weight: 900;
-            font-style: italic;
-            margin: 0;
-        }
-        .btn-header {
-            background-color: #ff0080;
-            color: white;
-            text-decoration: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            transition: 0.3s;
-            /* Brilho rosa */
-            box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
-        }
-        .btn-header:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 128, 0.8), 0 0 10px rgba(255, 255, 255, 0.3);
-            transform: scale(1.03);
-        }
-
-        /* HERO SECTION */
-        .hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 100px 5% 80px 5%;
-            flex-wrap: wrap;
-        }
-        .hero-text {
-            flex: 1;
-            min-width: 300px;
-        }
-        .hero-text h3 {
-            color: #00E5FF;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-            letter-spacing: 2px;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .hero-text h1 {
-            font-size: 55px;
-            font-weight: 900;
-            margin: 0 0 20px 0;
-            line-height: 1.1;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-        }
-        .hero-text p {
-            color: #aaa;
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 45px;
-            max-width: 500px;
-        }
-        .btn-main {
-            display: inline-block;
-            background-color: #ff0080;
-            color: white;
-            text-decoration: none;
-            padding: 18px 40px;
-            border-radius: 12px;
-            font-weight: 900;
-            font-size: 16px;
-            /* Brilho Neon Rosa Intenso */
-            box-shadow: 0 0 15px rgba(255, 0, 128, 0.6), 0 0 30px rgba(255, 0, 128, 0.3), 0 0 45px rgba(255, 0, 128, 0.1);
-            margin-bottom: 35px;
-            transition: 0.3s;
-        }
-        .btn-main:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 128, 0.9), 0 0 10px rgba(255, 255, 255, 0.4);
-            transform: scale(1.02);
-        }
-        
-        .stores {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .store-btn {
-            display: flex;
-            align-items: center;
-            background: black;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            border-radius: 10px;
-            color: white;
-            text-decoration: none;
-            cursor: default;
-        }
-        .store-btn span {
-            display: block;
-            font-size: 10px;
-            color: #888;
-        }
-        .store-btn strong {
-            font-size: 16px;
-        }
-
-        /* 🛠️ MOLDURA NEON DA ENGRENAGEM PRINCIPAL */
-        .hero-img {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            min-width: 300px;
-            margin-top: 40px;
-        }
-        .logo-circle-frame {
-            width: 400px; /* MAIOR */
-            height: 400px;
-            border-radius: 50%;
-            background-color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* 🛠️ Moldura Neon Mista (Azul e Rosa) */
-            border: 4px solid #00E5FF;
-            box-shadow: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 45px rgba(255, 0, 128, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.5);
-            padding: 15px;
-            overflow: hidden;
-        }
-        .logo-oficial-big {
-            width: 90%; /* Se ajusta dentro da moldura */
-            object-fit: contain;
-        }
-
-        /* FEATURES */
-        .features {
-            background-color: #0c0c0c;
-            padding: 100px 5%;
-            text-align: center;
-        }
-        .features h2 {
-            font-size: 32px;
-            font-weight: 900;
-            margin-bottom: 60px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
-        .cards {
-            display: flex;
-            gap: 25px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .card {
-            background-color: #1A1A1A;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 35px;
-            width: 280px;
-            text-align: left;
-            transition: 0.3s;
-        }
-        .card:hover {
-            border-color: rgba(0, 229, 255, 0.3);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        .card h4 {
-            font-size: 18px;
-            margin: 15px 0 10px 0;
-        }
-        .card p {
-            color: #888;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .icon-box {
-            background-color: rgba(255, 0, 128, 0.1);
-            color: #ff0080;
             width: 50px;
             height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #00E5FF;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .brand-name {
+            margin-left: 15px;
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #FF4B91, #00E5FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        main {
+            margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+        }
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        p {
+            font-size: 20px;
+            color: #94A3B8;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
-            font-size: 24px;
-            box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);
+            gap: 10px;
+            cursor: pointer;
+            border: none;
         }
-
-        /* FOOTER */
-        footer {
-            text-align: center;
-            padding: 50px 5%;
-            color: #888;
-            font-size: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        .btn-android {
+            background: linear-gradient(90deg, #FF4B91, #FF7EB3);
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 75, 145, 0.3);
         }
-        footer strong { color: white; }
-        footer a {
+        .btn-android:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(255, 75, 145, 0.5);
+        }
+        .btn-web {
+            background-color: transparent;
             color: #00E5FF;
-            text-decoration: none;
-            margin-top: 15px;
-            display: inline-block;
-            transition: 0.3s;
+            border: 2px solid #00E5FF;
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.1);
         }
-        footer a:hover {
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
-        }
-
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 800px) {
-            .hero-text h1 { font-size: 38px; text-align: center; }
-            .hero-text p { text-align: center; margin: 0 auto 35px auto; font-size: 14px; }
-            .hero-text h3 { text-align: center; }
-            .stores { justify-content: center; }
-            .btn-main { display: block; text-align: center; }
-            
-            .logo-circle-frame {
-                width: 250px; /* Menor no celular para caber */
-                height: 250px;
-            }
+        .btn-web:hover {
+            background-color: rgba(0, 229, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0, 229, 255, 0.3);
         }
     </style>
 </head>
 <body>
-
     <header>
         <div class="logo-container">
-            <img src="logo.oficial.png" alt="Logo Mão na Roda" class="logo-img-head">
-            <h2 class="logo-title">MÃO NA RODA</h2>
+            <img src="logo.jpg" alt="Logo Mão na Roda">
         </div>
-        <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-header">Entrar na Lista VIP</a>
+        <div class="brand-name">MÃO NA RODA</div>
     </header>
-
-    <section class="hero">
-        <div class="hero-text">
-            <h3>O SEU APLICATIVO DE</h3>
-            <h1>Serviços Locais<br>na palma da mão.</h1>
-            <p>Conectamos você aos melhores profissionais da sua cidade. Elétrica, limpeza, reformas e muito mais com pagamento 100% seguro.<br><br>Garanta sua vaga no aplicativo fazendo o seu Pré-Cadastro hoje mesmo!</p>
-            
-            <a href="https://tally.so/r/Bzk5MK" target="_blank" class="btn-main">FAZER PRÉ-CADASTRO AGORA</a>
-            
-            <div class="stores">
-                <div class="store-btn">
-                    <div>
-                        <span>Em breve na</span>
-                        <strong>App Store</strong>
-                    </div>
-                </div>
-                <div class="store-btn">
-                    <div>
-                        <span>Em breve no</span>
-                        <strong>Google Play</strong>
-                    </div>
-                </div>
-            </div>
+    
+    <main>
+        <h1>Conectando quem faz com quem precisa!</h1>
+        <p>Encontre os melhores profissionais da sua região em poucos cliques. Serviços rápidos, seguros e eficientes direto no seu celular.</p>
+        
+        <div class="btn-container">
+            <a href="#" class="btn btn-android" onclick="alert('APK estará disponível em breve após a compilação final!')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Baixar para Android
+            </a>
+            <a href="webapp.html" class="btn btn-web">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                Acessar Versão Web
+            </a>
         </div>
-        <div class="hero-img">
-            <div class="logo-circle-frame">
-                <img src="logo.oficial.png" alt="Mão na Roda Oficial" class="logo-oficial-big">
-            </div>
-        </div>
-    </section>
-
-    <section class="features">
-        <h2>POR QUE ESCOLHER O MÃO NA RODA?</h2>
-        <div class="cards">
-            <div class="card">
-                <div class="icon-box">🔒</div>
-                <h4>Pagamento Seguro</h4>
-                <p>Seu dinheiro fica protegido pela nossa taxa de custódia até o serviço ser finalizado.</p>
-            </div>
-            <div class="card">
-                <div class="icon-box">⭐</div>
-                <h4>Profissionais Avaliados</h4>
-                <p>Todos os prestadores passam por verificação e são avaliados pelos próprios clientes.</p>
-            </div>
-            <div class="card">
-                <div class="icon-box">📍</div>
-                <h4>Perto de Você</h4>
-                <p>Encontre rapidamente quem está disponível no seu bairro através do nosso sistema.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <strong>MÃO NA RODA © 2026</strong><br>
-        Desenvolvido por Impetus. Todos os direitos reservados.<br>
-        <a href="privacidade.html">Política de Privacidade</a>
-    </footer>
-
+    </main>
 </body>
 </html>
