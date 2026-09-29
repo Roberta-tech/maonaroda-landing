@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+﻿const fs = require('fs');
+
+const htmlContent = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -599,3 +601,7 @@
 
 </body>
 </html>
+`;
+
+fs.writeFileSync('C:\\Caio\\maonaroda-landing\\index.html', htmlContent, 'utf8');
+console.log('Landing page HTML successfully updated!');
