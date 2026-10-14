@@ -124228,14 +124228,14 @@ A.baK.prototype={
 $0(){},
 $S:0}
 A.aR_.prototype={
-$1(a){var s=null,r=A.ch(a,s,t.o).w,q=A.dO(A.a4(s,s,B.j,s,s,new A.ai(B.lV,s,s,A.W(2),s,s,B.t),s,4,s,s,s,s,44),s,s),p=A.am(B.ahU,B.o,B.l,B.m,0),o=this.a,n=A.bt8("Conversar \ud83d\udcac",a,B.a79,B.yj,new A.aQX(a,o),"Atendimento Humanizado 24h \u2022 Toque para conversar","WhatsApp Oficial do Suporte"),m=A.bt8("Copiar E-mail",a,B.a8G,B.r,new A.aQY(a,o),"suporte@appmaonaroda.com.br","E-mail da Equipe de Atendimento"),l=A.W(16),k=A.be(B.cN,1),j=t.p
+$1(a){var s=null,r=A.ch(a,s,t.o).w,q=A.dO(A.a4(s,s,B.j,s,s,new A.ai(B.lV,s,s,A.W(2),s,s,B.t),s,4,s,s,s,s,44),s,s),p=A.am(B.ahU,B.o,B.l,B.m,0),o=this.a,n=A.bt8("Conversar \ud83d\udcac",a,B.a79,B.yj,new A.aQX(a,o),"(16) 99729-5604 \u2022 Atendimento Humanizado 24h","WhatsApp Oficial do Suporte"),m=A.bt8("Copiar E-mail",a,B.a8G,B.r,new A.aQY(a,o),"suporte@appmaonaroda.com.br","E-mail da Equipe de Atendimento"),l=A.W(16),k=A.be(B.cN,1),j=t.p
 return new A.aI(new A.ar(20,24,20,r.f.d+24),A.iS(A.aL(A.c([q,B.hv,p,B.cs,B.baK,B.l5,n,B.a0,m,B.a0,A.a4(s,A.aL(A.c([A.am(B.ahf,B.o,B.l,B.m,0),B.bG,B.baj],j),B.G,B.l,B.m),B.j,s,s,new A.ai(B.ab,s,k,l,s,s,B.t),s,s,s,B.fa,s,s,s),B.cE,A.bi(A.uP(B.a9J,B.bb8,new A.aQZ(a,o),A.nw(s,s,s,s,s,s,s,s,s,s,s,s,B.i2,s,new A.bD(A.W(12),B.z),B.x0,s,s,s,s)),s,1/0),B.cs],j),B.G,B.l,B.K),s,B.F,s,s,s,B.ak),s)},
 $S:291}
 A.aQX.prototype={
 $0(){var s=0,r=A.x(t.H),q=1,p=[],o=this,n,m,l,k
 var $async$$0=A.r(function(a,b){if(a===1){p.push(b)
 s=q}for(;;)switch(s){case 0:A.bQ(o.a,!1).c9(null)
-n=A.fw("https://wa.me/5516997428800?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20M%C3%A3o%20na%20Roda!",0,null)
+n=A.fw("https://wa.me/5516997295604?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20M%C3%A3o%20na%20Roda!",0,null)
 q=3
 s=6
 return A.p(A.bmh(n,B.acf),$async$$0)
@@ -140140,8 +140140,8 @@ B.b6=new A.BV(2,"antiAlias")
 B.eE=new A.BV(3,"antiAliasWithSaveLayer")
 B.a0y=new A.m2(u.F)
 B.a0z=new A.m2("suporte@appmaonaroda.com.br")
-B.a0A=new A.m2("16997428800")
 B.xJ=new A.m2("66.472.410/0001-43")
+B.a0A=new A.m2("16997295604")
 B.qd=new A.BZ(0,"pasteable")
 B.qe=new A.BZ(1,"unknown")
 B.b2k=new A.zX(1,"closeButton")
