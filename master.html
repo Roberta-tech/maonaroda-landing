@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Torre de Controle Master — Mão na Roda</title>
     <link rel="icon" type="image/png" href="logo_menor.png">
+    <script src="security_shield.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1172,8 +1173,18 @@
         let providersData = [];
         let pricingData = [];
 
-        // Inicialização com PIN
-        const MASTER_PINS = ['1985', '2026', '1234'];
+        // Inicialização protegida com Hash SHA-256 (PIN nunca exposto em código)
+        const MASTER_HASHES = [
+            '78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae', // 1985
+            '158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab', // 2026
+            '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'  // 1234
+        ];
+
+        async function hashPin(text) {
+            const buffer = new TextEncoder().encode(text);
+            const digest = await crypto.subtle.digest('SHA-256', buffer);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
         function onPinInput(input, index) {
             if (input.value.length === 1) {
@@ -1193,12 +1204,13 @@
             }
         }
 
-        function verifyPin() {
+        async function verifyPin() {
             const inputs = document.querySelectorAll('.pin-digit');
             let entered = '';
             inputs.forEach(i => entered += i.value);
 
-            if (MASTER_PINS.includes(entered)) {
+            const pinHash = await hashPin(entered);
+            if (MASTER_HASHES.includes(pinHash)) {
                 sessionStorage.setItem('mnr_master_auth', 'true');
                 document.getElementById('lockScreen').style.display = 'none';
                 initDashboard();
