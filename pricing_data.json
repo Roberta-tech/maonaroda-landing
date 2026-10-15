@@ -1,0 +1,226 @@
+{
+  "Eletricista (Reparos e fiação)": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "350,00 (diária 8h)", "price": 350.0}
+  ],
+  "Diarista (Faxina residencial ou comercial)": [
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "300,00 (diária 8h)", "price": 300.0}
+  ],
+  "Diarista(Faxineira)": [
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "300,00 (diária 8h)", "price": 300.0}
+  ],
+  "Faxineira": [
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "300,00 (diária 8h)", "price": 300.0}
+  ],
+  "Encanador (Vazamentos e hidráulica)": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "350,00 (diária 8h)", "price": 350.0}
+  ],
+  "Pedreiro (Pequenas obras e reformas)": [
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "400,00 (diária 8h)", "price": 400.0}
+  ],
+  "Pintor (Paredes, portões e texturas)": [
+    {"label": "150,00 (meia diária 4h)", "price": 150.0},
+    {"label": "200,00 (diária 8h)", "price": 200.0}
+  ],
+  "Marido de Aluguel (Instalação de varal, cortinas, suportes)": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "120,00 (a hora)", "price": 120.0}
+  ],
+  "Montador de Móveis (Móveis novos ou mudanças)": [
+    {"label": "100,00 (Pequeno)", "price": 100.0},
+    {"label": "200,00 (Médio)", "price": 200.0},
+    {"label": "300,00 (Grande)", "price": 300.0}
+  ],
+  "Técnico de Ar-Condicionado (Limpeza e instalação)": [
+    {"label": "150,00 (limpeza)", "price": 150.0},
+    {"label": "500,00 (instalação)", "price": 500.0}
+  ],
+  "Vidraceiro (Troca de vidros e box)": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "150,00 (troca de vidro simples)", "price": 150.0}
+  ],
+  "Serralheiro (Reparos em portões e grades)": [
+    {"label": "150,00 (ponto de solda)", "price": 150.0},
+    {"label": "250,00 (reparo local)", "price": 250.0}
+  ],
+  "Desentupidor (Emergências em pias e ralos)": [
+    {"label": "150,00 (serviço padrão pia/ralo)", "price": 150.0},
+    {"label": "300,00 (desentupimento complexo)", "price": 300.0}
+  ],
+  "Instalador de redes de segurança": [
+    {"label": "50,00 (por metro quadrado)", "price": 50.0},
+    {"label": "80,00 (reforçada por metro quadrado)", "price": 80.0}
+  ],
+  "Chaveiro": [
+    {"label": "120,00 (abertura residencial/comercial)", "price": 120.0}
+  ],
+  "Passadeira (Serviço por hora ou cesto)": [
+    {"label": "100,00 (por cesto)", "price": 100.0},
+    {"label": "200,00 (diária)", "price": 200.0}
+  ],
+  "Jardineiro (Poda de grama e manutenção de plantas)": [
+    {"label": "180,00 (diária)", "price": 180.0}
+  ],
+  "Limpador de Piscina (Tratamento químico e limpeza)": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "120,00 (limpeza)", "price": 120.0}
+  ],
+  "Dedetizador (Controle de pragas e insetos)": [
+    {"label": "300,00 (residência padrão)", "price": 300.0}
+  ],
+  "Limpador de Estofados (Lavagem a seco de sofás e tapetes)": [
+    {"label": "180,00 (sofá 02 lugares)", "price": 180.0},
+    {"label": "280,00 (sofá 03 lugares)", "price": 280.0}
+  ],
+  "Babá": [
+    {"label": "30,00 (por hora)", "price": 30.0},
+    {"label": "200,00 (diária 8h)", "price": 200.0}
+  ],
+  "Personal Organizer": [
+    {"label": "500,00 (diária de organização)", "price": 500.0}
+  ],
+  "Cuidador de idosos": [
+    {"label": "200,00 (plantão 12h)", "price": 200.0}
+  ],
+  "Fretes e Mudanças (Transporte de móveis e objetos)": [
+    {"label": "150,00 (frete local)", "price": 150.0}
+  ],
+  "Motoboy / Entregas (Documentos e encomendas rápidas)": [
+    {"label": "20,00 (corrida padrão)", "price": 20.0}
+  ],
+  "Ajudante de Carga (Braço forte para carregar)": [
+    {"label": "150,00 (diária)", "price": 150.0}
+  ],
+  "Manicure e Pedicure": [
+    {"label": "40,00 (apenas pé ou mão)", "price": 40.0},
+    {"label": "80,00 (pé e mão completo)", "price": 80.0}
+  ],
+  "Cabeleireiro(a) (Corte e química em domicílio)": [
+    {"label": "80,00 (escova)", "price": 80.0},
+    {"label": "100,00 (corte)", "price": 100.0},
+    {"label": "180,00 (química)", "price": 180.0}
+  ],
+  "Maquiadora (Eventos e festas)": [
+    {"label": "200,00 (maquiagem completa)", "price": 200.0}
+  ],
+  "Massoterapeuta (Massagem relaxante ou drenagem)": [
+    {"label": "150,00 (a sessão)", "price": 150.0}
+  ],
+  "Depiladora": [
+    {"label": "140,00 (combo axila, virilha e perna)", "price": 140.0}
+  ],
+  "Acupunturista": [
+    {"label": "100,00 (a sessão)", "price": 100.0}
+  ],
+  "Psicólogo": [
+    {"label": "120,00 (a sessão)", "price": 120.0}
+  ],
+  "Nutricionista": [
+    {"label": "150,00 (consulta + 01 retorno)", "price": 150.0}
+  ],
+  "Fisioterapeuta": [
+    {"label": "60,00 (a sessão)", "price": 60.0}
+  ],
+  "Personal Trainer": [
+    {"label": "40,00 (a aula)", "price": 40.0}
+  ],
+  "Dog Walker (Passeador de cães)": [
+    {"label": "30,00 (por hora)", "price": 30.0}
+  ],
+  "Pet Sitter (Cuidador de animais em casa)": [
+    {"label": "60,00 (visita por 1 hora)", "price": 60.0}
+  ],
+  "Banho e Tosa em Domicílio": [
+    {"label": "80,00 (Pequeno)", "price": 80.0},
+    {"label": "100,00 (Médio)", "price": 100.0},
+    {"label": "120,00 (Grande)", "price": 120.0}
+  ],
+  "Adestrador": [
+    {"label": "80,00 (aula 1 hora)", "price": 80.0}
+  ],
+  "Aulas Particulares (Reforço escolar ou idiomas)": [
+    {"label": "80,00 (aula 1 hora)", "price": 80.0}
+  ],
+  "Técnico de Informática (Formatação e redes)": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "100,00 (formatação)", "price": 100.0}
+  ],
+  "Desenvolvimento web e aplicativos": [
+    {"label": "10,00 (consultoria express teste)", "price": 10.0},
+    {"label": "150,00 (hora de consultoria)", "price": 150.0},
+    {"label": "300,00 (projeto / diária)", "price": 300.0}
+  ],
+  "Especialista em Inteligência artificial e machine learning": [
+    {"label": "150,00 (hora de consultoria)", "price": 150.0},
+    {"label": "300,00 (projeto / mentoria)", "price": 300.0}
+  ],
+  "Instalador de Câmeras/Segurança (CFTV e cercas elétricas)": [
+    {"label": "80,00 (mão de obra por câmera)", "price": 80.0}
+  ],
+  "Digital Influencer (promoção de redes sociais e comércios)": [
+    {"label": "300,00 (por publicação)", "price": 300.0}
+  ],
+  "Guincho": [
+    {"label": "200,00 (por remoção urbana)", "price": 200.0}
+  ],
+  "Borracheiro": [
+    {"label": "60,00 (reparos / 1 hora)", "price": 60.0}
+  ],
+  "Mecânico": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "120,00 (reparos por hora)", "price": 120.0}
+  ],
+  "Auto elétrica": [
+    {"label": "80,00 (visita)", "price": 80.0},
+    {"label": "120,00 (reparos por hora)", "price": 120.0}
+  ],
+  "Estética automotiva (Lavagem, polimento, higienização)": [
+    {"label": "100,00 (lavagem)", "price": 100.0},
+    {"label": "200,00 (higienização)", "price": 200.0},
+    {"label": "300,00 (polimento simples)", "price": 300.0}
+  ],
+  "Martelinho de ouro": [
+    {"label": "100,00 (Pequeno)", "price": 100.0},
+    {"label": "200,00 (Médio)", "price": 200.0},
+    {"label": "300,00 (Grande)", "price": 300.0}
+  ],
+  "Consultoria": [
+    {"label": "250,00 (consulta inicial)", "price": 250.0}
+  ],
+  "Advogado": [
+    {"label": "250,00 (consulta inicial)", "price": 250.0}
+  ],
+  "Contador": [
+    {"label": "200,00 (abertura de empresa)", "price": 200.0},
+    {"label": "500,00 (mensalidade)", "price": 500.0}
+  ],
+  "Assessor de Investimentos": [
+    {"label": "200,00 (hora)", "price": 200.0}
+  ],
+  "Diversos": [
+    {"label": "200,00 (hora)", "price": 200.0}
+  ],
+  "Segurança (bares, festas e eventos)": [
+    {"label": "40,00 (por hora)", "price": 40.0},
+    {"label": "250,00 (diária 08h)", "price": 250.0}
+  ],
+  "Garçom (servir comidas e bebidas)": [
+    {"label": "30,00 (por hora)", "price": 30.0},
+    {"label": "180,00 (diária 08h)", "price": 180.0}
+  ],
+  "Auxiliar de cozinha (manipulação de alimentos)": [
+    {"label": "30,00 (por hora)", "price": 30.0},
+    {"label": "180,00 (diária 08h)", "price": 180.0}
+  ],
+  "Fotógrafo": [
+    {"label": "200,00 (por hora)", "price": 200.0},
+    {"label": "400,00 (ensaio e cobertura 4h)", "price": 400.0}
+  ]
+}
