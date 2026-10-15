@@ -809,6 +809,46 @@
             margin-top: 4px;
         }
 
+        /* User Avatar & Info */
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            color: #FFF;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-cell-name {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-cell-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
         /* Notification Toast */
         #toast {
             position: fixed;
@@ -866,6 +906,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 <span>Radar de Chamados</span>
                 <span class="nav-badge" id="badgeOrders">0</span>
+            </div>
+
+            <div class="nav-item" onclick="switchTab('usuarios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Usuários & Sessões</span>
+                <span class="nav-badge" id="badgeUsers">0</span>
             </div>
 
             <div class="nav-item" onclick="switchTab('custodia')">
@@ -971,6 +1017,24 @@
                         <div class="metric-value" id="kpiTotalVolume">R$ 0,00</div>
                         <div class="metric-sub">Transacionado na plataforma</div>
                     </div>
+
+                    <div class="metric-card" style="--card-accent: var(--cyan);">
+                        <div class="metric-header">
+                            <span class="metric-label">Usuários Cadastrados</span>
+                            <div class="metric-icon">👥</div>
+                        </div>
+                        <div class="metric-value" id="kpiRadarUsers">0</div>
+                        <div class="metric-sub" id="kpiRadarUsersSub">Clientes & Prestadores Reais</div>
+                    </div>
+
+                    <div class="metric-card" style="--card-accent: var(--green);">
+                        <div class="metric-header">
+                            <span class="metric-label">Sessões / App Ao Vivo</span>
+                            <div class="metric-icon">📱</div>
+                        </div>
+                        <div class="metric-value" id="kpiRadarSessions">0</div>
+                        <div class="metric-sub">Pings de atividade recente</div>
+                    </div>
                 </div>
 
                 <div class="panel-card">
@@ -1002,6 +1066,81 @@
                                 <tr>
                                     <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
                                         Carregando chamados do Firestore...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: USUÁRIOS & SESSÕES AO VIVO -->
+            <section id="tab-usuarios" class="tab-panel">
+                <div class="metrics-grid">
+                    <div class="metric-card" style="--card-accent: var(--cyan);">
+                        <div class="metric-header">
+                            <span class="metric-label">Total de Contas</span>
+                            <div class="metric-icon">👥</div>
+                        </div>
+                        <div class="metric-value" id="kpiTotalUsers">0</div>
+                        <div class="metric-sub">Usuários no Firebase impetus-mvp</div>
+                    </div>
+
+                    <div class="metric-card" style="--card-accent: var(--pink);">
+                        <div class="metric-header">
+                            <span class="metric-label">Clientes</span>
+                            <div class="metric-icon">🛍️</div>
+                        </div>
+                        <div class="metric-value" id="kpiTotalClients">0</div>
+                        <div class="metric-sub">Contratantes na plataforma</div>
+                    </div>
+
+                    <div class="metric-card" style="--card-accent: var(--green);">
+                        <div class="metric-header">
+                            <span class="metric-label">Prestadores de Serviço</span>
+                            <div class="metric-icon">🛠️</div>
+                        </div>
+                        <div class="metric-value" id="kpiTotalPros">0</div>
+                        <div class="metric-sub">Profissionais cadastrados</div>
+                    </div>
+
+                    <div class="metric-card" style="--card-accent: var(--amber);">
+                        <div class="metric-header">
+                            <span class="metric-label">Conexões / Sessões Hoje</span>
+                            <div class="metric-icon">📡</div>
+                        </div>
+                        <div class="metric-value" id="kpiActiveSessions">0</div>
+                        <div class="metric-sub">Pings de telemetria Web & Mobile</div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>👥 Usuários Reais Cadastrados (Coleção: users)</span>
+                            <span class="badge badge-green" id="userLiveBadge">Sincronizado</span>
+                        </div>
+                        <div class="search-box">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="userSearch" class="search-input" placeholder="Buscar por nome, e-mail ou perfil..." oninput="filterUsers()">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>E-mail</th>
+                                    <th>Perfil</th>
+                                    <th>Telefone</th>
+                                    <th>Data de Cadastro</th>
+                                    <th>UID Firebase</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                        Carregando usuários do Firestore...
                                     </td>
                                 </tr>
                             </tbody>
@@ -1215,6 +1354,7 @@
 
         let db = null;
         let ordersData = [];
+        let usersData = [];
         let logsData = [];
         let providersData = [];
         let pricingData = [];
@@ -1300,6 +1440,7 @@
 
             const titles = {
                 radar: 'Radar Operacional de Chamados',
+                usuarios: 'Usuários Cadastrados & Sessões Ao Vivo',
                 custodia: 'Custódia Financeira & Escrow',
                 telemetria: 'Telemetria & Logs do Sistema',
                 prestadores: 'Prestadores Reais Cadastrados',
@@ -1328,6 +1469,7 @@
                 
                 // Conectar Listeners em Tempo Real
                 listenOrders();
+                listenUsers();
                 listenLogs();
 
                 // Carregar Dados Locais
@@ -1479,6 +1621,116 @@
             }
         }
 
+        // Escuta Usuários em Tempo Real
+        function listenUsers() {
+            db.collection('users').onSnapshot(snapshot => {
+                usersData = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.docId = doc.id;
+                    usersData.push(data);
+                });
+                renderUsers(usersData);
+                updateUserMetrics(usersData);
+            }, err => {
+                console.warn('Erro ao escutar users:', err);
+                renderUsers([]);
+            });
+        }
+
+        function updateUserMetrics(users) {
+            const total = users.length;
+            let clients = 0;
+            let pros = 0;
+
+            users.forEach(u => {
+                const p = (u.perfil || u.role || '').toLowerCase();
+                if (p.includes('prestador') || p.includes('profissional') || p.includes('pro')) {
+                    pros++;
+                } else {
+                    clients++;
+                }
+            });
+
+            document.getElementById('badgeUsers').textContent = total;
+            document.getElementById('kpiTotalUsers').textContent = total;
+            document.getElementById('kpiRadarUsers').textContent = total;
+            document.getElementById('kpiRadarUsersSub').textContent = `${clients} Clientes • ${pros} Prestadores`;
+            document.getElementById('kpiTotalClients').textContent = clients;
+            document.getElementById('kpiTotalPros').textContent = pros;
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                            Nenhum usuário cadastrado encontrado no Firestore.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(u => {
+                const name = u.display_name || u.displayName || u.nome || 'Usuário Sem Nome';
+                const email = u.email || 'Não informado';
+                const rawPerfil = (u.perfil || u.role || 'cliente').toLowerCase();
+                const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro');
+                const perfilBadge = isPro 
+                    ? '<span class="badge badge-green">🛠️ Prestador</span>' 
+                    : '<span class="badge badge-pink">🛍️ Cliente</span>';
+                const phone = u.phone_number || u.phoneNumber || u.telefone || 'Não informado';
+                const photo = u.photo_url || u.photoUrl || '';
+                const uid = u.uid || u.docId || '';
+
+                let createdStr = '--/--/----';
+                if (u.created_time || u.createdAt) {
+                    try {
+                        const raw = u.created_time || u.createdAt;
+                        const d = raw.toDate ? raw.toDate() : new Date(raw);
+                        createdStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    } catch(e) {}
+                }
+
+                const initial = (name.trim().charAt(0) || 'U').toUpperCase();
+                const avatarHtml = (photo && photo.startsWith('http'))
+                    ? `<div class="user-avatar"><img src="${photo}" alt="${name}" onerror="this.onerror=null; this.parentNode.innerHTML='${initial}';"></div>`
+                    : `<div class="user-avatar">${initial}</div>`;
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                ${avatarHtml}
+                                <div>
+                                    <div class="user-cell-name">${name}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">${email}</td>
+                        <td>${perfilBadge}</td>
+                        <td style="font-family: 'JetBrains Mono'; color: var(--text-secondary);">${phone}</td>
+                        <td style="color: var(--text-muted); font-size: 12px;">${createdStr}</td>
+                        <td><code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 12)}...</code></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterUsers() {
+            const q = document.getElementById('userSearch').value.toLowerCase();
+            const filtered = usersData.filter(u => {
+                const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
+                const email = (u.email || '').toLowerCase();
+                const perfil = (u.perfil || u.role || '').toLowerCase();
+                const phone = (u.phone_number || u.phoneNumber || u.telefone || '').toLowerCase();
+                return name.includes(q) || email.includes(q) || perfil.includes(q) || phone.includes(q);
+            });
+            renderUsers(filtered);
+        }
+
         // Escuta Logs em Tempo Real
         function listenLogs() {
             db.collection('logs_sistema').orderBy('timestamp', 'desc').limit(150).onSnapshot(snapshot => {
@@ -1501,11 +1753,18 @@
 
             let crits = 0;
             let warns = 0;
+            let sessionPings = 0;
+
             logs.forEach(l => {
                 const s = (l.severity || '').toUpperCase();
                 if (s === 'CRITICAL' || s === 'ERROR') crits++;
                 if (s === 'WARNING') warns++;
+                if ((l.category || '').toUpperCase().includes('SESSAO')) sessionPings++;
             });
+
+            const sessionCount = Math.max(sessionPings, 1);
+            if (document.getElementById('kpiActiveSessions')) document.getElementById('kpiActiveSessions').textContent = sessionCount;
+            if (document.getElementById('kpiRadarSessions')) document.getElementById('kpiRadarSessions').textContent = sessionCount;
 
             document.getElementById('kpiCriticalLogs').textContent = crits;
             document.getElementById('kpiWarnLogs').textContent = warns;
@@ -1830,6 +2089,7 @@
             showToast('🔄 Atualizando dados da Torre de Controle...');
             if (db) {
                 listenOrders();
+                listenUsers();
                 listenLogs();
                 loadPricing();
             }
