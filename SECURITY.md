@@ -26,5 +26,5 @@ O ecossistema **Mão na Roda** opera com isolamento rigoroso entre camadas:
 
 ## 3. Reporte de Vulnerabilidades
 Para reportar vulnerabilidades ou solicitar auditoria de segurança:
-- **E-mail Oficial**: `suporte@appmaonaroda.com.br` / `contato@impetustecnologia.com.br`
+- **E-mail Oficial**: `startup.impetus@gmail.com`
 - **Responsável Técnico**: Tech Lead — Impetus Tecnologia
