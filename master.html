@@ -945,10 +945,10 @@
 
         <div class="sidebar-footer">
             <div class="techlead-info">
-                <div class="techlead-avatar">RF</div>
+                <div class="techlead-avatar" id="sidebarAvatar">RF</div>
                 <div>
-                    <div class="techlead-name">Roberta Ferreira</div>
-                    <div class="techlead-role">Tech Lead & Founder</div>
+                    <div class="techlead-name" id="sidebarUserName">Roberta Ferreira</div>
+                    <div class="techlead-role" id="sidebarUserRole">Tech Lead & Founder</div>
                 </div>
             </div>
             <button class="btn-lock" title="Bloquear Painel" onclick="lockDashboard()">
@@ -1507,9 +1507,27 @@
                 db = firebase.firestore();
                 const curUser = firebase.auth().currentUser;
                 if (curUser) {
+                    const email = (curUser.email || '').toLowerCase();
                     document.getElementById('firestoreStatus').textContent = `Conectado como ${curUser.email}`;
                     const adminEl = document.getElementById('googleAuthText');
                     if (adminEl) adminEl.textContent = curUser.email;
+
+                    const nameEl = document.getElementById('sidebarUserName');
+                    const roleEl = document.getElementById('sidebarUserRole');
+                    const avEl = document.getElementById('sidebarAvatar');
+                    if (email === 'faturamento.impetus@gmail.com') {
+                        if (nameEl) nameEl.textContent = 'Tatiane';
+                        if (roleEl) roleEl.textContent = 'Gestão Financeira & Faturamento';
+                        if (avEl) avEl.textContent = 'TI';
+                    } else if (email.includes('roberta') || email === 'startup.impetus@gmail.com') {
+                        if (nameEl) nameEl.textContent = 'Roberta Ferreira';
+                        if (roleEl) roleEl.textContent = 'Tech Lead & Founder';
+                        if (avEl) avEl.textContent = 'RF';
+                    } else {
+                        if (nameEl) nameEl.textContent = curUser.displayName || 'Gestor Autorizado';
+                        if (roleEl) roleEl.textContent = 'Administração Impetus';
+                        if (avEl) avEl.textContent = (curUser.displayName || 'A').substring(0, 2).toUpperCase();
+                    }
                 } else {
                     document.getElementById('firestoreStatus').textContent = 'Firestore Conectado (impetus-mvp)';
                 }
