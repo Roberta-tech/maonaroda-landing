@@ -932,14 +932,14 @@
 
             <div class="nav-item" onclick="switchTab('prestadores')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span>Prestadores Oficiais</span>
-                <span class="nav-badge" id="badgeProv">371</span>
+                <span>Prestadores Cadastrados</span>
+                <span class="nav-badge" id="badgeProv">0</span>
             </div>
 
             <div class="nav-item" onclick="switchTab('precos')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 <span>Tabela de Preços</span>
-                <span class="nav-badge">60</span>
+                <span class="nav-badge" id="badgePricingCount">60</span>
             </div>
         </nav>
 
@@ -1290,20 +1290,31 @@
                 </div>
             </section>
 
-            <!-- TAB 4: PRESTADORES OFICIAIS -->
+            <!-- TAB 4: PRESTADORES REAIS DO SISTEMA -->
             <section id="tab-prestadores" class="tab-panel">
                 <div class="panel-card">
                     <div class="panel-header">
                         <div class="panel-title">
-                            <span>👥 371 Profissionais Cadastrados na Lista Oficial</span>
+                            <span id="provTitleHeader">👥 Prestadores Cadastrados no Aplicativo</span>
+                            <span class="badge badge-green" id="provRealBadge">100% Reais</span>
                         </div>
-                        <div class="search-box">
-                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <input type="text" id="provSearch" class="search-input" placeholder="Buscar por nome, profissão ou cidade..." oninput="filterProviders()">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <button id="btnFilterProsReal" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 6px 14px; border-radius: 6px;" onclick="setProvidersView('app')">
+                                    🛠️ Reais do App (<span id="countProsApp">0</span>)
+                                </button>
+                                <button id="btnFilterProsCat" class="btn-action" style="background: transparent; color: var(--text-secondary); border: none; padding: 6px 14px; border-radius: 6px;" onclick="setProvidersView('catalogo')">
+                                    📖 Catálogo Base (<span id="countProsCat">371</span>)
+                                </button>
+                            </div>
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="provSearch" class="search-input" placeholder="Buscar prestador por nome, serviço ou telefone..." oninput="filterProviders()">
+                            </div>
                         </div>
                     </div>
                     <div class="providers-grid" id="providersGrid">
-                        <!-- Populated by JavaScript from prestadores.json -->
+                        <!-- Renderizado via JavaScript dinâmico -->
                     </div>
                 </div>
             </section>
@@ -1313,10 +1324,13 @@
                 <div class="panel-card">
                     <div class="panel-header">
                         <div class="panel-title">
-                            <span>🏷️ Gestão de Preços & Categorias Oficiais (60 Categorias)</span>
+                            <span id="pricingTitleHeader">🏷️ Gestão de Preços & Categorias Oficiais (<span id="countCategorias">60</span> Categorias)</span>
                             <span class="badge badge-green" id="pricingSyncBadge">🟢 Sincronizado ao Vivo</span>
                         </div>
                         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn-action" style="background: var(--pink); border-color: var(--pink); color: #fff; font-weight: 700;" onclick="openNewCategoryModal()">
+                                ➕ Nova Categoria
+                            </button>
                             <button class="btn-action" style="border-color: var(--cyan); color: var(--cyan); font-weight: 700;" onclick="saveAllPricingToFirestore()">
                                 💾 Salvar Todos no Firestore
                             </button>
@@ -1334,7 +1348,7 @@
                                     <th style="min-width: 180px;">Modalidade / Duração</th>
                                     <th style="min-width: 240px;">Preço de Referência (R$)</th>
                                     <th style="min-width: 220px;">Observações & Regras</th>
-                                    <th style="min-width: 100px;">Ações</th>
+                                    <th style="min-width: 160px;">Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="pricingTableBody">
@@ -1347,6 +1361,81 @@
 
         </div>
     </main>
+
+    <!-- MODAL DE ATENDIMENTO & SUPORTE DO CHAMADO (TATIANE & ROBERTA) -->
+    <div id="supportModal" style="display: none; position: fixed; inset: 0; background: rgba(5,6,10,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 650px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
+            <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 id="supportModalTitle" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">💬 Central de Atendimento & Suporte ao Chamado</h3>
+                    <div id="supportModalSub" style="font-size: 12px; color: var(--cyan); margin-top: 4px; font-family: 'JetBrains Mono';">Chamado #--</div>
+                </div>
+                <button onclick="closeSupportModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer;">✕</button>
+            </div>
+            
+            <div id="supportModalBody" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px;">
+                <div id="supportOrderDetails" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; font-size: 13px;">
+                </div>
+
+                <div>
+                    <h4 style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">📜 Histórico de Atendimentos & Respostas</h4>
+                    <div id="supportMessagesList" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: #080A0E; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-size: 12px; color: var(--text-secondary);">Nova Mensagem ou Resposta Oficial:</label>
+                    <textarea id="supportInputMsg" rows="3" placeholder="Digite aqui para orientar o cliente/prestador ou registrar nota interna..." style="width: 100%; background: #0E121A; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; padding: 10px; font-family: inherit; font-size: 13px; outline: none; resize: vertical;"></textarea>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; flex-wrap: wrap; gap: 10px;">
+                        <select id="supportStatusSelect" style="background: #0E121A; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; padding: 8px 12px; font-size: 12px; outline: none;">
+                            <option value="em_atendimento">🟡 Em Atendimento</option>
+                            <option value="aguardando_cliente">🔵 Aguardando Cliente</option>
+                            <option value="aguardando_prestador">🟠 Aguardando Prestador</option>
+                            <option value="resolvido">🟢 Resolvido / Concluído</option>
+                        </select>
+                        <button class="btn-action" style="background: var(--pink); border-color: var(--pink); color: #fff; font-weight: 700; padding: 8px 18px;" onclick="sendSupportMessage()">
+                            ✉️ Registrar / Responder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE NOVA CATEGORIA -->
+    <div id="newCategoryModal" style="display: none; position: fixed; inset: 0; background: rgba(5,6,10,0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 520px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">➕ Incluir Nova Categoria Oficial</h3>
+                <button onclick="closeNewCategoryModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer;">✕</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Nome da Categoria *</label>
+                    <input type="text" id="newCatName" placeholder="Ex: Enfermeira Domiciliar, Cuidador de Pets..." style="width: 100%; background: #0E121A; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Modalidade / Duração *</label>
+                    <input type="text" id="newCatModalidade" placeholder="Ex: Plantão 12h, Visita, Por hora..." value="Visita / Por hora" style="width: 100%; background: #0E121A; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Preço de Referência (R$) *</label>
+                    <input type="text" id="newCatPreco" placeholder="Ex: 80,00 (visita) | 150,00 (diária)" value="150,00" style="width: 100%; background: #0E121A; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Observações & Regras</label>
+                    <input type="text" id="newCatObs" placeholder="Ex: Atendimento com garantia Mão na Roda." value="Atendimento com garantia e proteção Impetus Escrow." style="width: 100%; background: #0E121A; border: 1px solid var(--border-color); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 13px; outline: none;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+                    <button class="btn-action" style="padding: 10px 16px;" onclick="closeNewCategoryModal()">Cancelar</button>
+                    <button class="btn-action" style="background: var(--pink); border-color: var(--pink); color: #fff; font-weight: 700; padding: 10px 20px;" onclick="submitNewCategory()">
+                        🚀 Adicionar & Sincronizar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="toast">🔔 Mensagem da Torre de Controle</div>
 
@@ -1680,9 +1769,14 @@
                         </td>
                         <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
                         <td>
-                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="forceComplete('${o.docId}')" title="Confirmar e Liberar Custódia">
-                                🔓 Liberar
-                            </button>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="forceComplete('${o.docId}')" title="Confirmar e Liberar Custódia">
+                                    🔓 Liberar
+                                </button>
+                                <button class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: var(--pink); color: var(--pink);" onclick="openSupportModal('${o.docId}')" title="Atendimento e Mensagens do Chamado">
+                                    💬 Suporte
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -1755,6 +1849,13 @@
             document.getElementById('kpiRadarUsersSub').textContent = `${clients} Clientes • ${pros} Prestadores`;
             document.getElementById('kpiTotalClients').textContent = clients;
             document.getElementById('kpiTotalPros').textContent = pros;
+
+            // O Badge de Prestadores reflete rigorosamente os profissionais REAIS cadastrados no App
+            const badgeProv = document.getElementById('badgeProv');
+            if (badgeProv) badgeProv.textContent = pros;
+            const countProsApp = document.getElementById('countProsApp');
+            if (countProsApp) countProsApp.textContent = pros;
+            renderProviders();
         }
 
         function renderUsers(users) {
@@ -1929,88 +2030,141 @@
             showToast('🗑️ Visualização de logs limpa.');
         }
 
-        // Carregar Prestadores Oficiais em Tempo Real do Firestore
-        function loadProviders() {
-            try {
-                if (db) {
-                    db.collection('prestadores').onSnapshot(snapshot => {
-                        providersData = [];
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            data.docId = doc.id;
-                            providersData.push(data);
-                        });
-                        document.getElementById('badgeProv').textContent = providersData.length;
-                        renderProviders(providersData);
-                    }, async err => {
-                        console.warn('Fallback prestadores.json:', err);
-                        loadProvidersFallback();
-                    });
-                } else {
-                    loadProvidersFallback();
-                }
-            } catch(e) {
-                console.error('Erro ao conectar prestadores:', e);
-                loadProvidersFallback();
+        let currentProvView = 'app'; // 'app' (prestadores reais) ou 'catalogo' (externo)
+
+        function setProvidersView(view) {
+            currentProvView = view;
+            const btnApp = document.getElementById('btnFilterProsReal');
+            const btnCat = document.getElementById('btnFilterProsCat');
+            const titleEl = document.getElementById('provTitleHeader');
+            const badgeEl = document.getElementById('provRealBadge');
+
+            if (view === 'app') {
+                if (btnApp) { btnApp.style.background = 'var(--cyan)'; btnApp.style.color = '#000'; }
+                if (btnCat) { btnCat.style.background = 'transparent'; btnCat.style.color = 'var(--text-secondary)'; }
+                if (titleEl) titleEl.textContent = '👥 Prestadores Cadastrados no Aplicativo';
+                if (badgeEl) { badgeEl.textContent = '100% Reais'; badgeEl.className = 'badge badge-green'; }
+            } else {
+                if (btnApp) { btnApp.style.background = 'transparent'; btnApp.style.color = 'var(--text-secondary)'; }
+                if (btnCat) { btnCat.style.background = 'var(--pink)'; btnCat.style.color = '#fff'; }
+                if (titleEl) titleEl.textContent = '📖 Catálogo Base Telefônico (Araraquara)';
+                if (badgeEl) { badgeEl.textContent = 'Catálogo Local'; badgeEl.className = 'badge badge-amber'; }
             }
+            renderProviders();
+        }
+
+        function loadProviders() {
+            loadProvidersFallback();
         }
 
         async function loadProvidersFallback() {
             try {
                 const res = await fetch('prestadores.json');
                 providersData = await res.json();
-                document.getElementById('badgeProv').textContent = providersData.length;
-                renderProviders(providersData);
+                const countCat = document.getElementById('countProsCat');
+                if (countCat) countCat.textContent = providersData.length;
             } catch(e) {}
         }
 
-        function renderProviders(list) {
+        function renderProviders(customList) {
             const grid = document.getElementById('providersGrid');
-            if (!list || list.length === 0) {
-                grid.innerHTML = '<div style="color: var(--text-muted); padding: 40px; grid-column: 1 / -1; text-align: center;">Nenhum prestador encontrado no momento.</div>';
-                return;
-            }
-            grid.innerHTML = list.slice(0, 300).map(p => {
-                const name = p.nome || 'Profissional';
-                const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                let locStr = 'Araraquara, SP';
-                if (p.localizacao) {
-                    if (typeof p.localizacao === 'string') {
-                        locStr = p.localizacao;
-                    } else if (p.localizacao.latitude && p.localizacao.longitude) {
-                        locStr = `Araraquara, SP (${p.localizacao.latitude.toFixed(2)}, ${p.localizacao.longitude.toFixed(2)})`;
-                    }
+            if (!grid) return;
+
+            if (currentProvView === 'app') {
+                // Prestadores Reais do Firestore (Coleção users)
+                const realPros = (customList || usersData || []).filter(u => {
+                    const p = (u.perfil || u.role || '').toLowerCase();
+                    return p.includes('prestador') || p.includes('profissional') || p.includes('pro');
+                });
+
+                if (realPros.length === 0) {
+                    grid.innerHTML = '<div style="color: var(--text-muted); padding: 40px; grid-column: 1 / -1; text-align: center;">Nenhum prestador cadastrado no aplicativo ainda. Assim que um profissional se registrar pelo app ou pela web, ele aparecerá aqui instantaneamente.</div>';
+                    return;
                 }
-                const phone = p.telefone || 'Telefone não informado';
-                const role = p.profissao || 'Prestador de Serviço';
-                const whatsappClean = (phone || '').replace(/\D/g, '');
-                return `
-                    <div class="prov-card">
-                        <div class="prov-avatar">${initials}</div>
-                        <div class="prov-details">
-                            <div class="prov-name" title="${name}">${name}</div>
-                            <div class="prov-role" title="${role}">${role}</div>
-                            <div class="prov-location">📍 ${locStr}</div>
-                            <div class="prov-phone">
-                                <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none;">
-                                    📞 ${phone}
-                                </a>
+
+                grid.innerHTML = realPros.map(p => {
+                    const name = p.display_name || p.displayName || p.nome || 'Prestador Parceiro';
+                    const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    const phone = p.phone_number || p.phoneNumber || p.telefone || 'Telefone não informado';
+                    const email = p.email || 'E-mail não informado';
+                    const role = p.profissao || p.especialidade || 'Prestador Oficial';
+                    const whatsappClean = phone.replace(/\D/g, '');
+                    const photo = p.photo_url || p.photoUrl || '';
+
+                    return `
+                        <div class="prov-card" style="border-color: rgba(0, 229, 255, 0.25);">
+                            <div class="prov-avatar" style="${photo ? `background-image: url('${photo}'); background-size: cover; background-position: center;` : ''}">
+                                ${!photo ? initials : ''}
+                            </div>
+                            <div class="prov-details">
+                                <div class="prov-name" title="${name}">${name}</div>
+                                <div class="prov-role" style="color: var(--cyan); font-weight: 700;">🛠️ ${role}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">✉️ ${email}</div>
+                                <div class="prov-phone" style="margin-top: 4px;">
+                                    <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 600;">
+                                        📞 ${phone}
+                                    </a>
+                                </div>
+                                <div style="margin-top: 6px;"><span class="badge badge-green">🟢 Cadastrado no App</span></div>
                             </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            } else {
+                // Catálogo de Apoio (371 contatos)
+                const list = customList || providersData || [];
+                if (!list.length) {
+                    grid.innerHTML = '<div style="color: var(--text-muted); padding: 40px; grid-column: 1 / -1; text-align: center;">Nenhum contato encontrado no catálogo.</div>';
+                    return;
+                }
+                grid.innerHTML = list.slice(0, 300).map(p => {
+                    const name = p.nome || 'Profissional';
+                    const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    let locStr = 'Araraquara, SP';
+                    const phone = p.telefone || 'Telefone não informado';
+                    const role = p.profissao || 'Prestador';
+                    const whatsappClean = (phone || '').replace(/\D/g, '');
+                    return `
+                        <div class="prov-card">
+                            <div class="prov-avatar">${initials}</div>
+                            <div class="prov-details">
+                                <div class="prov-name" title="${name}">${name}</div>
+                                <div class="prov-role" title="${role}">${role}</div>
+                                <div class="prov-location">📍 ${locStr}</div>
+                                <div class="prov-phone">
+                                    <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none;">
+                                        📞 ${phone}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
 
         function filterProviders() {
             const q = document.getElementById('provSearch').value.toLowerCase();
-            const filtered = providersData.filter(p => 
-                (p.nome || '').toLowerCase().includes(q) ||
-                (p.profissao || '').toLowerCase().includes(q) ||
-                (typeof p.localizacao === 'string' && p.localizacao.toLowerCase().includes(q)) ||
-                (p.telefone || '').toLowerCase().includes(q)
-            );
-            renderProviders(filtered);
+            if (currentProvView === 'app') {
+                const filtered = (usersData || []).filter(u => {
+                    const p = (u.perfil || u.role || '').toLowerCase();
+                    const isPro = p.includes('prestador') || p.includes('profissional') || p.includes('pro');
+                    if (!isPro) return false;
+                    const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
+                    const email = (u.email || '').toLowerCase();
+                    const phone = (u.phone_number || u.phoneNumber || u.telefone || '').toLowerCase();
+                    const role = (u.profissao || u.especialidade || '').toLowerCase();
+                    return name.includes(q) || email.includes(q) || phone.includes(q) || role.includes(q);
+                });
+                renderProviders(filtered);
+            } else {
+                const filtered = providersData.filter(p => 
+                    (p.nome || '').toLowerCase().includes(q) ||
+                    (p.profissao || '').toLowerCase().includes(q) ||
+                    (p.telefone || '').includes(q)
+                );
+                renderProviders(filtered);
+            }
         }
 
         // Tabela Oficial Completa de Preços de Referência (60 Categorias) - Padrão Mão na Roda
@@ -2104,6 +2258,11 @@
         }
 
         function renderPricing(list) {
+            const countEl = document.getElementById('countCategorias');
+            if (countEl) countEl.textContent = activePricing.length;
+            const badgePreco = document.getElementById('badgePricingCount');
+            if (badgePreco) badgePreco.textContent = activePricing.length;
+
             const tbody = document.getElementById('pricingTableBody');
             if (!list || list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Nenhuma categoria encontrada.</td></tr>`;
@@ -2133,12 +2292,20 @@
                                title="Clique para editar a observação da categoria">
                     </td>
                     <td>
-                        <button class="btn-action" 
-                                style="padding: 6px 12px; font-size: 12px; border-color: var(--cyan); color: var(--cyan);" 
-                                onclick="savePriceRow(${idx})" 
-                                title="Salvar alteração desta categoria na nuvem">
-                            💾 Salvar
-                        </button>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <button class="btn-action" 
+                                    style="padding: 6px 10px; font-size: 12px; border-color: var(--cyan); color: var(--cyan);" 
+                                    onclick="savePriceRow(${idx})" 
+                                    title="Salvar alteração desta categoria na nuvem">
+                                💾 Salvar
+                            </button>
+                            <button class="btn-action" 
+                                    style="padding: 6px 10px; font-size: 12px; border-color: var(--pink); color: var(--pink);" 
+                                    onclick="deleteCategory(${idx})" 
+                                    title="Excluir categoria da plataforma">
+                                🗑️ Excluir
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
@@ -2233,6 +2400,171 @@
                 listenUsers();
                 listenLogs();
                 loadPricing();
+            }
+        }
+
+        // ================= GESTÃO DE CATEGORIAS (INCLUIR & EXCLUIR) =================
+        function openNewCategoryModal() {
+            document.getElementById('newCategoryModal').style.display = 'flex';
+            document.getElementById('newCatName').value = '';
+            document.getElementById('newCatModalidade').value = 'Visita / Por hora';
+            document.getElementById('newCatPreco').value = '150,00';
+            document.getElementById('newCatObs').value = 'Atendimento com garantia e proteção Impetus Escrow.';
+            document.getElementById('newCatName').focus();
+        }
+
+        function closeNewCategoryModal() {
+            document.getElementById('newCategoryModal').style.display = 'none';
+        }
+
+        async function submitNewCategory() {
+            const nome = document.getElementById('newCatName').value.trim();
+            const modalidade = document.getElementById('newCatModalidade').value.trim();
+            const preco = document.getElementById('newCatPreco').value.trim();
+            const observacao = document.getElementById('newCatObs').value.trim();
+
+            if (!nome) {
+                alert('Por favor, informe o nome da categoria.');
+                return;
+            }
+
+            const newId = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '_');
+            
+            // Adiciona no início da lista
+            activePricing.unshift({
+                id: newId,
+                categoria: nome,
+                modalidade: modalidade || 'Visita / Por hora',
+                preco: preco || '150,00',
+                observacao: observacao || '',
+                criadoEm: new Date().toISOString(),
+                criadoPor: 'Painel Master'
+            });
+
+            closeNewCategoryModal();
+            renderPricing(activePricing);
+            await saveAllPricingToFirestore();
+            showToast(`🚀 Categoria "${nome}" adicionada e sincronizada no app e na web!`);
+        }
+
+        async function deleteCategory(idx) {
+            const item = activePricing[idx];
+            if (!item) return;
+
+            if (!confirm(`Tem certeza que deseja excluir a categoria "${item.categoria}"?\nEsta alteração refletirá imediatamente no aplicativo e na versão web.`)) {
+                return;
+            }
+
+            const removedName = item.categoria;
+            activePricing.splice(idx, 1);
+            renderPricing(activePricing);
+            await saveAllPricingToFirestore();
+            showToast(`🗑️ Categoria "${removedName}" excluída com sucesso!`);
+        }
+
+        // ================= CENTRAL DE ATENDIMENTO & SUPORTE (TATIANE) =================
+        let currentSupportDocId = null;
+
+        function openSupportModal(docId) {
+            currentSupportDocId = docId;
+            const order = (ordersData || []).find(o => (o.id === docId || o.docId === docId));
+            if (!order) return;
+
+            document.getElementById('supportModal').style.display = 'flex';
+            document.getElementById('supportModalSub').textContent = `Chamado #${(order.id || order.docId || '').substring(0, 10)} • ${order.category || 'Geral'}`;
+
+            const clientEmail = order.clientEmail || '';
+            const clientName = order.clientName || 'Cliente';
+            const amount = parseFloat(order.amount || 0).toFixed(2).replace('.', ',');
+
+            document.getElementById('supportOrderDetails').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                    <div><strong>Cliente:</strong> ${clientName} <br><span style="color:var(--cyan); font-family:'JetBrains Mono'; font-size:11px;">${clientEmail}</span></div>
+                    <div><strong>Prestador:</strong> ${order.professionalName || 'Não atribuído'}</div>
+                    <div><strong>Valor em Custódia:</strong> <span style="color:var(--green); font-weight:700;">R$ ${amount}</span></div>
+                    <div><strong>Status:</strong> <span class="badge badge-cyan">${order.status || 'Pendente'}</span></div>
+                </div>
+            `;
+
+            renderSupportMessages(order);
+        }
+
+        function closeSupportModal() {
+            document.getElementById('supportModal').style.display = 'none';
+            currentSupportDocId = null;
+        }
+
+        function renderSupportMessages(order) {
+            const listEl = document.getElementById('supportMessagesList');
+            const messages = order.mensagens_suporte || [];
+            if (!messages.length) {
+                listEl.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 12px;">Nenhuma mensagem registrada ainda para este chamado. Digite abaixo para registrar um atendimento ou responder às partes.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = messages.map(m => `
+                <div style="background: rgba(255,255,255,0.03); border-left: 3px solid var(--cyan); padding: 8px 12px; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+                        <strong style="color: var(--text-primary);">${m.autor || 'Suporte Impetus'}</strong>
+                        <span>${m.dataHora || ''}</span>
+                    </div>
+                    <div style="font-size: 13px; color: #fff;">${m.texto || ''}</div>
+                </div>
+            `).join('');
+            listEl.scrollTop = listEl.scrollHeight;
+        }
+
+        async function sendSupportMessage() {
+            if (!currentSupportDocId) return;
+            const input = document.getElementById('supportInputMsg');
+            const statusSelect = document.getElementById('supportStatusSelect');
+            const text = (input.value || '').trim();
+            if (!text) {
+                alert('Digite uma mensagem ou resposta.');
+                return;
+            }
+
+            const curUser = firebase.auth().currentUser;
+            let authorName = 'Tatiane (Faturamento & Atendimento)';
+            if (curUser && (curUser.email || '').includes('roberta')) {
+                authorName = 'Roberta Ferreira (Tech Lead)';
+            }
+
+            const newMsg = {
+                autor: authorName,
+                autorEmail: curUser ? curUser.email : 'tatiane@appmaonaroda.com.br',
+                texto: text,
+                status: statusSelect.value,
+                dataHora: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit'}),
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await db.collection('solicitacoes_servico').doc(currentSupportDocId).update({
+                    mensagens_suporte: firebase.firestore.FieldValue.arrayUnion(newMsg),
+                    status_suporte: statusSelect.value,
+                    ultimo_atendimento: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await db.collection('logs_sistema').add({
+                    severity: 'INFO',
+                    category: 'SUPORTE_ATENDIMENTO',
+                    message: `Atendimento no chamado #${currentSupportDocId.substring(0, 8)} por ${authorName}: ${text.substring(0, 50)}...`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userEmail: curUser ? curUser.email : 'tatiane@impetus.com'
+                });
+
+                input.value = '';
+                showToast('✉️ Atendimento registrado e sincronizado no chamado!');
+                
+                const updatedOrder = ordersData.find(o => (o.id === currentSupportDocId || o.docId === currentSupportDocId));
+                if (updatedOrder) {
+                    if (!updatedOrder.mensagens_suporte) updatedOrder.mensagens_suporte = [];
+                    updatedOrder.mensagens_suporte.push(newMsg);
+                    renderSupportMessages(updatedOrder);
+                }
+            } catch(e) {
+                alert('Erro ao enviar mensagem: ' + e.message);
             }
         }
     </script>
