@@ -1631,6 +1631,27 @@
                     } catch(e) {}
                 }
 
+                // Cruzamento inteligente com base de usuários para identificar o cliente real
+                const clientEmail = (o.clientEmail || '').trim();
+                const clientUid = (o.clientUid || '').trim();
+                const matchedUser = (usersData || []).find(u => 
+                    (clientUid && (u.uid === clientUid || u.docId === clientUid)) ||
+                    (clientEmail && u.email && u.email.toLowerCase() === clientEmail.toLowerCase())
+                );
+
+                let clientDisplayName = '';
+                if (matchedUser && (matchedUser.display_name || matchedUser.displayName || matchedUser.nome)) {
+                    clientDisplayName = matchedUser.display_name || matchedUser.displayName || matchedUser.nome;
+                } else if (o.clientName && o.clientName !== 'Cliente Mão na Roda' && o.clientName !== 'Cliente') {
+                    clientDisplayName = o.clientName;
+                } else if (clientEmail) {
+                    clientDisplayName = clientEmail.split('@')[0];
+                } else {
+                    clientDisplayName = 'Cliente App';
+                }
+
+                const clientPhone = matchedUser ? (matchedUser.phone_number || matchedUser.phoneNumber || matchedUser.telefone || '') : '';
+
                 return `
                     <tr>
                         <td>
@@ -1641,8 +1662,15 @@
                             <strong>${o.category || 'Serviço Geral'}</strong>
                             <div style="font-size: 11px; color: var(--text-muted);">${o.paymentMethod === 'pix' ? 'Pagamento PIX Instantâneo' : 'Cartão de Crédito'}</div>
                         </td>
-                        <td>${o.professionalName || 'Profissional Mão na Roda'}</td>
-                        <td>${o.clientName || 'Cliente'}</td>
+                        <td>
+                            <div style="font-weight: 600;">${o.professionalName || 'Profissional Mão na Roda'}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${o.professionalRole || ''}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 700; color: var(--text-primary);">${clientDisplayName}</div>
+                            ${clientEmail ? `<div style="font-size: 11px; color: var(--cyan); font-family: 'JetBrains Mono'; font-weight: 600;">${clientEmail}</div>` : ''}
+                            ${clientPhone ? `<div style="font-size: 10px; color: var(--text-muted);">${clientPhone}</div>` : ''}
+                        </td>
                         <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--green);">
                             R$ ${parseFloat(o.amount || 0).toFixed(2).replace('.', ',')}
                         </td>
@@ -1667,7 +1695,8 @@
                 (o.id || '').toLowerCase().includes(q) ||
                 (o.category || '').toLowerCase().includes(q) ||
                 (o.professionalName || '').toLowerCase().includes(q) ||
-                (o.clientName || '').toLowerCase().includes(q)
+                (o.clientName || '').toLowerCase().includes(q) ||
+                (o.clientEmail || '').toLowerCase().includes(q)
             );
             renderOrders(filtered);
         }
@@ -1697,6 +1726,9 @@
                 });
                 renderUsers(usersData);
                 updateUserMetrics(usersData);
+                if (ordersData && ordersData.length > 0) {
+                    renderOrders(ordersData);
+                }
             }, err => {
                 console.warn('Erro ao escutar users:', err);
                 renderUsers([]);
