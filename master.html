@@ -1183,11 +1183,11 @@
 
                     <div class="metric-card" style="--card-accent: var(--pink);">
                         <div class="metric-header">
-                            <span class="metric-label">Taxa Plataforma (10%)</span>
+                            <span class="metric-label">Receita da Plataforma (10% + 10%)</span>
                             <div class="metric-icon">📈</div>
                         </div>
                         <div class="metric-value" id="kpiPlatformFee">R$ 0,00</div>
-                        <div class="metric-sub">Receita bruta Mão na Roda</div>
+                        <div class="metric-sub">10% Cliente + 10% Prestador</div>
                     </div>
 
                     <div class="metric-card" style="--card-accent: var(--amber);">
@@ -1202,11 +1202,11 @@
 
                 <div class="panel-card" style="padding: 24px;">
                     <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 12px; color: var(--cyan);">
-                        🛡️ Regra de Negócio de Custódia e Proteção Financeira
+                        🛡️ Regra Oficial de Negócio: Menor Taxa Operacional do Mercado & Custódia Garantida
                     </h3>
                     <p style="color: var(--text-secondary); line-height: 1.7; font-size: 14px; margin-bottom: 20px;">
-                        No Mão na Roda, o prestador recebe <strong>R$ 150,00 líquido</strong> (ou o valor acordado) e o cliente paga <strong>R$ 165,00</strong> (10% de taxa de garantia da plataforma). O valor é imediatamente retido no cofre de custódia.
-                        <strong>O prestador NÃO tem o saldo liberado para saque</strong> até que o cliente aperte o botão "Confirmar Conclusão & Liberar Pagamento" no aplicativo móvel. Isso garante 100% de satisfação e segurança contra calotes.
+                        No <strong>Mão na Roda</strong>, operamos com transparência e sustentabilidade com a menor taxa do mercado: o cliente paga o valor bruto do serviço mais 10% de taxa de garantia/custódia (ex: <strong>R$ 150 + R$ 15 = R$ 165</strong>), e o prestador recebe o valor do serviço menos 10% de taxa operacional (<strong>R$ 150 - R$ 15 = R$ 135 líquido</strong>). A plataforma retém R$ 30,00 por serviço padrão.
+                        O valor total fica 100% protegido no <strong>Cofre de Custódia</strong> e <strong>NÃO</strong> é liberado para a carteira até que o serviço seja concluído no local e o cliente aperte o botão "Confirmar Conclusão & Liberar Pagamento". Isso elimina calotes e traz segurança absoluta para ambas as partes.
                     </p>
                     <div style="display: flex; gap: 16px; flex-wrap: wrap;">
                         <div style="flex: 1; min-width: 280px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px;">
@@ -1662,10 +1662,15 @@
             let volume = 0;
             let escrow = 0;
             let released = 0;
+            let platformFeeTotal = 0;
 
             orders.forEach(o => {
                 const amount = parseFloat(o.amount || 0);
                 volume += amount;
+                const baseBruto = amount > 0 ? (amount / 1.10) : 0;
+                const repassePrestador = baseBruto * 0.90; // R$ 135 para base de R$ 150
+                const retencaoPlataforma = amount - repassePrestador; // R$ 30 (10% cliente + 10% prestador)
+                platformFeeTotal += retencaoPlataforma;
 
                 if (o.status === 'em_andamento' || o.status === 'pendente_aceite') {
                     active++;
@@ -1674,7 +1679,7 @@
                     pendingPix++;
                 } else if (o.status === 'concluido') {
                     completed++;
-                    released += (amount * 0.90); // 90% para o prestador
+                    released += repassePrestador;
                 }
             });
 
@@ -1687,7 +1692,7 @@
             document.getElementById('kpiEscrowTotal').textContent = `R$ ${escrow.toFixed(2).replace('.', ',')}`;
             document.getElementById('badgeCustodia').textContent = `R$ ${escrow.toFixed(2).replace('.', ',')}`;
             document.getElementById('kpiReleasedPrestadores').textContent = `R$ ${released.toFixed(2).replace('.', ',')}`;
-            document.getElementById('kpiPlatformFee').textContent = `R$ ${(volume * 0.10).toFixed(2).replace('.', ',')}`;
+            document.getElementById('kpiPlatformFee').textContent = `R$ ${platformFeeTotal.toFixed(2).replace('.', ',')}`;
             document.getElementById('kpiPixWithdrawals').textContent = `R$ ${released.toFixed(2).replace('.', ',')}`;
         }
 
@@ -1760,8 +1765,10 @@
                             ${clientEmail ? `<div style="font-size: 11px; color: var(--cyan); font-family: 'JetBrains Mono'; font-weight: 600;">${clientEmail}</div>` : ''}
                             ${clientPhone ? `<div style="font-size: 10px; color: var(--text-muted);">${clientPhone}</div>` : ''}
                         </td>
-                        <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--green);">
-                            R$ ${parseFloat(o.amount || 0).toFixed(2).replace('.', ',')}
+                        <td style="font-family: 'JetBrains Mono';">
+                            <div style="font-weight: 700; color: var(--green);">R$ ${parseFloat(o.amount || 0).toFixed(2).replace('.', ',')}</div>
+                            <div style="font-size: 10.5px; color: var(--cyan); font-weight: 600;">Líq: R$ ${((parseFloat(o.amount || 0) > 0 ? (parseFloat(o.amount || 0) / 1.10) : 0) * 0.90).toFixed(2).replace('.', ',')}</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">Taxa Impetus: R$ ${(parseFloat(o.amount || 0) - ((parseFloat(o.amount || 0) > 0 ? (parseFloat(o.amount || 0) / 1.10) : 0) * 0.90)).toFixed(2).replace('.', ',')}</div>
                         </td>
                         <td>
                             <span style="font-size: 12px; color: var(--text-secondary);">${o.prazoEstimado || 'Até 30 min (Até 1km)'}</span>
