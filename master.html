@@ -1712,9 +1712,12 @@
             tbody.innerHTML = orders.map(o => {
                 let badgeClass = 'badge-cyan';
                 let statusLabel = o.status || 'Pendente';
-                if (o.status === 'concluido') { badgeClass = 'badge-green'; statusLabel = 'Concluído'; }
-                else if (o.status === 'em_andamento') { badgeClass = 'badge-cyan'; statusLabel = 'Em Andamento'; }
-                else if (o.status === 'aguardando_pix') { badgeClass = 'badge-amber'; statusLabel = 'Aguardando PIX'; }
+                const isPaidStripe = (o.pagoConfirmado === true || o.status === 'em_andamento' || o.status === 'concluido' || o.paymentMethod === 'card_paid');
+                const isWaitingPayment = (o.status === 'aguardando_pix' || o.status === 'aguardando_pagamento' || !isPaidStripe);
+
+                if (o.status === 'concluido') { badgeClass = 'badge-green'; statusLabel = '✅ Concluído'; }
+                else if (o.status === 'em_andamento') { badgeClass = 'badge-cyan'; statusLabel = '⚡ Em Andamento'; }
+                else if (isWaitingPayment) { badgeClass = 'badge-amber'; statusLabel = '🟡 Aguardando Pagamento'; }
                 else if (o.status === 'cancelado') { badgeClass = 'badge-red'; statusLabel = 'Cancelado'; }
 
                 let dateStr = '--/--';
@@ -1727,6 +1730,7 @@
 
                 // Cruzamento inteligente com base de usuários para identificar o cliente real
                 const clientEmail = (o.clientEmail || '').trim();
+                const isDevOrder = (clientEmail.includes('roberta') || clientEmail.includes('impetus') || clientEmail.includes('caio') || (o.clientName || '').toLowerCase().includes('roberta'));
                 const clientUid = (o.clientUid || '').trim();
                 const matchedUser = (usersData || []).find(u => 
                     (clientUid && (u.uid === clientUid || u.docId === clientUid)) ||
@@ -1751,10 +1755,11 @@
                         <td>
                             <strong style="font-family: 'JetBrains Mono'; color: var(--cyan);">${(o.id || o.docId || '').substring(0, 8)}</strong>
                             <div style="font-size: 11px; color: var(--text-muted);">${dateStr}</div>
+                            ${isDevOrder ? '<div style="font-size: 9.5px; color: #ffb300; font-weight: 700; margin-top: 2px;">🧪 Simulação / Dev</div>' : '<div style="font-size: 9.5px; color: #00E676; font-weight: 700; margin-top: 2px;">✅ Chamado Externo</div>'}
                         </td>
                         <td>
                             <strong>${o.category || 'Serviço Geral'}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">${o.paymentMethod === 'pix' ? 'Pagamento PIX Instantâneo' : 'Cartão de Crédito'}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${o.paymentMethod === 'pix' || o.paymentMethod === 'pix_stripe' ? 'Pagamento PIX Stripe' : 'Cartão Stripe'}</div>
                         </td>
                         <td>
                             <div style="font-weight: 600;">${o.professionalName || 'Profissional Mão na Roda'}</div>
@@ -1782,6 +1787,9 @@
                                 </button>
                                 <button class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: var(--pink); color: var(--pink);" onclick="openSupportModal('${o.docId}')" title="Atendimento e Mensagens do Chamado">
                                     💬 Suporte
+                                </button>
+                                <button class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: rgba(255, 0, 128, 0.4); color: #ff5252;" onclick="confirmDeleteOrder('${o.docId}')" title="Excluir Chamado">
+                                    🗑️ Excluir
                                 </button>
                             </div>
                         </td>
@@ -1813,6 +1821,23 @@
                 showToast('✅ Chamado concluído e custódia liberada!');
             } catch(e) {
                 alert('Erro ao atualizar: ' + e.message);
+            }
+        }
+
+        async function confirmDeleteOrder(docId) {
+            if (!docId) return;
+            if (!confirm(`Deseja realmente EXCLUIR este chamado do sistema?\n\nID: #${docId.substring(0, 10)}\nEsta ação limpará o chamado do Radar e do histórico imediatamente.`)) return;
+
+            try {
+                showToast('⏳ Removendo chamado do sistema...');
+                await db.collection('solicitacoes_servico').doc(docId).delete();
+                try {
+                    await db.collection('orders').doc(docId).delete();
+                } catch(_) {}
+                showToast('🗑️ Chamado excluído com sucesso!');
+            } catch(err) {
+                console.error('Erro ao excluir chamado:', err);
+                alert('Erro ao excluir chamado: ' + err.message);
             }
         }
 
@@ -2093,26 +2118,49 @@
                     const name = p.display_name || p.displayName || p.nome || 'Prestador Parceiro';
                     const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                     const phone = p.phone_number || p.phoneNumber || p.telefone || 'Telefone não informado';
-                    const email = p.email || 'E-mail não informado';
+                    const email = (p.email || '').trim();
                     const role = p.profissao || p.especialidade || 'Prestador Oficial';
                     const whatsappClean = phone.replace(/\D/g, '');
                     const photo = p.photo_url || p.photoUrl || '';
+                    const isDevAccount = email.includes('roberta') || email.includes('impetus') || email.includes('caio') || email.includes('pinto') || email.includes('teste');
+                    const docNum = p.documento || p.cpf || p.cnpj || '';
+                    const tipoDoc = p.tipo_documento || (docNum.length === 14 ? 'CNPJ' : (docNum.length === 11 ? 'CPF' : 'Doc'));
+                    let dataCadStr = '';
+                    if (p.created_time) {
+                        try {
+                            const d = p.created_time.toDate ? p.created_time.toDate() : new Date(p.created_time);
+                            dataCadStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+                        } catch(e) {}
+                    }
 
                     return `
-                        <div class="prov-card" style="border-color: rgba(0, 229, 255, 0.25);">
-                            <div class="prov-avatar" style="${photo ? `background-image: url('${photo}'); background-size: cover; background-position: center;` : ''}">
-                                ${!photo ? initials : ''}
-                            </div>
-                            <div class="prov-details">
-                                <div class="prov-name" title="${name}">${name}</div>
-                                <div class="prov-role" style="color: var(--cyan); font-weight: 700;">🛠️ ${role}</div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">✉️ ${email}</div>
-                                <div class="prov-phone" style="margin-top: 4px;">
-                                    <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 600;">
+                        <div class="prov-card" style="border-color: ${isDevAccount ? 'rgba(255, 179, 0, 0.4)' : 'rgba(0, 229, 255, 0.35)'}; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <div class="prov-avatar" style="${photo ? `background-image: url('${photo}'); background-size: cover; background-position: center;` : ''}">
+                                        ${!photo ? initials : ''}
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div class="prov-name" title="${name}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
+                                        <div class="prov-role" style="color: var(--cyan); font-weight: 700; font-size: 12px;">🛠️ ${role}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); word-break: break-all;">✉️ ${email || 'Sem e-mail'}</div>
+                                <div class="prov-phone" style="margin-top: 3px;">
+                                    <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 600; font-size: 12px;">
                                         📞 ${phone}
                                     </a>
                                 </div>
-                                <div style="margin-top: 6px;"><span class="badge badge-green">🟢 Cadastrado no App</span></div>
+                                <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                                    ${isDevAccount ? '<span class="badge badge-amber" style="font-size: 10px;">🧪 CONTA DE TESTE</span>' : '<span class="badge badge-green" style="font-size: 10px;">✅ PRESTADOR REAL</span>'}
+                                    ${docNum ? `<span class="badge badge-cyan" style="font-size: 10px;">📄 ${tipoDoc}: ${docNum.substring(0, 6)}...</span>` : '<span class="badge" style="background: rgba(255,255,255,0.08); color: #888; font-size: 10px;">Sem doc</span>'}
+                                </div>
+                                ${dataCadStr ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">📅 Cadastro: ${dataCadStr}</div>` : ''}
+                            </div>
+                            <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;">
+                                <button class="btn-action" style="background: rgba(255, 0, 128, 0.12); border: 1px solid var(--pink); color: #ff5252; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="confirmDeleteProvider('${p.docId}', '${name.replace(/'/g, "\\'")}', '${email}')">
+                                    <span>🗑️ Excluir Prestador</span>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -2171,6 +2219,31 @@
                     (p.telefone || '').includes(q)
                 );
                 renderProviders(filtered);
+            }
+        }
+
+        async function confirmDeleteProvider(docId, name, email) {
+            if (!docId) {
+                alert('ID do prestador não encontrado.');
+                return;
+            }
+            const confirmed = confirm(`Tem certeza que deseja APAGAR o prestador:\n\n"${name}" (${email})?\n\nEsta ação removerá o prestador definitivamente do banco de dados Firestore, sumindo imediatamente do Mapa e das buscas no App e na Web.`);
+            if (!confirmed) return;
+
+            try {
+                showToast('⏳ Removendo prestador do Firestore...');
+                await db.collection('users').doc(docId).delete();
+                try {
+                    await db.collection('prestadores').doc(docId).delete();
+                } catch(_) {}
+                try {
+                    const snap = await db.collection('prestadores').where('uid', '==', docId).get();
+                    snap.forEach(d => d.ref.delete());
+                } catch(_) {}
+                showToast(`✅ Prestador "${name}" excluído com sucesso do Firestore e do aplicativo!`);
+            } catch(err) {
+                console.error('Erro ao excluir prestador:', err);
+                alert('Erro ao excluir prestador: ' + err.message);
             }
         }
 
