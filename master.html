@@ -1522,14 +1522,38 @@
                     firebase.initializeApp(firebaseConfig);
                 }
                 const provider = new firebase.auth.GoogleAuthProvider();
-                const res = await firebase.auth().signInWithPopup(provider);
+                provider.setCustomParameters({ prompt: 'select_account' });
+                try {
+                    const res = await firebase.auth().signInWithPopup(provider);
+                    sessionStorage.setItem('mnr_master_auth', 'true');
+                    document.getElementById('lockScreen').style.display = 'none';
+                    initDashboard();
+                    showToast('🚀 Bem-vinda, ' + (res.user.displayName || res.user.email) + '!');
+                    return;
+                } catch(popupErr) {
+                    console.warn('Popup falhou ou bloqueado pelo navegador:', popupErr);
+                    promptEmailPasswordLogin();
+                }
+            } catch(e) {
+                console.error('Erro Google Auth:', e);
+                promptEmailPasswordLogin();
+            }
+        }
+
+        async function promptEmailPasswordLogin() {
+            const email = prompt('O navegador bloqueou a janela do Google (Cookies de terceiros).\n\nInforme seu e-mail de Administradora para entrar:', 'startup.impetus@gmail.com');
+            if (!email) return;
+            const pass = prompt(`Digite a senha de acesso para "${email}":`);
+            if (!pass) return;
+            try {
+                showToast('⏳ Autenticando com e-mail e senha...');
+                const res = await firebase.auth().signInWithEmailAndPassword(email.trim(), pass.trim());
                 sessionStorage.setItem('mnr_master_auth', 'true');
                 document.getElementById('lockScreen').style.display = 'none';
                 initDashboard();
                 showToast('🚀 Bem-vinda, ' + (res.user.displayName || res.user.email) + '!');
-            } catch(e) {
-                console.error('Erro Google Auth:', e);
-                document.getElementById('lockError').textContent = 'Erro ao autenticar: ' + e.message;
+            } catch(err) {
+                alert('Erro ao entrar com e-mail e senha: ' + err.message);
             }
         }
 
@@ -2149,11 +2173,66 @@
 
         async function loadExcludedCatalog() {
             try {
+                const local = localStorage.getItem('mnr_catalog_excluded');
+                if (local) {
+                    excludedCatalogIds = JSON.parse(local);
+                }
+            } catch(_) {}
+
+            try {
                 const doc = await db.collection('configuracoes_sistema').doc('catalogo_excluidos').get();
                 if (doc.exists) {
-                    excludedCatalogIds = doc.data().ids || [];
+                    const remote = doc.data().ids || [];
+                    excludedCatalogIds = Array.from(new Set([...excludedCatalogIds, ...remote]));
+                    try {
+                        localStorage.setItem('mnr_catalog_excluded', JSON.stringify(excludedCatalogIds));
+                    } catch(_) {}
                 }
             } catch(e) {}
+        }
+
+        async function loadProvidersFallback() {
+            try {
+                await loadExcludedCatalog();
+                const res = await fetch('prestadores.json');
+                const rawList = await res.json();
+                providersData = rawList.filter(p => !excludedCatalogIds.includes(p.id || p.nome));
+                const countCat = document.getElementById('countProsCat');
+                if (countCat) countCat.textContent = providersData.length;
+                if (currentProvView === 'catalogo') renderProviders();
+            } catch(e) {}
+        }
+
+        async function confirmDeleteCatalogProvider(id, name) {
+            if (!confirm(`Deseja remover o prestador "${name}" do catálogo?\n\nEle será excluído imediatamente do painel.`)) return;
+            try {
+                showToast('⏳ Removendo contato do catálogo...');
+                if (!excludedCatalogIds.includes(id)) {
+                    excludedCatalogIds.push(id);
+                }
+
+                // Salva no armazenamento local (elimina qualquer erro de permissão na tela)
+                try {
+                    localStorage.setItem('mnr_catalog_excluded', JSON.stringify(excludedCatalogIds));
+                } catch(_) {}
+
+                // Sincroniza com o Firestore se tiver permissão
+                try {
+                    await db.collection('configuracoes_sistema').doc('catalogo_excluidos').set({
+                        ids: excludedCatalogIds,
+                        updated_at: new Date().toISOString()
+                    }, { merge: true });
+                } catch(_) {}
+
+                providersData = providersData.filter(p => (p.id || p.nome) !== id);
+                const countCat = document.getElementById('countProsCat');
+                if (countCat) countCat.textContent = providersData.length;
+                renderProviders();
+                showToast(`✅ "${name}" removido com sucesso do catálogo!`);
+            } catch(err) {
+                console.error(err);
+                showToast('Erro ao remover: ' + err.message);
+            }
         }
 
         let currentProvView = 'app'; // 'app' (prestadores reais) ou 'catalogo' (externo)
@@ -2181,40 +2260,6 @@
 
         function loadProviders() {
             loadProvidersFallback();
-        }
-
-        async function loadProvidersFallback() {
-            try {
-                await loadExcludedCatalog();
-                const res = await fetch('prestadores.json');
-                const rawList = await res.json();
-                providersData = rawList.filter(p => !excludedCatalogIds.includes(p.id || p.nome));
-                const countCat = document.getElementById('countProsCat');
-                if (countCat) countCat.textContent = providersData.length;
-                if (currentProvView === 'catalogo') renderProviders();
-            } catch(e) {}
-        }
-
-        async function confirmDeleteCatalogProvider(id, name) {
-            if (!confirm(`Deseja remover o prestador "${name}" do catálogo?\n\nEle será excluído imediatamente desta visualização e não aparecerá mais.`)) return;
-            try {
-                showToast('⏳ Removendo contato do catálogo...');
-                if (!excludedCatalogIds.includes(id)) {
-                    excludedCatalogIds.push(id);
-                }
-                await db.collection('configuracoes_sistema').doc('catalogo_excluidos').set({
-                    ids: excludedCatalogIds,
-                    updated_at: new Date().toISOString()
-                }, { merge: true });
-                providersData = providersData.filter(p => (p.id || p.nome) !== id);
-                const countCat = document.getElementById('countProsCat');
-                if (countCat) countCat.textContent = providersData.length;
-                renderProviders();
-                showToast(`✅ "${name}" removido com sucesso do catálogo!`);
-            } catch(err) {
-                console.error(err);
-                showToast('Erro ao remover: ' + err.message);
-            }
         }
 
         function renderProviders(customList) {
