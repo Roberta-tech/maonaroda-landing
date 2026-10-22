@@ -437,12 +437,15 @@
             padding: 22px;
             position: relative;
             overflow: hidden;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            user-select: none;
         }
 
         .metric-card:hover {
-            border-color: rgba(255, 255, 255, 0.16);
-            transform: translateY(-2px);
+            border-color: var(--card-accent, rgba(0, 229, 255, 0.5));
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
         }
 
         .metric-card::before {
@@ -993,7 +996,7 @@
             <!-- TAB 1: RADAR DE CHAMADOS -->
             <section id="tab-radar" class="tab-panel active">
                 <div class="metrics-grid">
-                    <div class="metric-card" style="--card-accent: var(--cyan);">
+                    <div class="metric-card" style="--card-accent: var(--cyan);" onclick="filterOrdersByStatus('em_andamento')" title="Clique para filtrar chamados ativos">
                         <div class="metric-header">
                             <span class="metric-label">Chamados Ativos</span>
                             <div class="metric-icon">⚡</div>
@@ -1002,7 +1005,7 @@
                         <div class="metric-sub">Em andamento ou pendente aceite</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--amber);">
+                    <div class="metric-card" style="--card-accent: var(--amber);" onclick="filterOrdersByStatus('aguardando_pix')" title="Clique para ver chamados aguardando PIX">
                         <div class="metric-header">
                             <span class="metric-label">Aguardando PIX / Pagamento</span>
                             <div class="metric-icon">⏳</div>
@@ -1011,7 +1014,7 @@
                         <div class="metric-sub">Gerados nas últimas horas</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--green);">
+                    <div class="metric-card" style="--card-accent: var(--green);" onclick="filterOrdersByStatus('concluido')" title="Clique para ver chamados concluídos">
                         <div class="metric-header">
                             <span class="metric-label">Chamados Concluídos</span>
                             <div class="metric-icon">✅</div>
@@ -1020,7 +1023,7 @@
                         <div class="metric-sub">Garantia concluída com sucesso</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--pink);">
+                    <div class="metric-card" style="--card-accent: var(--pink);" onclick="switchTab('custodia')" title="Clique para abrir Custódia & Caixa">
                         <div class="metric-header">
                             <span class="metric-label">Volume Total (R$)</span>
                             <div class="metric-icon">💰</div>
@@ -1029,7 +1032,7 @@
                         <div class="metric-sub">Transacionado na plataforma</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--cyan);">
+                    <div class="metric-card" style="--card-accent: var(--cyan);" onclick="switchTab('usuarios')" title="Clique para abrir Usuários & Sessões">
                         <div class="metric-header">
                             <span class="metric-label">Usuários Cadastrados</span>
                             <div class="metric-icon">👥</div>
@@ -1038,7 +1041,7 @@
                         <div class="metric-sub" id="kpiRadarUsersSub">Clientes & Prestadores Reais</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--green);">
+                    <div class="metric-card" style="--card-accent: var(--green);" onclick="switchTab('usuarios')" title="Clique para ver Sessões ao Vivo">
                         <div class="metric-header">
                             <span class="metric-label">Sessões / App Ao Vivo</span>
                             <div class="metric-icon">📱</div>
@@ -1230,7 +1233,7 @@
             <!-- TAB 3: TELEMETRIA & LOGS DO SISTEMA -->
             <section id="tab-telemetria" class="tab-panel">
                 <div class="metrics-grid">
-                    <div class="metric-card" style="--card-accent: var(--cyan);">
+                    <div class="metric-card" style="--card-accent: var(--cyan);" onclick="filterLogsBySev('ALL')" title="Clique para ver todos os logs">
                         <div class="metric-header">
                             <span class="metric-label">Total de Logs</span>
                             <div class="metric-icon">📝</div>
@@ -1239,7 +1242,7 @@
                         <div class="metric-sub">Eventos capturados</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--red);">
+                    <div class="metric-card" style="--card-accent: var(--red);" onclick="filterLogsBySev('CRITICAL')" title="Clique para filtrar apenas Erros Críticos">
                         <div class="metric-header">
                             <span class="metric-label">Erros Críticos</span>
                             <div class="metric-icon">🚨</div>
@@ -1248,7 +1251,7 @@
                         <div class="metric-sub">Falhas assíncronas ou crashes</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--amber);">
+                    <div class="metric-card" style="--card-accent: var(--amber);" onclick="filterLogsBySev('WARNING')" title="Clique para filtrar apenas Avisos">
                         <div class="metric-header">
                             <span class="metric-label">Avisos (Warnings)</span>
                             <div class="metric-icon">⚠️</div>
@@ -1257,7 +1260,7 @@
                         <div class="metric-sub">Tentativas de retry e alertas</div>
                     </div>
 
-                    <div class="metric-card" style="--card-accent: var(--green);">
+                    <div class="metric-card" style="--card-accent: var(--green);" onclick="filterLogsBySev('ALL')" title="Clique para verificar saúde do app">
                         <div class="metric-header">
                             <span class="metric-label">Saúde do App</span>
                             <div class="metric-icon">💚</div>
@@ -1272,9 +1275,14 @@
                         <div class="panel-title">
                             <span>⚡ Console de Telemetria ao Vivo (Firestore: logs_sistema)</span>
                         </div>
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border);">
+                                <button id="btnLogFilterAll" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('ALL')">Todos</button>
+                                <button id="btnLogFilterCrit" class="btn-action" style="background: transparent; color: var(--red); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('CRITICAL')">🚨 Apenas Erros</button>
+                                <button id="btnLogFilterWarn" class="btn-action" style="background: transparent; color: var(--amber); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('WARNING')">⚠️ Avisos</button>
+                            </div>
                             <button class="btn-action" onclick="exportLogs()">📥 Exportar JSON</button>
-                            <button class="btn-action" style="border-color: rgba(255, 61, 113, 0.4); color: var(--red);" onclick="clearLogs()">🗑️ Limpar</button>
+                            <button class="btn-action" style="border-color: rgba(255, 61, 113, 0.4); color: var(--red); font-weight: 700;" onclick="clearLogs()">🗑️ Limpar Erros no Firestore</button>
                         </div>
                     </div>
                     <div style="padding: 16px;">
@@ -2055,11 +2063,80 @@
             showToast('📥 Logs exportados com sucesso!');
         }
 
+        function filterOrdersByStatus(status) {
+            switchTab('radar');
+            const searchInput = document.getElementById('orderSearch');
+            if (searchInput) {
+                searchInput.value = status;
+                filterOrders();
+            }
+            const tableEl = document.getElementById('ordersTableBody');
+            if (tableEl) {
+                tableEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            showToast(`Filtrando chamados por: ${status}`);
+        }
+
+        function filterLogsBySev(sev) {
+            switchTab('telemetria');
+            const btnAll = document.getElementById('btnLogFilterAll');
+            const btnCrit = document.getElementById('btnLogFilterCrit');
+            const btnWarn = document.getElementById('btnLogFilterWarn');
+            if (btnAll) { btnAll.style.background = sev === 'ALL' ? 'var(--cyan)' : 'transparent'; btnAll.style.color = sev === 'ALL' ? '#000' : 'var(--text-secondary)'; }
+            if (btnCrit) { btnCrit.style.background = sev === 'CRITICAL' ? 'var(--red)' : 'transparent'; btnCrit.style.color = sev === 'CRITICAL' ? '#fff' : 'var(--red)'; }
+            if (btnWarn) { btnWarn.style.background = sev === 'WARNING' ? 'var(--amber)' : 'transparent'; btnWarn.style.color = sev === 'WARNING' ? '#000' : 'var(--amber)'; }
+
+            if (!logsData || logsData.length === 0) return;
+            if (sev === 'ALL') {
+                renderLogs(logsData);
+                showToast('Exibindo todos os logs do sistema.');
+            } else if (sev === 'CRITICAL') {
+                const filtered = logsData.filter(l => {
+                    const s = (l.severity || '').toUpperCase();
+                    return s === 'CRITICAL' || s === 'ERROR';
+                });
+                renderLogs(filtered);
+                showToast(`Filtrados: ${filtered.length} erros críticos.`);
+            } else if (sev === 'WARNING') {
+                const filtered = logsData.filter(l => (l.severity || '').toUpperCase() === 'WARNING');
+                renderLogs(filtered);
+                showToast(`Filtrados: ${filtered.length} avisos.`);
+            }
+            const termEl = document.getElementById('logTerminal');
+            if (termEl) {
+                termEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
         async function clearLogs() {
-            if (!confirm('Deseja limpar os logs recentes do painel?')) return;
-            logsData = [];
-            renderLogs([]);
-            showToast('🗑️ Visualização de logs limpa.');
+            if (!confirm('Deseja realmente limpar todos os logs e erros antigos do banco Firestore?\n\nIsso resetará os erros críticos para ZERO e restaurará a Saúde do App para 100% imediatamente.')) return;
+            try {
+                showToast('⏳ Limpando logs no Firestore...');
+                const snap = await db.collection('logs_sistema').limit(300).get();
+                if (!snap.empty) {
+                    const batch = db.batch();
+                    snap.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                }
+                logsData = [];
+                renderLogs([]);
+                updateLogMetrics([]);
+                showToast('✅ Todos os logs e erros antigos foram limpos do Firestore! Saúde do App restaurada para 100%.');
+            } catch(err) {
+                console.error('Erro ao limpar logs:', err);
+                showToast('❌ Erro ao limpar logs: ' + err.message);
+            }
+        }
+
+        let excludedCatalogIds = [];
+
+        async function loadExcludedCatalog() {
+            try {
+                const doc = await db.collection('configuracoes_sistema').doc('catalogo_excluidos').get();
+                if (doc.exists) {
+                    excludedCatalogIds = doc.data().ids || [];
+                }
+            } catch(e) {}
         }
 
         let currentProvView = 'app'; // 'app' (prestadores reais) ou 'catalogo' (externo)
@@ -2091,11 +2168,36 @@
 
         async function loadProvidersFallback() {
             try {
+                await loadExcludedCatalog();
                 const res = await fetch('prestadores.json');
-                providersData = await res.json();
+                const rawList = await res.json();
+                providersData = rawList.filter(p => !excludedCatalogIds.includes(p.id || p.nome));
                 const countCat = document.getElementById('countProsCat');
                 if (countCat) countCat.textContent = providersData.length;
+                if (currentProvView === 'catalogo') renderProviders();
             } catch(e) {}
+        }
+
+        async function confirmDeleteCatalogProvider(id, name) {
+            if (!confirm(`Deseja remover o prestador "${name}" do catálogo?\n\nEle será excluído imediatamente desta visualização e não aparecerá mais.`)) return;
+            try {
+                showToast('⏳ Removendo contato do catálogo...');
+                if (!excludedCatalogIds.includes(id)) {
+                    excludedCatalogIds.push(id);
+                }
+                await db.collection('configuracoes_sistema').doc('catalogo_excluidos').set({
+                    ids: excludedCatalogIds,
+                    updated_at: new Date().toISOString()
+                }, { merge: true });
+                providersData = providersData.filter(p => (p.id || p.nome) !== id);
+                const countCat = document.getElementById('countProsCat');
+                if (countCat) countCat.textContent = providersData.length;
+                renderProviders();
+                showToast(`✅ "${name}" removido com sucesso do catálogo!`);
+            } catch(err) {
+                console.error(err);
+                showToast('Erro ao remover: ' + err.message);
+            }
         }
 
         function renderProviders(customList) {
@@ -2180,17 +2282,26 @@
                     const role = p.profissao || 'Prestador';
                     const whatsappClean = (phone || '').replace(/\D/g, '');
                     return `
-                        <div class="prov-card">
-                            <div class="prov-avatar">${initials}</div>
-                            <div class="prov-details">
-                                <div class="prov-name" title="${name}">${name}</div>
-                                <div class="prov-role" title="${role}">${role}</div>
-                                <div class="prov-location">📍 ${locStr}</div>
-                                <div class="prov-phone">
-                                    <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none;">
-                                        📞 ${phone}
-                                    </a>
+                        <div class="prov-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <div class="prov-avatar">${initials}</div>
+                                    <div class="prov-details" style="flex: 1; min-width: 0;">
+                                        <div class="prov-name" title="${name}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
+                                        <div class="prov-role" title="${role}">🛠️ ${role}</div>
+                                        <div class="prov-location">📍 ${locStr}</div>
+                                        <div class="prov-phone" style="margin-top: 4px;">
+                                            <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none; font-size: 12px; font-weight: 600;">
+                                                📞 ${phone}
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                            <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+                                <button class="btn-action" style="background: rgba(255, 0, 128, 0.12); border: 1px solid var(--pink); color: #ff5252; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="confirmDeleteCatalogProvider('${(p.id || p.nome).replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}')">
+                                    <span>🗑️ Excluir do Catálogo</span>
+                                </button>
                             </div>
                         </div>
                     `;
