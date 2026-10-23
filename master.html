@@ -935,6 +935,12 @@
                 <span class="nav-badge" id="badgeProv">0</span>
             </div>
 
+            <div class="nav-item" onclick="switchTab('suporte-alertas')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span>Alertas & Auditoria</span>
+                <span class="nav-badge" id="badgeAlertas" style="background: rgba(255, 0, 128, 0.2); color: var(--pink); border: 1px solid var(--pink);">0</span>
+            </div>
+
             <div class="nav-item" onclick="switchTab('precos')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 <span>Tabela de Preços</span>
@@ -1353,6 +1359,57 @@
                             </thead>
                             <tbody id="pricingTableBody">
                                 <!-- Populated dynamically by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: ALERTAS & AUDITORIA DE SUPORTE (ROBERTA EXCLUSIVE) -->
+            <section id="tab-suporte-alertas" class="tab-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🚨 Auditoria Sigilosa de Suporte & Incidentes (<span id="countAlertas">0</span> Alertas)</span>
+                            <span class="badge badge-pink" id="alertasSyncBadge">🔴 Escuta Ativa em Tempo Real</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="alertSearch" class="search-input" placeholder="Buscar alerta por e-mail ou motivo..." oninput="filterAlerts()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px; padding: 14px 18px; border-radius: 12px; background: rgba(255, 0, 128, 0.08); border: 1px solid rgba(255, 0, 128, 0.25); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 24px;">🛡️</span>
+                            <div>
+                                <strong style="color: #fff; font-size: 13.5px;">Auditoria de Contatos com WhatsApp Comercial:</strong>
+                                <p style="margin: 2px 0 0; color: var(--text-muted); font-size: 12px;">Todos os acionamentos de suporte pelo app ou landing são notificados instantaneamente no e-mail sigiloso <strong style="color: var(--cyan);">startup.impetus@gmail.com</strong> e sincronizados aqui na Torre Master.</p>
+                            </div>
+                        </div>
+                        <span class="badge badge-cyan" style="font-family: 'JetBrains Mono'; font-size: 11px;">E-mail Roberta Ativo ✅</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 150px;">Data / Horário</th>
+                                    <th style="min-width: 140px;">Tipo de Evento</th>
+                                    <th style="min-width: 200px;">Usuário / E-mail</th>
+                                    <th style="min-width: 110px;">Origem</th>
+                                    <th style="min-width: 260px;">Motivo / Ocorrência</th>
+                                    <th style="min-width: 120px;">Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alertasTableBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        Aguardando acionamentos... Nenhuma ocorrência recente registrada.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -2893,6 +2950,79 @@
                 alert('Erro ao enviar mensagem: ' + e.message);
             }
         }
+        // ================= AUDITORIA DE ALERTAS DE SUPORTE (ROBERTA) =================
+        let rawAlertas = [];
+        try {
+            db.collection('alertas_suporte').orderBy('created_at', 'desc').limit(100).onSnapshot(snapshot => {
+                rawAlertas = [];
+                snapshot.forEach(doc => {
+                    rawAlertas.push({ id: doc.id, ...doc.data() });
+                });
+                renderAlertas(rawAlertas);
+            }, err => {
+                console.warn('Erro ao escutar alertas_suporte:', err);
+            });
+        } catch(e) {
+            console.warn(e);
+        }
+
+        function renderAlertas(list) {
+            const tbody = document.getElementById('alertasTableBody');
+            const countEl = document.getElementById('countAlertas');
+            const badgeEl = document.getElementById('badgeAlertas');
+            if (countEl) countEl.textContent = list.length;
+            if (badgeEl) badgeEl.textContent = list.length;
+
+            if (!tbody) return;
+
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Aguardando acionamentos... Nenhuma ocorrência recente registrada.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(a => {
+                let dtStr = 'Agora mesmo';
+                if (a.created_at) {
+                    try {
+                        const d = a.created_at.toDate ? a.created_at.toDate() : new Date(a.created_at);
+                        dtStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    } catch (_) {}
+                }
+                const isWhatsApp = a.tipo === 'whatsapp_clique';
+                const badgeColor = isWhatsApp ? 'badge-green' : 'badge-pink';
+                const badgeText = isWhatsApp ? '📱 WhatsApp Suporte' : '⚠️ Denúncia / Falha';
+
+                return `
+                    <tr>
+                        <td style="font-family: 'JetBrains Mono'; font-size: 11.5px; color: var(--text-muted);">${dtStr}</td>
+                        <td><span class="badge ${badgeColor}">${badgeText}</span></td>
+                        <td>
+                            <strong style="color: var(--text-primary); font-size: 12.5px;">${a.email || 'Não informado'}</strong>
+                            <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--cyan);">${(a.uid || 'anonimo').substring(0, 16)}...</div>
+                        </td>
+                        <td><span class="badge badge-cyan">${a.plataforma || 'Web'}</span></td>
+                        <td style="font-size: 12.5px; color: #fff;">${a.motivo || 'Acionamento de suporte'}</td>
+                        <td style="font-size: 11.5px; color: var(--text-muted);">${a.detalhes || 'Sem detalhes'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterAlerts() {
+            const q = (document.getElementById('alertSearch')?.value || '').toLowerCase().trim();
+            if (!q) {
+                renderAlertas(rawAlertas);
+                return;
+            }
+            const filtered = rawAlertas.filter(a => 
+                (a.email || '').toLowerCase().includes(q) ||
+                (a.motivo || '').toLowerCase().includes(q) ||
+                (a.tipo || '').toLowerCase().includes(q) ||
+                (a.detalhes || '').toLowerCase().includes(q)
+            );
+            renderAlertas(filtered);
+        }
+
     </script>
 </body>
 </html>

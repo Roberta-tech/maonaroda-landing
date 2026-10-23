@@ -2,6 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MG43CMTMK0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-MG43CMTMK0');
+    </script>
     <script>
         if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
             location.replace('https:' + location.href.substring(location.protocol.length));
@@ -854,5 +863,41 @@
         <span>Suporte WhatsApp</span>
     </a>
 
+    <!-- Sistema de Auditoria e Notificação Sigilosa de Suporte para Roberta (startup.impetus@gmail.com) -->
+    <script>
+        function auditSupportClick(sourceName) {
+            try {
+                const nowStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                const payload = {
+                    _subject: "🚨 [MÃO NA RODA - AUDITORIA] Cliente acionou o Suporte WhatsApp!",
+                    alerta: "Um visitante/cliente clicou no WhatsApp Comercial de Suporte na Landing Page.",
+                    origem: sourceName,
+                    horario_brasilia: nowStr,
+                    destino_chamado: "(16) 99729-5604 (Depto Comercial)",
+                    dispositivo: navigator.userAgent,
+                    url_origem: window.location.href
+                };
+
+                // Disparo de notificação sigilosa direto para startup.impetus@gmail.com
+                fetch("https://formsubmit.co/ajax/startup.impetus@gmail.com", {
+                    method: "POST",
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                }).catch(() => {});
+            } catch(e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+                link.addEventListener('click', () => {
+                    const label = link.innerText.trim() || link.getAttribute('title') || 'Botão WhatsApp';
+                    auditSupportClick(label);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
