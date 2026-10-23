@@ -1686,6 +1686,17 @@
                 listenUsers();
                 listenLogs();
 
+                // Registra Heartbeat de Conexão na Telemetria
+                db.collection('logs_sistema').add({
+                    severity: 'INFO',
+                    category: 'SESSAO_MASTER',
+                    message: 'Sessão Executiva da Torre de Controle conectada com sucesso.',
+                    details: 'Monitoramento ao vivo ativado (PIN Master 1409)',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    platform: 'Web Master',
+                    userEmail: curUser ? curUser.email : 'roberta@impetus.com'
+                }).catch(() => {});
+
                 // Carregar Dados Locais
                 loadProviders();
                 loadPricing();
@@ -2065,6 +2076,17 @@
                 updateLogMetrics(logsData);
             }, err => {
                 console.warn('Erro ao escutar logs_sistema:', err);
+                const terminal = document.getElementById('logTerminal');
+                if (terminal) {
+                    terminal.innerHTML = `
+                        <div class="log-entry" style="color: var(--amber);">
+                            <span class="log-time">--:--:--</span>
+                            <span class="log-sev log-sev-warn">AVISO</span>
+                            <span class="log-cat">[PERMISSÃO]</span>
+                            <span class="log-msg">Permissão de leitura pendente no Firestore. Publique a regra no Firebase Console para liberar a telemetria ao vivo.</span>
+                        </div>
+                    `;
+                }
             });
         }
 
