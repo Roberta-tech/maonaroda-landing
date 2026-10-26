@@ -671,7 +671,7 @@
             <a href="https://wa.me/5516997295604?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20M%C3%A3o%20na%20Roda!" target="_blank" rel="noopener noreferrer" class="nav-whatsapp">
                 💬 Suporte WhatsApp
             </a>
-            <a href="app/" class="nav-btn">Acessar App Web</a>
+            <a href="app/" class="nav-btn" onclick="trackWebAppClick('Navbar - Acessar App Web')">Acessar App Web</a>
         </nav>
     </header>
 
@@ -686,7 +686,7 @@
         </div>
 
         <div class="cta-group">
-            <a href="app/" class="btn-primary" style="padding: 16px 36px; font-size: 16px;">
+            <a href="app/" class="btn-primary" style="padding: 16px 36px; font-size: 16px;" onclick="trackWebAppClick('Hero - Entrar na Plataforma Web')">
                 🚀 Entrar na Plataforma Web
             </a>
         </div>
@@ -890,7 +890,34 @@
             } catch(e) {}
         }
 
+        // Tag Google Analytics (GA4) para o botão de acesso à plataforma web
+        function trackWebAppClick(sourceName) {
+            try {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'click_entrar_plataforma_web', {
+                        event_category: 'cta_button',
+                        event_label: sourceName || 'Entrar na Plataforma Web',
+                        button_name: 'Entrar na Plataforma Web',
+                        destination: '/app/'
+                    });
+                    gtag('event', 'select_content', {
+                        content_type: 'button',
+                        item_id: 'btn_entrar_plataforma_web'
+                    });
+                }
+            } catch(e) {}
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Rastreamento Google Analytics em todos os botões de entrar no app web
+            document.querySelectorAll('a[href^="app/"], a[href="/app/"], a[href*="appmaonaroda.com.br/app"]').forEach(link => {
+                link.addEventListener('click', () => {
+                    const label = link.innerText.trim() || 'Entrar na Plataforma Web';
+                    trackWebAppClick(label);
+                });
+            });
+
+            // Auditoria silenciosa de WhatsApp
             document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
                 link.addEventListener('click', () => {
                     const label = link.innerText.trim() || link.getAttribute('title') || 'Botão WhatsApp';
