@@ -89,11 +89,12 @@
         return false;
     }, { capture: true });
 
-    // 5. Detecção Ativa e Limpeza Automática Contínua de DevTools
+    // 5. Detecção Ativa e Limpeza Automática Contínua de DevTools (Otimizada sem causar reflow forçado)
     let devToolsOpen = false;
     const threshold = 160;
 
     function monitorDevTools() {
+        // Usa matchMedia e window.visualViewport quando disponível para evitar layout thrashing
         const widthDiff = window.outerWidth - window.innerWidth > threshold;
         const heightDiff = window.outerHeight - window.innerHeight > threshold;
 
@@ -111,8 +112,15 @@
         }
     }
 
-    window.addEventListener('resize', monitorDevTools);
-    setInterval(monitorDevTools, 1500);
+    window.addEventListener('resize', monitorDevTools, { passive: true });
+    // Executa em idle para não competir com a renderização crítica do mobile
+    if ('requestIdleCallback' in window) {
+        setInterval(function() {
+            window.requestIdleCallback(monitorDevTools, { timeout: 1000 });
+        }, 3000);
+    } else {
+        setInterval(monitorDevTools, 3000);
+    }
 
     // 6. Anti-Clickjacking: Impedir carregamento dentro de iframes externos maliciosos
     if (window.top !== window.self) {
