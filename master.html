@@ -1226,6 +1226,43 @@
                         </div>
                     </div>
                 </div>
+            
+                <!-- Painel de Repasses e Liquidação PIX dos Prestadores -->
+                <div class="panel-card" style="margin-top: 24px;">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>💸 Fila de Custódia & Repasses PIX dos Prestadores</span>
+                            <span class="badge badge-green" id="custodiaLiveBadge">Sincronizado</span>
+                        </div>
+                        <div class="search-box">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="custodiaSearch" class="search-input" placeholder="Buscar por chamado, prestador ou cliente..." oninput="filterCustodia()">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID Chamado</th>
+                                    <th>Prestador / Chave PIX</th>
+                                    <th>Cliente</th>
+                                    <th>Total Pago (R$)</th>
+                                    <th>Taxa Impetus</th>
+                                    <th>Líquido Prestador (R$)</th>
+                                    <th>Status da Custódia</th>
+                                    <th>Ações de Repasse</th>
+                                </tr>
+                            </thead>
+                            <tbody id="custodiaTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        Carregando chamados para custódia e repasses...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <!-- TAB 3: TELEMETRIA & LOGS DO SISTEMA -->
@@ -1778,6 +1815,7 @@
                     ordersData.push(data);
                 });
                 renderOrders(ordersData);
+                renderCustodia(ordersData);
                 updateOrderMetrics(ordersData);
             }, err => {
                 console.warn('Erro ao escutar solicitacoes_servico:', err);
@@ -3046,6 +3084,180 @@
                 (a.detalhes || '').toLowerCase().includes(q)
             );
             renderAlertas(filtered);
+        }
+
+
+        // ==========================================
+        // FLUXO DE CUSTÓDIA & REPASSES PIX (IMPETUS)
+        // ==========================================
+        function renderCustodia(orders) {
+            const tbody = document.getElementById('custodiaTableBody');
+            if (!tbody) return;
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                            Nenhum chamado registrado para custódia no momento.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => {
+                const amount = parseFloat(o.amount || 0);
+                const baseBruto = amount > 0 ? (amount / 1.10) : 0;
+                const liquidoPrestador = baseBruto * 0.90;
+                const taxaImpetus = amount - liquidoPrestador;
+
+                const isConcluido = (o.status === 'concluido' || o.concluidoPeloCliente === true);
+                const isRepassado = (o.repassePixRealizado === true || o.statusRepasse === 'repassado');
+                const isPagoCustodia = (o.pagoConfirmado === true || o.pagoEmCustodia === true || o.paymentStatus === 'pago_infinitepay' || o.status === 'pendente_aceite' || o.status === 'em_andamento' || isConcluido);
+
+                let badgeClass = 'badge-amber';
+                let statusLabel = '🟡 Aguardando Pagamento Inicial';
+
+                if (isRepassado) {
+                    badgeClass = 'badge-green';
+                    statusLabel = '✅ PIX Repassado ao Prestador';
+                } else if (isConcluido) {
+                    badgeClass = 'badge-green';
+                    statusLabel = '⚡ LIBERADO PELO CLIENTE (PRONTO PARA PIX)';
+                } else if (isPagoCustodia) {
+                    badgeClass = 'badge-cyan';
+                    statusLabel = '🔒 Retido em Custódia (Em Atendimento)';
+                }
+
+                const prestadorNome = o.professionalName || 'Prestador Mão na Roda';
+                const chavePix = o.pixKey || o.chavePix || o.pixPayload || o.professionalPhone || 'Chave PIX Cadastrada';
+
+                const clientEmail = (o.clientEmail || '').trim();
+                const clientDisplayName = o.clientName || (clientEmail ? clientEmail.split('@')[0] : 'Cliente App');
+
+                let dataStr = '--/--';
+                if (o.createdAt) {
+                    try {
+                        const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+                        dataStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit'});
+                    } catch(e) {}
+                }
+
+                let actionHtml = '';
+                if (isRepassado) {
+                    actionHtml = `<span style="font-size: 11px; color: var(--green); font-weight: 700;">✅ Repasse Finalizado</span>`;
+                } else if (isConcluido) {
+                    actionHtml = `
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px; background: rgba(0, 230, 118, 0.2); border: 1px solid #00E676; color: #00E676;" onclick="confirmarRepassePix('${o.docId}', ${liquidoPrestador}, '${prestadorNome}')" title="Confirmar PIX Realizado">
+                                💸 Confirmar PIX Feito
+                            </button>
+                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="copiarChavePix('${chavePix}')" title="Copiar Chave PIX">
+                                📋 Copiar PIX
+                            </button>
+                        </div>
+                    `;
+                } else if (isPagoCustodia) {
+                    actionHtml = `
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="forceComplete('${o.docId}')" title="Liberar Custódia Manualmente">
+                                🔓 Liberar Custódia
+                            </button>
+                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="copiarChavePix('${chavePix}')" title="Copiar Chave PIX">
+                                📋 Copiar PIX
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionHtml = `<span style="font-size: 11px; color: var(--amber);">Aguardando Pagamento</span>`;
+                }
+
+                return `
+                    <tr>
+                        <td>
+                            <strong style="font-family: 'JetBrains Mono'; color: var(--cyan);">${(o.id || o.docId || '').substring(0, 8)}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">${dataStr}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 700; color: var(--text-primary);">${prestadorNome}</div>
+                            <div style="font-size: 11px; color: var(--cyan); font-family: 'JetBrains Mono';">${chavePix}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600;">${clientDisplayName}</div>
+                            ${clientEmail ? `<div style="font-size: 10px; color: var(--text-muted);">${clientEmail}</div>` : ''}
+                        </td>
+                        <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--text-primary);">
+                            R$ ${amount.toFixed(2).replace('.', ',')}
+                        </td>
+                        <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--pink);">
+                            R$ ${taxaImpetus.toFixed(2).replace('.', ',')}
+                            <div style="font-size: 9.5px; color: var(--text-muted); font-weight: normal;">(10% Cli + 10% Prest)</div>
+                        </td>
+                        <td style="font-family: 'JetBrains Mono'; font-weight: 800; color: var(--green); font-size: 14px;">
+                            R$ ${liquidoPrestador.toFixed(2).replace('.', ',')}
+                        </td>
+                        <td>
+                            <span class="badge ${badgeClass}">${statusLabel}</span>
+                            ${o.dataRepassePix ? `<div style="font-size: 9.5px; color: var(--text-muted); margin-top: 3px;">Em: ${new Date(o.dataRepassePix).toLocaleString('pt-BR')}</div>` : ''}
+                        </td>
+                        <td>
+                            ${actionHtml}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterCustodia() {
+            const term = (document.getElementById('custodiaSearch').value || '').toLowerCase().trim();
+            if (!term) {
+                renderCustodia(ordersData);
+                return;
+            }
+            const filtered = ordersData.filter(o => 
+                (o.id && o.id.toLowerCase().includes(term)) ||
+                (o.docId && o.docId.toLowerCase().includes(term)) ||
+                (o.professionalName && o.professionalName.toLowerCase().includes(term)) ||
+                (o.clientName && o.clientName.toLowerCase().includes(term)) ||
+                (o.clientEmail && o.clientEmail.toLowerCase().includes(term)) ||
+                (o.category && o.category.toLowerCase().includes(term))
+            );
+            renderCustodia(filtered);
+        }
+
+        function copiarChavePix(pixKey) {
+            if (!pixKey || pixKey === 'Chave PIX Cadastrada') {
+                alert('Chave PIX não informada no pedido.');
+                return;
+            }
+            navigator.clipboard.writeText(pixKey).then(() => {
+                showToast('📋 Chave PIX copiada para a área de transferência!');
+            }).catch(() => {
+                prompt('Copie a chave PIX abaixo:', pixKey);
+            });
+        }
+
+        async function confirmarRepassePix(docId, valor, prestadorNome) {
+            if (!confirm(`Confirmar que a transferência PIX de R$ ${valor.toFixed(2).replace('.', ',')} foi efetuada para ${prestadorNome}?\n\nO sistema dará baixa na custódia e registrará a liquidação.`)) return;
+            try {
+                showToast('⏳ Registrando baixa do PIX no Firestore...');
+                await ensureMasterAuth();
+                await db.collection('solicitacoes_servico').doc(docId).update({
+                    repassePixRealizado: true,
+                    dataRepassePix: new Date().toISOString(),
+                    statusRepasse: 'repassado'
+                });
+                await db.collection('logs_sistema').add({
+                    severity: 'INFO',
+                    category: 'REPASSE_PIX',
+                    message: `Repasse PIX de R$ ${valor.toFixed(2)} liquidado para ${prestadorNome} (Chamado #${docId.substring(0, 8)})`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    platform: 'Torre Master'
+                });
+                showToast('✅ Repasse PIX confirmado com sucesso!');
+            } catch(err) {
+                console.error('Erro ao confirmar repasse:', err);
+                alert('Erro ao confirmar repasse: ' + err.message);
+            }
         }
 
     </script>

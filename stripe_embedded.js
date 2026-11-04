@@ -265,4 +265,42 @@
   };
 
   window.closeStripeEmbeddedCheckout = window.closeInfinitePayCheckout;
+
+  // Monitor de Retorno Oficial InfinitePay & Rastreamento no Google Analytics
+  (function monitorInfinitePayReturn() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const receiptUrl = urlParams.get('receipt_url');
+      const orderNsu = urlParams.get('order_nsu');
+      const slug = urlParams.get('slug');
+
+      if (receiptUrl || orderNsu || slug) {
+        console.log('🎉 Retorno de pagamento InfinitePay:', { orderNsu, receiptUrl, slug });
+
+        // 1. Google Analytics 4 (Evento Oficial de Compra)
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'purchase', {
+            transaction_id: orderNsu || slug || ('MNR-' + Date.now()),
+            value: 66.0,
+            currency: 'BRL',
+            items: [{
+              item_id: orderNsu || 'servico',
+              item_name: 'Serviço Especializado Mão na Roda',
+              price: 66.0,
+              quantity: 1
+            }]
+          });
+        }
+
+        // 2. Notificação visual de sucesso
+        const banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#00E676;color:#000;padding:14px 24px;border-radius:14px;font-weight:bold;z-index:99999999;box-shadow:0 8px 30px rgba(0,0,0,0.5);font-family:sans-serif;display:flex;align-items:center;gap:10px;';
+        banner.innerHTML = '<span>✅ Pagamento Confirmado com Sucesso pela InfinitePay! Custódia ativada.</span>';
+        document.body.appendChild(banner);
+        setTimeout(function() { banner.remove(); }, 6000);
+      }
+    } catch (e) {
+      console.warn('monitorInfinitePayReturn error:', e);
+    }
+  })();
 })();
