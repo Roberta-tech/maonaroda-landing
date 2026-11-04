@@ -155,95 +155,47 @@
       }
     }
 
-    try {
-      const orderNsu = 'mnr-' + Date.now();
-      const redirectUrl = window.location.origin + '/app/';
+    const targetUrl = (finalAmount <= 15.0)
+      ? 'https://checkout.infinitepay.io/appmaonaroda/Ew6LzLK9ee'
+      : 'https://checkout.infinitepay.io/appmaonaroda/VSXzUzACLS';
 
-      const payload = {
-        order_nsu: orderNsu,
-        redirect_url: redirectUrl,
-        items: [
-          {
-            description: desc + ' (R$ ' + finalAmount.toFixed(2).replace('.', ',') + ')',
-            price: priceInCents,
-            quantity: 1
-          }
-        ]
-      };
+    const mount = document.getElementById('infinitepay-mount-point');
+    if (mount) {
+      mount.innerHTML = `
+        <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" id="btn-open-infinitepay" style="
+          width: 100%;
+          height: 52px;
+          background: linear-gradient(90deg, #00D1FF, #00B4D8);
+          border: none;
+          border-radius: 14px;
+          color: #000000;
+          font-size: 15px;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          text-decoration: none;
+          box-sizing: border-box;
+        ">
+          <span>💳 Pagar Agora com Cartão (InfinitePay)</span>
+          <span>→</span>
+        </a>
+        <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
+          Ambiente 100% blindado e oficial InfinitePay • Impetus Tecnologia
+        </div>
+      `;
 
-      if (customerData && typeof customerData === 'object') {
-        payload.customer = {
-          name: customerData.name || 'Cliente Mão na Roda',
-          email: customerData.email || 'cliente@appmaonaroda.com.br'
+      const btn = document.getElementById('btn-open-infinitepay');
+      if (btn) {
+        btn.onclick = function () {
+          setTimeout(function () {
+            window.closeInfinitePayCheckout();
+          }, 1500);
         };
-      }
-
-      const response = await fetch(INFINITEPAY_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'X-Api-Key': INFINITEPAY_API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (data && data.url) {
-        const mount = document.getElementById('infinitepay-mount-point');
-        if (mount) {
-          mount.innerHTML = `
-            <a href="${data.url}" target="_blank" rel="noopener noreferrer" id="btn-open-infinitepay" style="
-              width: 100%;
-              height: 52px;
-              background: linear-gradient(90deg, #00D1FF, #00B4D8);
-              border: none;
-              border-radius: 14px;
-              color: #000000;
-              font-size: 15px;
-              font-weight: 800;
-              cursor: pointer;
-              box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-              text-decoration: none;
-              box-sizing: border-box;
-            ">
-              <span>💳 Pagar Agora com Cartão (InfinitePay)</span>
-              <span>→</span>
-            </a>
-            <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
-              Ambiente 100% blindado e criptografado pela InfinitePay • Impetus Tecnologia
-            </div>
-          `;
-
-          // Abertura com fechamento suave do modal
-          const btn = document.getElementById('btn-open-infinitepay');
-          if (btn) {
-            btn.onclick = function () {
-              setTimeout(function () {
-                window.closeInfinitePayCheckout();
-              }, 1200);
-            };
-          }
-        }
-      } else {
-        throw new Error(data.message || 'Resposta inesperada da InfinitePay');
-      }
-    } catch (err) {
-      console.error('Erro ao gerar checkout InfinitePay:', err);
-      const mount = document.getElementById('infinitepay-mount-point');
-      if (mount) {
-        mount.innerHTML = `
-          <div style="text-align: center; padding: 20px; color: #FF0080;">
-            <div style="font-size: 24px; margin-bottom: 6px;">⚠️</div>
-            <div style="font-size: 13px; font-weight: bold;">Falha ao conectar com o Cartão InfinitePay.</div>
-            <div style="font-size: 11px; color: #B0B8C1; margin-top: 4px;">${err.message || 'Tente novamente em instantes.'}</div>
-          </div>
-        `;
       }
     }
   };
