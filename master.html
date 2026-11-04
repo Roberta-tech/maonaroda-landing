@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -1845,10 +1845,11 @@
             tbody.innerHTML = orders.map(o => {
                 let badgeClass = 'badge-cyan';
                 let statusLabel = o.status || 'Pendente';
-                const isPaidStripe = (o.pagoConfirmado === true || o.status === 'em_andamento' || o.status === 'concluido' || o.paymentMethod === 'card_paid');
+                const isPaidStripe = (o.pagoConfirmado === true || o.pagoEmCustodia === true || o.paymentStatus === 'pago_infinitepay' || o.status === 'pendente_aceite' || o.status === 'em_andamento' || o.status === 'concluido' || o.paymentMethod === 'card_paid');
                 const isWaitingPayment = (o.status === 'aguardando_pix' || o.status === 'aguardando_pagamento' || !isPaidStripe);
 
                 if (o.status === 'concluido') { badgeClass = 'badge-green'; statusLabel = '✅ Concluído'; }
+                else if (o.status === 'pendente_aceite' || o.pagoEmCustodia === true || o.paymentStatus === 'pago_infinitepay') { badgeClass = 'badge-green'; statusLabel = '🔒 Em Custódia (Pago)'; }
                 else if (o.status === 'em_andamento') { badgeClass = 'badge-cyan'; statusLabel = '⚡ Em Andamento'; }
                 else if (isWaitingPayment) { badgeClass = 'badge-amber'; statusLabel = '🟡 Aguardando Pagamento'; }
                 else if (o.status === 'cancelado') { badgeClass = 'badge-red'; statusLabel = 'Cancelado'; }
@@ -1892,7 +1893,7 @@
                         </td>
                         <td>
                             <strong>${o.category || 'Serviço Geral'}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">${o.paymentMethod === 'pix' || o.paymentMethod === 'pix_stripe' ? 'Pagamento PIX Stripe' : 'Cartão Stripe'}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${o.paymentMethod === 'pix' || o.paymentMethod === 'pix_stripe' || o.paymentMethod === 'pix_impetus' ? 'PIX Banco Central' : (o.paymentMethod === 'card_infinitepay' ? 'Cartão InfinitePay' : 'Cartão de Crédito')}</div>
                         </td>
                         <td>
                             <div style="font-weight: 600;">${o.professionalName || 'Profissional Mão na Roda'}</div>
