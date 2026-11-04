@@ -2499,6 +2499,9 @@
                                     <div style="flex: 1; min-width: 0;">
                                         <div class="prov-name" title="${name}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
                                         <div class="prov-role" style="color: var(--cyan); font-weight: 700; font-size: 12px;">🛠️ ${role}</div>
+                                        <div style="margin-top: 4px; font-size: 12.5px; font-weight: 800; color: var(--green); font-family: 'JetBrains Mono';">
+                                            💵 Valor Base: R$ ${(parseFloat(p.valor_base || 10)).toFixed(2).replace('.', ',')}
+                                        </div>
                                     </div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); word-break: break-all;">✉️ ${email || 'Sem e-mail'}</div>
@@ -2584,6 +2587,39 @@
                     (p.telefone || '').includes(q)
                 );
                 renderProviders(filtered);
+            }
+        }
+
+        async function editarPrecoPrestador(docId, name, currentPrice) {
+            const novoPrecoStr = prompt(`Ajustar Valor Base de "${name}":\n\nDigite o novo valor em R$ (ex: 10 ou 150):`, currentPrice || 10);
+            if (!novoPrecoStr) return;
+            const novoPreco = parseFloat(novoPrecoStr.replace(',', '.'));
+            if (isNaN(novoPreco) || novoPreco <= 0) {
+                alert('Valor inválido. Digite um número positivo.');
+                return;
+            }
+            try {
+                showToast('⏳ Atualizando preço no Firestore...');
+                await ensureMasterAuth();
+                await db.collection('users').doc(docId).update({
+                    valor_base: novoPreco,
+                    preco_base: novoPreco,
+                    preco: novoPreco
+                });
+                try {
+                    await db.collection('prestadores').doc(docId).set({
+                        valor_base: novoPreco
+                    }, { merge: true });
+                } catch(_) {}
+                
+                // Atualiza localmente
+                const u = usersData.find(x => x.docId === docId || x.uid === docId);
+                if (u) u.valor_base = novoPreco;
+                renderProviders();
+                showToast(`✅ Preço de "${name}" atualizado para R$ ${novoPreco.toFixed(2).replace('.', ',')} com sucesso!`);
+            } catch(err) {
+                console.error(err);
+                alert('Erro ao atualizar preço: ' + err.message);
             }
         }
 
