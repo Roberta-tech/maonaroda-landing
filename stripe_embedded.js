@@ -155,106 +155,106 @@
       }
     }
 
-    try {
-      const orderNsu = 'mnr-' + Date.now();
-      const redirectUrl = window.location.origin + '/app/';
+    // Links oficiais mapeados pela API InfinitePay para cada faixa de valor com retorno para /app/
+    const infinitePayTierLinks = {
+      11: 'https://checkout.infinitepay.io/appmaonaroda/zvK6baEc3F',
+      22: 'https://checkout.infinitepay.io/appmaonaroda/4Q8M1yjVsd',
+      33: 'https://checkout.infinitepay.io/appmaonaroda/1QUzsvfRiU',
+      44: 'https://checkout.infinitepay.io/appmaonaroda/56qiGddqLD',
+      55: 'https://checkout.infinitepay.io/appmaonaroda/exJW6Sqt64',
+      66: 'https://checkout.infinitepay.io/appmaonaroda/Cbfgs4M6S0', // R$ 66,00 (Visita Técnica R$ 60 + 10%)
+      77: 'https://checkout.infinitepay.io/appmaonaroda/yWHkDzhnbW',
+      88: 'https://checkout.infinitepay.io/appmaonaroda/VZiFh4D4ot',
+      99: 'https://checkout.infinitepay.io/appmaonaroda/Sp3TXwhGJt',
+      110: 'https://checkout.infinitepay.io/appmaonaroda/Ft930ZGQMg',
+      120: 'https://checkout.infinitepay.io/appmaonaroda/e7kkYseL2e',
+      132: 'https://checkout.infinitepay.io/appmaonaroda/wPkow9fuvx',
+      143: 'https://checkout.infinitepay.io/appmaonaroda/bxTYgtm4nN',
+      154: 'https://checkout.infinitepay.io/appmaonaroda/Iurp5edFoq',
+      165: 'https://checkout.infinitepay.io/appmaonaroda/1iRVY5NF60', // R$ 165,00 (Serviço Padrão R$ 150 + 10%)
+      176: 'https://checkout.infinitepay.io/appmaonaroda/Up7V7rTaqd',
+      198: 'https://checkout.infinitepay.io/appmaonaroda/C5jw11I3ep',
+      220: 'https://checkout.infinitepay.io/appmaonaroda/u2y5BRptoF',
+      242: 'https://checkout.infinitepay.io/appmaonaroda/x4hHmgL7Xe',
+      264: 'https://checkout.infinitepay.io/appmaonaroda/15BTCIVezu',
+      275: 'https://checkout.infinitepay.io/appmaonaroda/4AEb0dJaGU',
+      330: 'https://checkout.infinitepay.io/appmaonaroda/qDeToS6AlW',
+      385: 'https://checkout.infinitepay.io/appmaonaroda/PIZ16aJKvf',
+      440: 'https://checkout.infinitepay.io/appmaonaroda/Bf8YM3Fxtl'
+    };
 
-      const payload = {
-        order_nsu: orderNsu,
-        redirect_url: redirectUrl,
-        items: [
-          {
-            description: desc + ' (R$ ' + finalAmount.toFixed(2).replace('.', ',') + ')',
-            price: priceInCents,
-            quantity: 1
-          }
-        ]
-      };
-
-      if (customerData && typeof customerData === 'object') {
-        payload.customer = {
-          name: customerData.name || 'Cliente Mão na Roda',
-          email: customerData.email || 'cliente@appmaonaroda.com.br'
-        };
+    function resolvePaymentUrl(val) {
+      const rounded = Math.round(val);
+      if (infinitePayTierLinks[rounded]) {
+        return infinitePayTierLinks[rounded];
       }
-
-      const response = await fetch(INFINITEPAY_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'X-Api-Key': INFINITEPAY_API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (data && data.url) {
-        const mount = document.getElementById('infinitepay-mount-point');
-        if (mount) {
-          mount.innerHTML = `
-            <a href="${data.url}" target="_blank" rel="noopener noreferrer" id="btn-open-infinitepay" style="
-              width: 100%;
-              height: 52px;
-              background: linear-gradient(90deg, #00D1FF, #00B4D8);
-              border: none;
-              border-radius: 14px;
-              color: #000000;
-              font-size: 15px;
-              font-weight: 800;
-              cursor: pointer;
-              box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-              text-decoration: none;
-              box-sizing: border-box;
-            ">
-              <span>💳 Pagar Agora com Cartão (InfinitePay)</span>
-              <span>→</span>
-            </a>
-            <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
-              Ambiente 100% blindado e criptografado pela InfinitePay • Impetus Tecnologia
-            </div>
-          `;
-
-          // Abertura com fechamento suave do modal
-          const btn = document.getElementById('btn-open-infinitepay');
-          if (btn) {
-            btn.onclick = function () {
-              setTimeout(function () {
-                window.closeInfinitePayCheckout();
-              }, 1200);
-            };
-          }
+      let closest = 165;
+      let minDiff = 999999;
+      for (const k in infinitePayTierLinks) {
+        const diff = Math.abs(parseInt(k, 10) - rounded);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = k;
         }
-      } else {
-        throw new Error(data.message || 'Resposta inesperada da InfinitePay');
       }
-    } catch (err) {
-      console.error('Erro ao gerar checkout InfinitePay:', err);
-      const mount = document.getElementById('infinitepay-mount-point');
-      if (mount) {
-        mount.innerHTML = `
-          <div style="text-align: center; padding: 20px; color: #FF0080;">
-            <div style="font-size: 24px; margin-bottom: 6px;">⚠️</div>
-            <div style="font-size: 13px; font-weight: bold;">Falha ao conectar com o Cartão InfinitePay.</div>
-            <div style="font-size: 11px; color: #B0B8C1; margin-top: 4px;">${err.message || 'Tente novamente em instantes.'}</div>
-          </div>
-        `;
+      return infinitePayTierLinks[closest];
+    }
+
+    const targetUrl = resolvePaymentUrl(finalAmount);
+
+    const mount = document.getElementById('infinitepay-mount-point');
+    if (mount) {
+      mount.innerHTML = `
+        <a href="${targetUrl}" id="btn-open-infinitepay" style="
+          width: 100%;
+          height: 52px;
+          background: linear-gradient(90deg, #00D1FF, #00B4D8);
+          border: none;
+          border-radius: 14px;
+          color: #000000;
+          font-size: 15px;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          text-decoration: none;
+          box-sizing: border-box;
+        ">
+          <span>💳 Pagar Agora R$ ${finalAmount.toFixed(2).replace('.', ',')} (Cartão InfinitePay)</span>
+          <span>→</span>
+        </a>
+        <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
+          Ambiente 100% blindado e oficial InfinitePay • Retorno automático ao App
+        </div>
+      `;
+
+      const btn = document.getElementById('btn-open-infinitepay');
+      if (btn) {
+        btn.onclick = function (e) {
+          // Navegação na mesma janela para não abrir abas duplicadas
+          e.preventDefault();
+          window.location.href = targetUrl;
+        };
       }
     }
   };
 
   // Compatibilidade com as chamadas legadas do Stripe (redireciona para InfinitePay)
-  window.openStripeEmbeddedCheckout = function (clientSecretOrAmount) {
+  window.openStripeEmbeddedCheckout = function (clientSecretOrAmount, description) {
     let amount = 165.0;
     if (typeof clientSecretOrAmount === 'number') {
       amount = clientSecretOrAmount;
+    } else if (typeof clientSecretOrAmount === 'string') {
+      const parsed = parseFloat(clientSecretOrAmount.replace(',', '.'));
+      if (!isNaN(parsed) && parsed > 0) {
+        amount = parsed;
+      }
     }
-    window.openInfinitePayCheckout(amount, 'Serviço Especializado Mão na Roda');
+    window.openInfinitePayCheckout(amount, description || 'Serviço Especializado Mão na Roda');
   };
 
   window.closeInfinitePayCheckout = function () {
