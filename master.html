@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -1529,6 +1529,17 @@
             return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
+        async function ensureMasterAuth() {
+            try {
+                const u = firebase.auth().currentUser;
+                if (!u || (u.email !== 'torre.master@appmaonaroda.com.br' && u.email !== 'robertaferreirap14@gmail.com' && u.email !== 'startup.impetus@gmail.com')) {
+                    await firebase.auth().signInWithEmailAndPassword('torre.master@appmaonaroda.com.br', 'ImpetusTorreMaster2026!#');
+                }
+            } catch(e) {
+                console.warn('ensureMasterAuth:', e);
+            }
+        }
+
         function onPinInput(input, index) {
             if (input.value.length === 1) {
                 const inputs = document.querySelectorAll('.pin-digit');
@@ -1935,6 +1946,7 @@
         async function forceComplete(docId) {
             if (!confirm('Deseja forçar a conclusão deste chamado e liberar a custódia para o profissional?')) return;
             try {
+                await ensureMasterAuth();
                 await db.collection('solicitacoes_servico').doc(docId).update({
                     status: 'concluido',
                     concluidoPeloCliente: true,
@@ -1952,6 +1964,7 @@
 
             try {
                 showToast('⏳ Removendo chamado do sistema...');
+                await ensureMasterAuth();
                 await db.collection('solicitacoes_servico').doc(docId).delete();
                 try {
                     await db.collection('orders').doc(docId).delete();
@@ -2544,7 +2557,8 @@
             if (!confirmed) return;
 
             try {
-                showToast('⏳ Removendo prestador do Firestore...'); if (!firebase.auth().currentUser) { await firebase.auth().signInWithEmailAndPassword('torre.master@appmaonaroda.com.br', 'ImpetusTorreMaster2026!#'); }
+                showToast('⏳ Removendo prestador do Firestore...');
+                await ensureMasterAuth();
                 await db.collection('users').doc(docId).delete();
                 try {
                     await db.collection('prestadores').doc(docId).delete();
@@ -3036,3 +3050,4 @@
     </script>
 </body>
 </html>
+
