@@ -1569,7 +1569,7 @@
         async function ensureMasterAuth() {
             try {
                 const u = firebase.auth().currentUser;
-                if (!u || (u.email !== 'torre.master@appmaonaroda.com.br' && u.email !== 'robertaferreirap14@gmail.com' && u.email !== 'startup.impetus@gmail.com')) {
+                if (!u || (u.email !== 'torre.master@appmaonaroda.com.br' && u.email !== 'robertaferreirap14@gmail.com' && u.email !== 'robertaferreira1982@gmail.com' && u.email !== 'startup.impetus@gmail.com')) {
                     await firebase.auth().signInWithEmailAndPassword('torre.master@appmaonaroda.com.br', 'ImpetusTorreMaster2026!#');
                 }
             } catch(e) {

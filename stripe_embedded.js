@@ -277,6 +277,51 @@
       if (receiptUrl || orderNsu || slug) {
         console.log('🎉 Retorno de pagamento InfinitePay:', { orderNsu, receiptUrl, slug });
 
+        // Sincroniza pedido no Firebase Firestore
+        try {
+          if (window.firebase && window.firebase.firestore) {
+            const db = window.firebase.firestore();
+            const urlDocId = urlParams.get('order_id') || urlParams.get('doc_id');
+            const trackingPayload = {
+              pagoConfirmado: true,
+              pagoEmCustodia: true,
+              status: 'pendente_aceite',
+              paymentStatus: 'pago_infinitepay',
+              infinitepay_nsu: orderNsu || '',
+              infinitepay_receipt: receiptUrl || '',
+              infinitepay_slug: slug || '',
+              paidAt: new Date().toISOString()
+            };
+
+            if (urlDocId) {
+              db.collection('solicitacoes_servico').doc(urlDocId).set(trackingPayload, { merge: true });
+            } else {
+              db.collection('solicitacoes_servico')
+                .where('clientEmail', 'in', ['robertaferreira1982@gmail.com', 'robertaferreirap14@gmail.com', 'caio.arapress@gmail.com'])
+                .orderBy('createdAt', 'desc')
+                .limit(1)
+                .get()
+                .then(snap => {
+                  if (!snap.empty) {
+                    snap.docs[0].ref.update(trackingPayload);
+                  }
+                }).catch(e => console.warn('Busca doc recente:', e));
+            }
+
+            db.collection('logs_sistema').add({
+              severity: 'INFO',
+              category: 'PAGAMENTO_INFINITEPAY',
+              message: 'Pagamento InfinitePay aprovado NSU: ' + (orderNsu || 'N/A') + ' (Recibo: ' + (receiptUrl ? 'Disponível' : 'N/A') + ')',
+              details: 'Cliente: robertaferreira1982@gmail.com',
+              timestamp: window.firebase.firestore.FieldValue.serverTimestamp(),
+              platform: 'Web InfinitePay'
+            }).catch(() => {});
+          }
+        } catch(fbErr) {
+          console.warn('Erro ao atualizar Firestore no retorno da InfinitePay:', fbErr);
+        }
+        console.log('🎉 Retorno de pagamento InfinitePay:', { orderNsu, receiptUrl, slug });
+
         // 1. Google Analytics 4 (Evento Oficial de Compra)
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'purchase', {
