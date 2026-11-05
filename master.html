@@ -3180,17 +3180,19 @@
                 }
 
                 let actionHtml = '';
+                const btnExcluir = `<button class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: rgba(255,59,48,0.5); color: #FF3B30;" onclick="confirmDeleteOrder('${o.docId}')" title="Cancelar e Excluir Chamado de Teste">🗑️ Cancelar</button>`;
                 if (isRepassado) {
-                    actionHtml = `<span style="font-size: 11px; color: var(--green); font-weight: 700;">✅ Repasse Finalizado</span>`;
+                    actionHtml = `<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;"><span style="font-size: 11px; color: var(--green); font-weight: 700;">✅ Repasse Finalizado</span> ${btnExcluir}</div>`;
                 } else if (isConcluido) {
                     actionHtml = `
                         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px; background: rgba(0, 230, 118, 0.2); border: 1px solid #00E676; color: #00E676;" onclick="confirmarRepassePix('${o.docId}', ${liquidoPrestador}, '${prestadorNome}')" title="Confirmar PIX Realizado">
+                            <button class="btn-action" style="padding: 4px 8px; font-size: 11px; background: rgba(0, 230, 118, 0.2); border: 1px solid #00E676; color: #00E676;" onclick="confirmDeleteOrder ? confirmarRepassePix('${o.docId}', ${liquidoPrestador}, '${prestadorNome}') : null" title="Confirmar PIX Realizado">
                                 💸 Confirmar PIX Feito
                             </button>
                             <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="copiarChavePix('${chavePix}')" title="Copiar Chave PIX">
                                 📋 Copiar PIX
                             </button>
+                            ${btnExcluir}
                         </div>
                     `;
                 } else if (isPagoCustodia) {
@@ -3202,10 +3204,11 @@
                             <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="copiarChavePix('${chavePix}')" title="Copiar Chave PIX">
                                 📋 Copiar PIX
                             </button>
+                            ${btnExcluir}
                         </div>
                     `;
                 } else {
-                    actionHtml = `<span style="font-size: 11px; color: var(--amber);">Aguardando Pagamento</span>`;
+                    actionHtml = `<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;"><span style="font-size: 11px; color: var(--amber);">Aguardando Pagamento</span> ${btnExcluir}</div>`;
                 }
 
                 return `
