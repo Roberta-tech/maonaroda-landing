@@ -1805,7 +1805,67 @@
             }
         }
 
-        // Escuta Chamados em Tempo Real
+        // Escuta Chamados em Tempo Real & Sincroniza Eventos GA4 (purchase / refund)
+        function syncHistoricalAndLiveGA4(orders) {
+            try {
+                if (typeof gtag !== 'function') return;
+                // 1. Reconciliação única dos 2 testes reais concluídos e reembolsados na Stripe (MNR-6509 R$ 66 e MNR-4791 R$ 11)
+                if (!localStorage.getItem('mnr_ga4_reconciled_tests_v1')) {
+                    const historicalTests = [
+                        { id: 'MNR-6509', category: 'Eletricista', pro: 'Joao', amount: 66.00 },
+                        { id: 'MNR-4791', category: 'Consultoria Express', pro: 'luana martins', amount: 11.00 }
+                    ];
+                    historicalTests.forEach(t => {
+                        gtag('event', 'purchase', {
+                            transaction_id: t.id,
+                            value: t.amount,
+                            currency: 'BRL',
+                            transport_type: 'beacon',
+                            items: [{ item_id: t.id, item_name: t.category, item_category: t.pro, price: t.amount, quantity: 1 }]
+                        });
+                        gtag('event', 'refund', {
+                            transaction_id: t.id,
+                            value: t.amount,
+                            currency: 'BRL',
+                            transport_type: 'beacon',
+                            items: [{ item_id: t.id, item_name: t.category, item_category: t.pro, price: t.amount, quantity: 1 }]
+                        });
+                    });
+                    localStorage.setItem('mnr_ga4_reconciled_tests_v1', 'true');
+                }
+
+                // 2. Sincroniza qualquer novo chamado do Firestore que ainda não tenha sido enviado ao GA4
+                const trackedMap = JSON.parse(localStorage.getItem('mnr_ga4_tracked_orders') || '{}');
+                let updated = false;
+                (orders || []).forEach(o => {
+                    const oid = o.id || o.docId;
+                    const amt = parseFloat(o.amount || 0);
+                    if (oid && amt > 0 && !trackedMap[oid]) {
+                        gtag('event', 'purchase', {
+                            transaction_id: oid,
+                            value: amt,
+                            currency: 'BRL',
+                            transport_type: 'beacon',
+                            items: [{
+                                item_id: oid,
+                                item_name: o.category || 'Servico Mao na Roda',
+                                item_category: o.professionalName || 'Prestador',
+                                price: amt,
+                                quantity: 1
+                            }]
+                        });
+                        trackedMap[oid] = Date.now();
+                        updated = true;
+                    }
+                });
+                if (updated) {
+                    localStorage.setItem('mnr_ga4_tracked_orders', JSON.stringify(trackedMap));
+                }
+            } catch (e) {
+                console.warn('GA4 sync warn:', e);
+            }
+        }
+
         function listenOrders() {
             db.collection('solicitacoes_servico').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
                 ordersData = [];
@@ -1814,6 +1874,7 @@
                     data.docId = doc.id;
                     ordersData.push(data);
                 });
+                syncHistoricalAndLiveGA4(ordersData);
                 renderOrders(ordersData);
                 renderCustodia(ordersData);
                 updateOrderMetrics(ordersData);
@@ -2019,11 +2080,27 @@
             try {
                 showToast('⏳ Removendo chamado do sistema...');
                 await ensureMasterAuth();
+                const order = (ordersData || []).find(o => o.docId === docId || o.id === docId) || {};
+                const valorReembolso = parseFloat(order.amount || 0);
+                if (typeof gtag === 'function' && valorReembolso > 0) {
+                    gtag('event', 'refund', {
+                        transaction_id: docId,
+                        value: valorReembolso,
+                        currency: 'BRL',
+                        transport_type: 'beacon',
+                        items: [{
+                            item_id: docId,
+                            item_name: order.category || 'Servico Mao na Roda',
+                            price: valorReembolso,
+                            quantity: 1
+                        }]
+                    });
+                }
                 await db.collection('solicitacoes_servico').doc(docId).delete();
                 try {
                     await db.collection('orders').doc(docId).delete();
                 } catch(_) {}
-                showToast('🗑️ Chamado excluído com sucesso!');
+                showToast('🗑️ Chamado excluído e reembolso registrado no Analytics!');
             } catch(err) {
                 console.error('Erro ao excluir chamado:', err);
                 alert('Erro ao excluir chamado: ' + err.message);
