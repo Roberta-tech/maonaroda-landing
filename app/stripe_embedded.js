@@ -204,6 +204,60 @@
 
     const mount = document.getElementById('infinitepay-mount-point');
     if (mount) {
+      const renderCheckoutBtn = function(val) {
+        const url = resolvePaymentUrl(val);
+        const amountEl = document.getElementById('inf-checkout-amount');
+        if (amountEl) amountEl.textContent = 'R$ ' + val.toFixed(2).replace('.', ',');
+        mount.innerHTML = `
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 11px; color: #94A3B8; margin-bottom: 6px; font-weight: 600;">Selecione ou confirme a faixa do serviço:</div>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" id="tier-btn-10" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val <= 11 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val <= 11 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">⚡ Teste R$ 10</button>
+              <button type="button" id="tier-btn-66" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val === 66 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val === 66 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">🔧 Visita R$ 66</button>
+              <button type="button" id="tier-btn-165" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val === 165 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val === 165 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">⭐ Padrão R$ 165</button>
+            </div>
+          </div>
+          <a href="${url}" id="btn-open-infinitepay" style="
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(90deg, #00D1FF, #00B4D8);
+            border: none;
+            border-radius: 14px;
+            color: #000000;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-sizing: border-box;
+          ">
+            <span>💳 Pagar Agora R$ ${val.toFixed(2).replace('.', ',')} (Cartão)</span>
+            <span>→</span>
+          </a>
+          <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
+            Ambiente 100% blindado • Custódia Impetus Ativa
+          </div>
+        `;
+
+        document.getElementById('tier-btn-10').onclick = function() { renderCheckoutBtn(10.0); };
+        document.getElementById('tier-btn-66').onclick = function() { renderCheckoutBtn(66.0); };
+        document.getElementById('tier-btn-165').onclick = function() { renderCheckoutBtn(165.0); };
+        const btn = document.getElementById('btn-open-infinitepay');
+        if (btn) {
+          btn.onclick = function(e) {
+            e.preventDefault();
+            window.location.href = url;
+          };
+        }
+      };
+
+      renderCheckoutBtn(finalAmount);
+      return;
       mount.innerHTML = `
         <a href="${targetUrl}" id="btn-open-infinitepay" style="
           width: 100%;
