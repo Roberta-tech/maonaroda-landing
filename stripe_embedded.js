@@ -7,6 +7,21 @@
 (function () {
   'use strict';
 
+  // Limpeza automática de caches antigos de pedidos no navegador (evita pedidos fantasmas)
+  try {
+    const legacyKeys = [
+      'flutter.mao_na_roda_client_orders_v5_prod',
+      'flutter.mao_na_roda_client_orders_v4',
+      'flutter.mao_na_roda_client_orders_v3',
+      'flutter.mao_na_roda_client_orders_v7_real'
+    ];
+    for (let i = 0; i < legacyKeys.length; i++) {
+      if (window.localStorage && window.localStorage.getItem(legacyKeys[i])) {
+        window.localStorage.removeItem(legacyKeys[i]);
+      }
+    }
+  } catch (_) {}
+
   // Links Oficiais Stripe Connect (Conta: Startup Impetus - acct_1TIEpPJ8bCrM1s4s)
   // Configurados com transfer_group (ESCROW_MNR) e metadados de Split (10% Cliente + 10% Prestador)
   const stripeConnectTierLinks = {
@@ -110,7 +125,7 @@
               ">🛡️</div>
               <div>
                 <div style="font-weight: 800; font-size: 15px; color: #ffffff; letter-spacing: -0.3px;">Stripe Connect • Custódia Impetus</div>
-                <div style="font-size: 11.5px; color: #00E5FF; font-weight: 600;">Cartão de Crédito & PIX • Segregação de Fundos</div>
+                <div style="font-size: 11.5px; color: #00E5FF; font-weight: 600;">Cobrança & Transferência Separada • Segregação de Fundos</div>
               </div>
             </div>
             <button id="mao-na-roda-close-checkout" style="
@@ -139,7 +154,7 @@
             margin-bottom: 18px;
             line-height: 1.45;
           ">
-            🔒 <strong style="color: #ffffff;">Segregação de Fundos Stripe Connect:</strong> Seu pagamento fica retido na conta de custódia da <strong>Startup Impetus</strong> e só é transferido ao prestador após você confirmar a conclusão do serviço.
+            🔒 <strong style="color: #ffffff;">Arquitetura Oficial Stripe Connect (Separate Charges & Transfers):</strong> O pagamento via Cartão/Carteira Digital é capturado com segurança na conta de custódia segregada da <strong>Startup Impetus</strong> (sem risco de expiração em 7 dias) e transferido ao prestador assim que você confirmar a conclusão do serviço.
           </div>
 
           <!-- Resumo do Pedido -->
@@ -191,18 +206,9 @@
         if (amountEl) amountEl.textContent = 'R$ ' + val.toFixed(2).replace('.', ',');
 
         mount.innerHTML = `
-          <div style="width: 100%; margin-bottom: 14px;">
-            <div style="font-size: 11px; color: #94A3B8; margin-bottom: 6px; font-weight: 600;">Confirme ou selecione a faixa de valor:</div>
-            <div style="display: flex; gap: 6px;">
-              <button type="button" id="tier-btn-10" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val <= 11 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val <= 11 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">⚡ Teste R$ 10</button>
-              <button type="button" id="tier-btn-66" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val === 66 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val === 66 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">🔧 Visita R$ 66</button>
-              <button type="button" id="tier-btn-165" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val === 165 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val === 165 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">⭐ Padrão R$ 165</button>
-            </div>
-          </div>
-
           <div style="width: 100%; background: rgba(0, 230, 118, 0.06); border: 1px dashed rgba(0, 230, 118, 0.35); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 11.5px; color: #cbd5e1; display: flex; justify-content: space-between;">
-            <span>💼 Repasse Líquido Prestador: <strong style="color: #00E676;">R$ ${liquido}</strong></span>
-            <span>🏛️ Taxa Impetus: <strong style="color: #00E5FF;">R$ ${taxa}</strong></span>
+            <span>💼 Valor do Serviço (Prestador): <strong style="color: #00E676;">R$ ${(val / 1.10).toFixed(2).replace('.', ',')}</strong></span>
+            <span>🛡️ Taxa Custódia (10%): <strong style="color: #00E5FF;">R$ ${(val - (val / 1.10)).toFixed(2).replace('.', ',')}</strong></span>
           </div>
 
           <a href="${url}" id="btn-open-stripe-connect" style="
@@ -224,17 +230,15 @@
             text-decoration: none;
             box-sizing: border-box;
           ">
-            <span>🛡️ Pagar R$ ${val.toFixed(2).replace('.', ',')} (Cartão ou PIX Stripe)</span>
+            <span>💳 Pagar R$ ${val.toFixed(2).replace('.', ',')} via Stripe Connect</span>
             <span>→</span>
           </a>
-          <div style="margin-top: 12px; font-size: 11px; text-align: center; color: #94A3B8;">
-            Processado por <strong>Stripe Connect (Startup Impetus)</strong> • Retorno automático ao App
+          <div style="margin-top: 12px; font-size: 11px; text-align: center; color: #94A3B8; line-height: 1.4;">
+            Processado por <strong>Stripe Connect (Startup Impetus)</strong> • Cartão de Crédito, Apple Pay e Google Pay.<br/>
+            Para pagar via <strong>PIX Instantâneo (CNPJ 66.472.410/0001-43)</strong>, selecione a opção PIX na tela do Checkout.
           </div>
         `;
 
-        document.getElementById('tier-btn-10').onclick = function () { renderCheckoutBtn(10.0); };
-        document.getElementById('tier-btn-66').onclick = function () { renderCheckoutBtn(66.0); };
-        document.getElementById('tier-btn-165').onclick = function () { renderCheckoutBtn(165.0); };
         const btn = document.getElementById('btn-open-stripe-connect');
         if (btn) {
           btn.onclick = function (e) {
