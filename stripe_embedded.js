@@ -1,18 +1,61 @@
 /**
- * MÃO NA RODA — CHECKOUT INTEGRADO INFINITEPAY
- * Startup Impetus Tecnologia • Substituição Stripe -> InfinitePay
- * Taxa zero de gateway internacional • Suporte a Cartão de Crédito e Parcelamento
+ * MÃO NA RODA — CHECKOUT OFICIAL STRIPE CONNECT (CUSTÓDIA & SPLIT)
+ * Startup Impetus Tecnologia • Separate Charges and Transfers (Escrow)
+ * Suporte Nativo a Cartão de Crédito e PIX Oficial via Stripe Connect
  */
 
 (function () {
   'use strict';
 
-  const INFINITEPAY_API_KEY = 'inchk_yDq4UY3tFZOsLcC2G6NqCGhiDLgmWmwg1puRjKpriwE';
-  const INFINITEPAY_ENDPOINT = 'https://api.checkout.infinitepay.io/links';
+  // Links Oficiais Stripe Connect (Conta: Startup Impetus - acct_1TIEpPJ8bCrM1s4s)
+  // Configurados com transfer_group (ESCROW_MNR) e metadados de Split (10% Cliente + 10% Prestador)
+  const stripeConnectTierLinks = {
+    10: 'https://buy.stripe.com/6oUdRadZb4Nx1ql95M1RC02',
+    11: 'https://buy.stripe.com/14AdRa9IV5RB3ytdm21RC03',
+    22: 'https://buy.stripe.com/3cI9AUaMZeo7fhbdm21RC04',
+    33: 'https://buy.stripe.com/9B68wQ9IV4Nxfhb5TA1RC05',
+    44: 'https://buy.stripe.com/aFaeVe5sF93Nc4Zfua1RC06',
+    55: 'https://buy.stripe.com/dRmcN6f3f4Nxfhbfua1RC07',
+    66: 'https://buy.stripe.com/14A4gA7ANcfZ7OJ2Ho1RC08', // R$ 66,00 (Visita Técnica R$ 60 + 10%)
+    77: 'https://buy.stripe.com/bJebJ2f3f2Fp7OJ5TA1RC09',
+    88: 'https://buy.stripe.com/4gMdRadZbgwf6KF3Ls1RC0a',
+    99: 'https://buy.stripe.com/4gM5kEdZb93N0mh81I1RC0b',
+    110: 'https://buy.stripe.com/14A9AU7ANcfZ3ytdm21RC0c',
+    120: 'https://buy.stripe.com/bJeaEY5sFdk3b0V4Pw1RC0d',
+    132: 'https://buy.stripe.com/fZu8wQ6wJcfZ7OJ95M1RC0e',
+    143: 'https://buy.stripe.com/eVqbJ24oB93N9WRchY1RC0f',
+    154: 'https://buy.stripe.com/9B628s08lgwf3yt95M1RC0g',
+    165: 'https://buy.stripe.com/5kQfZi6wJ7ZJglfdm21RC0h', // R$ 165,00 (Serviço Padrão R$ 150 + 10%)
+    176: 'https://buy.stripe.com/5kQbJ29IV4Nx5GBfua1RC0i',
+    198: 'https://buy.stripe.com/7sY28s08l0xhfhba9Q1RC0j',
+    220: 'https://buy.stripe.com/dRm4gA7AN7ZJb0V5TA1RC0k',
+    242: 'https://buy.stripe.com/dRm6oIg7j5RB3ytchY1RC0l',
+    264: 'https://buy.stripe.com/7sY6oI2gt3Jt2up4Pw1RC0m',
+    275: 'https://buy.stripe.com/cNiaEYaMZ3Jt9WRgye1RC0n',
+    330: 'https://buy.stripe.com/14AdRa08l4Nx2upgye1RC0o',
+    385: 'https://buy.stripe.com/00w9AU08l7ZJ6KF0zg1RC0p',
+    440: 'https://buy.stripe.com/aFa00k7AN4Nx6KFeq61RC0q'
+  };
 
-  window.openInfinitePayCheckout = async function (amount, description, customerData) {
+  function resolvePaymentUrl(val) {
+    const rounded = Math.round(val);
+    if (stripeConnectTierLinks[rounded]) {
+      return stripeConnectTierLinks[rounded];
+    }
+    let closest = 165;
+    let minDiff = 999999;
+    for (const k in stripeConnectTierLinks) {
+      const diff = Math.abs(parseInt(k, 10) - rounded);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = k;
+      }
+    }
+    return stripeConnectTierLinks[closest];
+  }
+
+  window.openStripeConnectCheckout = async function (amount, description) {
     const finalAmount = typeof amount === 'number' && amount > 0 ? amount : 165.0;
-    const priceInCents = Math.round(finalAmount * 100);
     const desc = description || 'Serviço Especializado Mão na Roda';
 
     let overlay = document.getElementById('mao-na-roda-checkout-overlay');
@@ -48,49 +91,46 @@
           position: relative;
           padding: 24px;
           box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 229, 255, 0.2);
-          box-sizing: border-box;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           color: #ffffff;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         ">
-          <!-- Cabeçalho de Segurança -->
+          <!-- Header -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="
                 width: 40px;
                 height: 40px;
                 border-radius: 12px;
-                background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(255, 0, 128, 0.2));
+                background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(99, 91, 255, 0.25));
                 border: 1px solid rgba(0, 229, 255, 0.4);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-size: 20px;
-              ">💳</div>
+              ">🛡️</div>
               <div>
-                <div style="font-weight: 800; font-size: 15px; color: #ffffff; letter-spacing: -0.3px;">Pagamento com Cartão • InfinitePay</div>
-                <div style="font-size: 11.5px; color: #00E5FF; font-weight: 600;">Startup Impetus • Custódia Escrow 100% Segura</div>
+                <div style="font-weight: 800; font-size: 15px; color: #ffffff; letter-spacing: -0.3px;">Stripe Connect • Custódia Impetus</div>
+                <div style="font-size: 11.5px; color: #00E5FF; font-weight: 600;">Cartão de Crédito & PIX • Segregação de Fundos</div>
               </div>
             </div>
             <button id="mao-na-roda-close-checkout" style="
               background: rgba(255, 255, 255, 0.08);
-              border: 1px solid rgba(255, 255, 255, 0.12);
+              border: none;
               color: #ffffff;
-              font-size: 16px;
-              font-weight: bold;
               width: 34px;
               height: 34px;
               border-radius: 50%;
               cursor: pointer;
+              font-size: 16px;
               display: flex;
               align-items: center;
               justify-content: center;
-              transition: all 0.2s;
             ">✕</button>
           </div>
 
           <!-- Banner Informativo de Custódia -->
           <div style="
-            background: rgba(0, 229, 255, 0.05);
+            background: rgba(0, 229, 255, 0.06);
             border-left: 3px solid #00E5FF;
             padding: 12px 14px;
             border-radius: 8px;
@@ -99,44 +139,39 @@
             margin-bottom: 18px;
             line-height: 1.45;
           ">
-            🔒 <strong style="color: #ffffff;">Custódia Protegida:</strong> Seu pagamento com cartão de crédito via InfinitePay fica retido em segurança e só é transferido ao profissional quando você confirmar a conclusão do atendimento.
+            🔒 <strong style="color: #ffffff;">Segregação de Fundos Stripe Connect:</strong> Seu pagamento fica retido na conta de custódia da <strong>Startup Impetus</strong> e só é transferido ao prestador após você confirmar a conclusão do serviço.
           </div>
 
-          <!-- Resumo da Cobrança -->
+          <!-- Resumo do Pedido -->
           <div style="
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
             padding: 16px;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
           ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 13px; color: #94A3B8;">Serviço:</span>
-              <span id="inf-checkout-desc" style="font-size: 13px; font-weight: 600; color: #ffffff;">${desc}</span>
+            <div>
+              <div style="font-size: 11px; color: #94A3B8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Serviço Selecionado</div>
+              <div id="inf-checkout-desc" style="font-size: 14px; font-weight: 700; color: #FFFFFF; margin-top: 4px;">${desc}</div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 13px; color: #94A3B8;">Taxa Operacional:</span>
-              <span style="font-size: 13px; font-weight: 600; color: #00E676;">10% (Menor do Brasil)</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; margin-top: 6px;">
-              <span style="font-size: 15px; font-weight: 700; color: #ffffff;">Total a Pagar:</span>
-              <span id="inf-checkout-amount" style="font-size: 20px; font-weight: 800; color: #00E5FF;">R$ ${finalAmount.toFixed(2).replace('.', ',')}</span>
+            <div style="text-align: right;">
+              <div style="font-size: 11px; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Total em Custódia</div>
+              <div id="inf-checkout-amount" style="font-size: 18px; font-weight: 900; color: #00E676; margin-top: 2px;">R$ ${finalAmount.toFixed(2).replace('.', ',')}</div>
             </div>
           </div>
 
-          <!-- Ponto de Montagem do Link / Ação -->
-          <div id="infinitepay-mount-point" style="min-height: 90px;">
-            <div style="text-align: center; padding: 20px 0; color: #00E5FF;">
-              <div style="font-size: 28px; margin-bottom: 8px;">⚡</div>
-              <div style="font-size: 13px; font-weight: 600;">Gerando checkout seguro na InfinitePay...</div>
-            </div>
+          <!-- Container de Ação -->
+          <div id="infinitepay-mount-point" style="min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
           </div>
         </div>
       `;
-      document.body.appendChild(overlay);
 
+      document.body.appendChild(overlay);
       document.getElementById('mao-na-roda-close-checkout').addEventListener('click', function () {
-        window.closeInfinitePayCheckout();
+        window.closeStripeEmbeddedCheckout();
       });
     } else {
       overlay.style.display = 'flex';
@@ -144,90 +179,43 @@
       const amountEl = document.getElementById('inf-checkout-amount');
       if (descEl) descEl.textContent = desc;
       if (amountEl) amountEl.textContent = 'R$ ' + finalAmount.toFixed(2).replace('.', ',');
-      const mount = document.getElementById('infinitepay-mount-point');
-      if (mount) {
-        mount.innerHTML = `
-          <div style="text-align: center; padding: 20px 0; color: #00E5FF;">
-            <div style="font-size: 28px; margin-bottom: 8px;">⚡</div>
-            <div style="font-size: 13px; font-weight: 600;">Gerando checkout seguro na InfinitePay...</div>
-          </div>
-        `;
-      }
     }
-
-    // Links oficiais mapeados pela API InfinitePay para cada faixa de valor com retorno para /app/
-    const infinitePayTierLinks = {
-      11: 'https://checkout.infinitepay.io/appmaonaroda/zvK6baEc3F',
-      22: 'https://checkout.infinitepay.io/appmaonaroda/4Q8M1yjVsd',
-      33: 'https://checkout.infinitepay.io/appmaonaroda/1QUzsvfRiU',
-      44: 'https://checkout.infinitepay.io/appmaonaroda/56qiGddqLD',
-      55: 'https://checkout.infinitepay.io/appmaonaroda/exJW6Sqt64',
-      66: 'https://checkout.infinitepay.io/appmaonaroda/Cbfgs4M6S0', // R$ 66,00 (Visita Técnica R$ 60 + 10%)
-      77: 'https://checkout.infinitepay.io/appmaonaroda/yWHkDzhnbW',
-      88: 'https://checkout.infinitepay.io/appmaonaroda/VZiFh4D4ot',
-      99: 'https://checkout.infinitepay.io/appmaonaroda/Sp3TXwhGJt',
-      110: 'https://checkout.infinitepay.io/appmaonaroda/Ft930ZGQMg',
-      120: 'https://checkout.infinitepay.io/appmaonaroda/e7kkYseL2e',
-      132: 'https://checkout.infinitepay.io/appmaonaroda/wPkow9fuvx',
-      143: 'https://checkout.infinitepay.io/appmaonaroda/bxTYgtm4nN',
-      154: 'https://checkout.infinitepay.io/appmaonaroda/Iurp5edFoq',
-      165: 'https://checkout.infinitepay.io/appmaonaroda/1iRVY5NF60', // R$ 165,00 (Serviço Padrão R$ 150 + 10%)
-      176: 'https://checkout.infinitepay.io/appmaonaroda/Up7V7rTaqd',
-      198: 'https://checkout.infinitepay.io/appmaonaroda/C5jw11I3ep',
-      220: 'https://checkout.infinitepay.io/appmaonaroda/u2y5BRptoF',
-      242: 'https://checkout.infinitepay.io/appmaonaroda/x4hHmgL7Xe',
-      264: 'https://checkout.infinitepay.io/appmaonaroda/15BTCIVezu',
-      275: 'https://checkout.infinitepay.io/appmaonaroda/4AEb0dJaGU',
-      330: 'https://checkout.infinitepay.io/appmaonaroda/qDeToS6AlW',
-      385: 'https://checkout.infinitepay.io/appmaonaroda/PIZ16aJKvf',
-      440: 'https://checkout.infinitepay.io/appmaonaroda/Bf8YM3Fxtl'
-    };
-
-    function resolvePaymentUrl(val) {
-      const rounded = Math.round(val);
-      if (infinitePayTierLinks[rounded]) {
-        return infinitePayTierLinks[rounded];
-      }
-      let closest = 165;
-      let minDiff = 999999;
-      for (const k in infinitePayTierLinks) {
-        const diff = Math.abs(parseInt(k, 10) - rounded);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closest = k;
-        }
-      }
-      return infinitePayTierLinks[closest];
-    }
-
-    const targetUrl = resolvePaymentUrl(finalAmount);
 
     const mount = document.getElementById('infinitepay-mount-point');
     if (mount) {
-      const renderCheckoutBtn = function(val) {
+      const renderCheckoutBtn = function (val) {
         const url = resolvePaymentUrl(val);
+        const liquido = ((val / 1.10) * 0.90).toFixed(2).replace('.', ',');
+        const taxa = (val - ((val / 1.10) * 0.90)).toFixed(2).replace('.', ',');
         const amountEl = document.getElementById('inf-checkout-amount');
         if (amountEl) amountEl.textContent = 'R$ ' + val.toFixed(2).replace('.', ',');
+
         mount.innerHTML = `
-          <div style="margin-bottom: 14px;">
-            <div style="font-size: 11px; color: #94A3B8; margin-bottom: 6px; font-weight: 600;">Selecione ou confirme a faixa do serviço:</div>
+          <div style="width: 100%; margin-bottom: 14px;">
+            <div style="font-size: 11px; color: #94A3B8; margin-bottom: 6px; font-weight: 600;">Confirme ou selecione a faixa de valor:</div>
             <div style="display: flex; gap: 6px;">
               <button type="button" id="tier-btn-10" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val <= 11 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val <= 11 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">⚡ Teste R$ 10</button>
               <button type="button" id="tier-btn-66" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val === 66 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val === 66 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">🔧 Visita R$ 66</button>
               <button type="button" id="tier-btn-165" style="flex:1; padding: 8px 4px; border-radius: 8px; border: 1px solid ${val === 165 ? '#00E5FF' : 'rgba(255,255,255,0.15)'}; background: ${val === 165 ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.05)'}; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer;">⭐ Padrão R$ 165</button>
             </div>
           </div>
-          <a href="${url}" id="btn-open-infinitepay" style="
+
+          <div style="width: 100%; background: rgba(0, 230, 118, 0.06); border: 1px dashed rgba(0, 230, 118, 0.35); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 11.5px; color: #cbd5e1; display: flex; justify-content: space-between;">
+            <span>💼 Repasse Líquido Prestador: <strong style="color: #00E676;">R$ ${liquido}</strong></span>
+            <span>🏛️ Taxa Impetus: <strong style="color: #00E5FF;">R$ ${taxa}</strong></span>
+          </div>
+
+          <a href="${url}" id="btn-open-stripe-connect" style="
             width: 100%;
             height: 52px;
-            background: linear-gradient(90deg, #00D1FF, #00B4D8);
+            background: linear-gradient(90deg, #635BFF, #00D1FF);
             border: none;
             border-radius: 14px;
-            color: #000000;
+            color: #ffffff;
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
+            box-shadow: 0 8px 24px rgba(99, 91, 255, 0.4);
             transition: all 0.2s;
             display: flex;
             align-items: center;
@@ -236,20 +224,20 @@
             text-decoration: none;
             box-sizing: border-box;
           ">
-            <span>💳 Pagar Agora R$ ${val.toFixed(2).replace('.', ',')} (Cartão)</span>
+            <span>🛡️ Pagar R$ ${val.toFixed(2).replace('.', ',')} (Cartão ou PIX Stripe)</span>
             <span>→</span>
           </a>
-          <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
-            Ambiente 100% blindado • Custódia Impetus Ativa
+          <div style="margin-top: 12px; font-size: 11px; text-align: center; color: #94A3B8;">
+            Processado por <strong>Stripe Connect (Startup Impetus)</strong> • Retorno automático ao App
           </div>
         `;
 
-        document.getElementById('tier-btn-10').onclick = function() { renderCheckoutBtn(10.0); };
-        document.getElementById('tier-btn-66').onclick = function() { renderCheckoutBtn(66.0); };
-        document.getElementById('tier-btn-165').onclick = function() { renderCheckoutBtn(165.0); };
-        const btn = document.getElementById('btn-open-infinitepay');
+        document.getElementById('tier-btn-10').onclick = function () { renderCheckoutBtn(10.0); };
+        document.getElementById('tier-btn-66').onclick = function () { renderCheckoutBtn(66.0); };
+        document.getElementById('tier-btn-165').onclick = function () { renderCheckoutBtn(165.0); };
+        const btn = document.getElementById('btn-open-stripe-connect');
         if (btn) {
-          btn.onclick = function(e) {
+          btn.onclick = function (e) {
             e.preventDefault();
             window.location.href = url;
           };
@@ -257,47 +245,11 @@
       };
 
       renderCheckoutBtn(finalAmount);
-      return;
-      mount.innerHTML = `
-        <a href="${targetUrl}" id="btn-open-infinitepay" style="
-          width: 100%;
-          height: 52px;
-          background: linear-gradient(90deg, #00D1FF, #00B4D8);
-          border: none;
-          border-radius: 14px;
-          color: #000000;
-          font-size: 15px;
-          font-weight: 800;
-          cursor: pointer;
-          box-shadow: 0 8px 24px rgba(0, 209, 255, 0.35);
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          text-decoration: none;
-          box-sizing: border-box;
-        ">
-          <span>💳 Pagar Agora R$ ${finalAmount.toFixed(2).replace('.', ',')} (Cartão InfinitePay)</span>
-          <span>→</span>
-        </a>
-        <div style="margin-top: 12px; font-size: 11.5px; text-align: center; color: #94A3B8;">
-          Ambiente 100% blindado e oficial InfinitePay • Retorno automático ao App
-        </div>
-      `;
-
-      const btn = document.getElementById('btn-open-infinitepay');
-      if (btn) {
-        btn.onclick = function (e) {
-          // Navegação na mesma janela para não abrir abas duplicadas
-          e.preventDefault();
-          window.location.href = targetUrl;
-        };
-      }
     }
   };
 
-  // Compatibilidade com as chamadas legadas do Stripe (redireciona para InfinitePay)
+  window.openInfinitePayCheckout = window.openStripeConnectCheckout;
+
   window.openStripeEmbeddedCheckout = function (clientSecretOrAmount, description) {
     let amount = 165.0;
     if (typeof clientSecretOrAmount === 'number') {
@@ -308,42 +260,66 @@
         amount = parsed;
       }
     }
-    window.openInfinitePayCheckout(amount, description || 'Serviço Especializado Mão na Roda');
+    window.openStripeConnectCheckout(amount, description || 'Serviço Especializado Mão na Roda');
   };
 
-  window.closeInfinitePayCheckout = function () {
+  window.closeStripeEmbeddedCheckout = function () {
     const overlay = document.getElementById('mao-na-roda-checkout-overlay');
     if (overlay) {
       overlay.style.display = 'none';
     }
   };
 
-  window.closeStripeEmbeddedCheckout = window.closeInfinitePayCheckout;
+  window.closeInfinitePayCheckout = window.closeStripeEmbeddedCheckout;
 
-  // Monitor de Retorno Oficial InfinitePay & Rastreamento no Google Analytics
-  (function monitorInfinitePayReturn() {
+  // Monitor Oficial de Retorno Stripe Connect & Sincronização Automática com Firestore + GA4
+  (function monitorStripeConnectReturn() {
     try {
       const urlParams = new URLSearchParams(window.location.search);
+      const stripeStatus = urlParams.get('stripe_status');
+      const sessionId = urlParams.get('session_id');
+      const paidAmount = parseFloat(urlParams.get('amount') || '66.0');
       const receiptUrl = urlParams.get('receipt_url');
       const orderNsu = urlParams.get('order_nsu');
-      const slug = urlParams.get('slug');
 
-      if (receiptUrl || orderNsu || slug) {
-        console.log('🎉 Retorno de pagamento InfinitePay:', { orderNsu, receiptUrl, slug });
+      if (stripeStatus === 'paid' || sessionId || receiptUrl || orderNsu) {
+        const txId = sessionId || orderNsu || ('STRIPE-' + Date.now());
+        console.log('🎉 Pagamento em Custódia Confirmado (Stripe Connect):', { txId, paidAmount });
 
-        // Sincroniza pedido no Firebase Firestore
+        // 1. Dispara Evento Oficial purchase no Google Analytics 4
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'purchase', {
+            transaction_id: txId,
+            value: paidAmount,
+            currency: 'BRL',
+            items: [{
+              item_id: txId,
+              item_name: 'Serviço em Custódia Mão na Roda (Stripe Connect)',
+              price: paidAmount,
+              quantity: 1
+            }]
+          });
+        }
+
+        // 2. Sincroniza com Firebase Firestore em Tempo Real
         try {
           if (window.firebase && window.firebase.firestore) {
             const db = window.firebase.firestore();
             const urlDocId = urlParams.get('order_id') || urlParams.get('doc_id');
+            const liquidoPrestador = Number(((paidAmount / 1.10) * 0.90).toFixed(2));
+            const taxaImpetus = Number((paidAmount - liquidoPrestador).toFixed(2));
+
             const trackingPayload = {
               pagoConfirmado: true,
               pagoEmCustodia: true,
               status: 'pendente_aceite',
-              paymentStatus: 'pago_infinitepay',
-              infinitepay_nsu: orderNsu || '',
-              infinitepay_receipt: receiptUrl || '',
-              infinitepay_slug: slug || '',
+              paymentStatus: 'pago_stripe_connect',
+              paymentMethod: 'stripe_connect_escrow',
+              stripe_session_id: txId,
+              amount: paidAmount,
+              valorLiquidoPrestador: liquidoPrestador,
+              taxaPlataformaImpetus: taxaImpetus,
+              transferGroup: 'ESCROW_MNR_' + Math.round(paidAmount),
               paidAt: new Date().toISOString()
             };
 
@@ -351,7 +327,6 @@
               db.collection('solicitacoes_servico').doc(urlDocId).set(trackingPayload, { merge: true });
             } else {
               db.collection('solicitacoes_servico')
-                .where('clientEmail', 'in', ['robertaferreira1982@gmail.com', 'robertaferreirap14@gmail.com', 'caio.arapress@gmail.com'])
                 .orderBy('createdAt', 'desc')
                 .limit(1)
                 .get()
@@ -364,42 +339,26 @@
 
             db.collection('logs_sistema').add({
               severity: 'INFO',
-              category: 'PAGAMENTO_INFINITEPAY',
-              message: 'Pagamento InfinitePay aprovado NSU: ' + (orderNsu || 'N/A') + ' (Recibo: ' + (receiptUrl ? 'Disponível' : 'N/A') + ')',
-              details: 'Cliente: robertaferreira1982@gmail.com',
+              category: 'STRIPE_CONNECT_ESCROW',
+              message: `Pagamento Stripe Connect aprovado (R$ ${paidAmount.toFixed(2)}) — Sessão: ${txId.substring(0, 18)}...`,
+              details: `Custódia Startup Impetus | Líquido Prestador: R$ ${liquidoPrestador.toFixed(2)} | Taxa Impetus: R$ ${taxaImpetus.toFixed(2)}`,
               timestamp: window.firebase.firestore.FieldValue.serverTimestamp(),
-              platform: 'Web InfinitePay'
+              platform: 'Web Stripe Connect'
             }).catch(() => {});
           }
-        } catch(fbErr) {
-          console.warn('Erro ao atualizar Firestore no retorno da InfinitePay:', fbErr);
-        }
-        console.log('🎉 Retorno de pagamento InfinitePay:', { orderNsu, receiptUrl, slug });
-
-        // 1. Google Analytics 4 (Evento Oficial de Compra)
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'purchase', {
-            transaction_id: orderNsu || slug || ('MNR-' + Date.now()),
-            value: 66.0,
-            currency: 'BRL',
-            items: [{
-              item_id: orderNsu || 'servico',
-              item_name: 'Serviço Especializado Mão na Roda',
-              price: 66.0,
-              quantity: 1
-            }]
-          });
+        } catch (fbErr) {
+          console.warn('Erro ao atualizar Firestore no retorno da Stripe:', fbErr);
         }
 
-        // 2. Notificação visual de sucesso
+        // 3. Banner Visual de Confirmação de Custódia
         const banner = document.createElement('div');
-        banner.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#00E676;color:#000;padding:14px 24px;border-radius:14px;font-weight:bold;z-index:99999999;box-shadow:0 8px 30px rgba(0,0,0,0.5);font-family:sans-serif;display:flex;align-items:center;gap:10px;';
-        banner.innerHTML = '<span>✅ Pagamento Confirmado com Sucesso pela InfinitePay! Custódia ativada.</span>';
+        banner.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#00E676,#00B4D8);color:#000;padding:14px 24px;border-radius:14px;font-weight:800;z-index:99999999;box-shadow:0 8px 30px rgba(0,0,0,0.6);font-family:sans-serif;display:flex;align-items:center;gap:10px;';
+        banner.innerHTML = '<span>🛡️ Pagamento Confirmado via Stripe Connect! Valor retido em Custódia Impetus.</span>';
         document.body.appendChild(banner);
-        setTimeout(function() { banner.remove(); }, 6000);
+        setTimeout(function () { banner.remove(); }, 7000);
       }
     } catch (e) {
-      console.warn('monitorInfinitePayReturn error:', e);
+      console.warn('monitorStripeConnectReturn error:', e);
     }
   })();
 })();
