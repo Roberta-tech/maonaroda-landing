@@ -243,6 +243,25 @@
         if (btn) {
           btn.onclick = function (e) {
             e.preventDefault();
+            try {
+              const txId = 'STRIPE-' + Date.now();
+              if (window.localStorage) {
+                window.localStorage.setItem('mnr_pending_stripe_purchase', JSON.stringify({
+                  transaction_id: txId,
+                  value: val,
+                  description: desc,
+                  ts: Date.now()
+                }));
+              }
+              if (typeof window.gtag === 'function') {
+                window.gtag('event', 'begin_checkout', {
+                  currency: 'BRL',
+                  value: val,
+                  items: [{ item_id: txId, item_name: desc, price: val, quantity: 1 }],
+                  transport_type: 'beacon'
+                });
+              }
+            } catch (_) {}
             window.location.href = url;
           };
         }
@@ -290,20 +309,30 @@
         const txId = sessionId || orderNsu || ('STRIPE-' + Date.now());
         console.log('🎉 Pagamento em Custódia Confirmado (Stripe Connect):', { txId, paidAmount });
 
-        // 1. Dispara Evento Oficial purchase no Google Analytics 4
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'purchase', {
-            transaction_id: txId,
-            value: paidAmount,
-            currency: 'BRL',
-            items: [{
-              item_id: txId,
-              item_name: 'Serviço em Custódia Mão na Roda (Stripe Connect)',
-              price: paidAmount,
-              quantity: 1
-            }]
-          });
-        }
+        // 1. Dispara Evento Oficial purchase no Google Analytics 4 (com beacon garantido)
+        const firePurchaseEvent = function () {
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'purchase', {
+              transaction_id: txId,
+              value: paidAmount,
+              currency: 'BRL',
+              transport_type: 'beacon',
+              items: [{
+                item_id: txId,
+                item_name: 'Serviço em Custódia Mão na Roda (Stripe Connect)',
+                price: paidAmount,
+                quantity: 1
+              }]
+            });
+          }
+        };
+        firePurchaseEvent();
+        setTimeout(firePurchaseEvent, 1500);
+        try {
+          if (window.localStorage) {
+            window.localStorage.removeItem('mnr_pending_stripe_purchase');
+          }
+        } catch (_) {}
 
         // 2. Sincroniza com Firebase Firestore em Tempo Real
         try {
