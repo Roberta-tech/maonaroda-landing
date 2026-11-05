@@ -361,10 +361,6 @@
   ],
   "Desenvolvimento web e aplicativos": [
     {
-      "label": "10,00 (consultoria express teste)",
-      "price": 10
-    },
-    {
       "label": "150,00 (hora de consultoria)",
       "price": 150
     },
@@ -531,30 +527,22 @@
   ],
   "Programador": [
     {
-      "label": "10,00 (consultoria express teste)",
-      "price": 10
-    },
-    {
-      "label": "50,00 (correção de bug)",
-      "price": 50
-    },
-    {
-      "label": "150,00 (hora técnica)",
+      "label": "150,00 (hora de consultoria)",
       "price": 150
+    },
+    {
+      "label": "300,00 (projeto / diária)",
+      "price": 300
     }
   ],
   "Programador (Desenvolvimento de Software e Web)": [
     {
-      "label": "10,00 (consultoria express teste)",
-      "price": 10
-    },
-    {
-      "label": "50,00 (correção de bug)",
-      "price": 50
-    },
-    {
-      "label": "150,00 (hora técnica)",
+      "label": "150,00 (hora de consultoria)",
       "price": 150
+    },
+    {
+      "label": "300,00 (projeto / diária)",
+      "price": 300
     }
   ]
 }

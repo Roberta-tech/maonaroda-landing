@@ -1,15 +1,5 @@
 [
   {
-    "id": "gSk0q3Y0lcavIDsMpjOL4oZwdlE2",
-    "nome": "Roberta Ferreira (Programadora)",
-    "profissao": "Programador",
-    "categoria": "Programador",
-    "valor_base": 10,
-    "precoBase": 10,
-    "localizacao": "Araraquara, SP",
-    "telefone": ""
-  },
-  {
     "id": "003mmEOfSmuqxCQDGXnD",
     "nome": "Marcondes avelino dos santos",
     "profissao": "Jardineiro (Poda de grama e manutenção)",
@@ -738,16 +728,6 @@
     "precoBase": 150,
     "localizacao": "Araraquara, SP",
     "telefone": "+5521979041735"
-  },
-  {
-    "id": "4tdfA9VYuHpNALgQnbsX",
-    "nome": "Roberta Ferreira Pinto",
-    "profissao": "Diarista (Faxineira)",
-    "categoria": "Diarista (Faxineira)",
-    "valor_base": 150,
-    "precoBase": 150,
-    "localizacao": "Araraquara, SP",
-    "telefone": "+5519994993061"
   },
   {
     "id": "4xuQTHPGOIX7M5Bi5cbZ",
@@ -3154,16 +3134,6 @@
     "nome": "Programador & Dev Web",
     "profissao": "Desenvolvimento web e aplicativos",
     "categoria": "Desenvolvimento web e aplicativos",
-    "valor_base": 10,
-    "precoBase": 10,
-    "localizacao": "Araraquara, SP",
-    "telefone": ""
-  },
-  {
-    "id": "prestador_programador_oficial",
-    "nome": "Programador Especialista",
-    "profissao": "Programador",
-    "categoria": "Programador",
     "valor_base": 10,
     "precoBase": 10,
     "localizacao": "Araraquara, SP",
