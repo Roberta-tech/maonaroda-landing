@@ -1986,11 +1986,26 @@
             if (!confirm('Deseja forçar a conclusão deste chamado e liberar a custódia para o profissional?')) return;
             try {
                 await ensureMasterAuth();
+                const order = (ordersData || []).find(o => o.docId === docId || o.id === docId) || {};
+                const valorCompra = parseFloat(order.amount || 0);
                 await db.collection('solicitacoes_servico').doc(docId).update({
                     status: 'concluido',
                     concluidoPeloCliente: true,
                     concluidoPeloPrestador: true
                 });
+                if (typeof gtag === 'function' && valorCompra > 0) {
+                    gtag('event', 'purchase', {
+                        transaction_id: docId,
+                        value: valorCompra,
+                        currency: 'BRL',
+                        items: [{
+                            item_id: docId,
+                            item_name: order.category || 'Servico Mao na Roda',
+                            price: valorCompra,
+                            quantity: 1
+                        }]
+                    });
+                }
                 showToast('✅ Chamado concluído e custódia liberada!');
             } catch(e) {
                 alert('Erro ao atualizar: ' + e.message);
