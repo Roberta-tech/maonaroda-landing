@@ -2058,7 +2058,7 @@
 
             users.forEach(u => {
                 const p = (u.perfil || u.role || '').toLowerCase();
-                const isPro = p.includes('prestador') || p.includes('profissional') || p.includes('pro') || Boolean(u.profissao) || Boolean(u.categoria) || Boolean(u.valor_base) || Boolean(u.especialidade);
+                const isPro = p.includes('prestador') || p.includes('profissional') || p.includes('pro') || Boolean((u.profissao || u.especialidade || '').trim());
                 if (isPro) {
                     pros++;
                 } else {
@@ -2462,7 +2462,7 @@
                 // Prestadores Reais do Firestore (Coleção users)
                 const realPros = (customList || usersData || []).filter(u => {
                     const p = (u.perfil || u.role || '').toLowerCase();
-                    return p.includes('prestador') || p.includes('profissional') || p.includes('pro') || Boolean(u.profissao) || Boolean(u.categoria) || Boolean(u.valor_base) || Boolean(u.especialidade);
+                    return p.includes('prestador') || p.includes('profissional') || p.includes('pro') || Boolean((u.profissao || u.especialidade || '').trim());
                 });
 
                 if (realPros.length === 0) {
@@ -2571,7 +2571,7 @@
             if (currentProvView === 'app') {
                 const filtered = (usersData || []).filter(u => {
                     const p = (u.perfil || u.role || '').toLowerCase();
-                    const isPro = p.includes('prestador') || p.includes('profissional') || p.includes('pro') || Boolean(u.profissao) || Boolean(u.categoria) || Boolean(u.valor_base) || Boolean(u.especialidade);
+                    const isPro = p.includes('prestador') || p.includes('profissional') || p.includes('pro') || Boolean((u.profissao || u.especialidade || '').trim());
                     if (!isPro) return false;
                     const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
                     const email = (u.email || '').toLowerCase();
