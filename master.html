@@ -2054,6 +2054,23 @@
                     concluidoPeloCliente: true,
                     concluidoPeloPrestador: true
                 });
+
+                // Se for Assinatura Mão na Roda PRO, ativa os 30 dias na hora no perfil do usuário
+                if (order.category && (order.category.includes('PRO') || order.paymentMethod === 'pix_pro_mensal_itau')) {
+                    const clientUid = order.clientUid;
+                    if (clientUid) {
+                        const proExp = new Date(Date.now() + 30 * 86400000).toISOString();
+                        await db.collection('users').doc(clientUid).set({
+                            is_pro: true,
+                            is_pro_confirmado_banco: true,
+                            is_pro_pendente: false,
+                            pro_expira_em: proExp
+                        }, { merge: true });
+                        await db.collection('prestadores').doc(clientUid).set({
+                            is_pro: true
+                        }, { merge: true }).catch(() => {});
+                    }
+                }
                 if (typeof gtag === 'function' && valorCompra > 0) {
                     gtag('event', 'purchase', {
                         transaction_id: docId,
