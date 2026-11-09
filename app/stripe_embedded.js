@@ -25,8 +25,6 @@
   // Links Oficiais Stripe Connect (Conta: Startup Impetus - acct_1TIEpPJ8bCrM1s4s)
   // Configurados com transfer_group (ESCROW_MNR) e metadados de Split (10% Cliente + 10% Prestador)
   const stripeConnectTierLinks = {
-    10: 'https://buy.stripe.com/6oUdRadZb4Nx1ql95M1RC02',
-    11: 'https://buy.stripe.com/14AdRa9IV5RB3ytdm21RC03',
     22: 'https://buy.stripe.com/3cI9AUaMZeo7fhbdm21RC04',
     33: 'https://buy.stripe.com/9B68wQ9IV4Nxfhb5TA1RC05',
     44: 'https://buy.stripe.com/aFaeVe5sF93Nc4Zfua1RC06',
@@ -54,19 +52,10 @@
 
   function resolvePaymentUrl(val) {
     const rounded = Math.round(val);
-    if (stripeConnectTierLinks[rounded]) {
+    if (Math.abs(val - rounded) < 0.05 && stripeConnectTierLinks[rounded]) {
       return stripeConnectTierLinks[rounded];
     }
-    let closest = 165;
-    let minDiff = 999999;
-    for (const k in stripeConnectTierLinks) {
-      const diff = Math.abs(parseInt(k, 10) - rounded);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closest = k;
-      }
-    }
-    return stripeConnectTierLinks[closest];
+    return null;
   }
 
   window.openStripeConnectCheckout = async function (amount, description) {
