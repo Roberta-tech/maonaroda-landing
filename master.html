@@ -1992,7 +1992,7 @@
                         </td>
                         <td>
                             <strong>${o.category || 'Serviço Geral'}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">${o.paymentMethod === 'pix' || o.paymentMethod === 'pix_stripe' || o.paymentMethod === 'pix_impetus' ? 'PIX Banco Central' : (o.paymentMethod === 'stripe_connect_escrow' ? '🛡️ Stripe Connect (Escrow)' : (o.paymentMethod === 'card_infinitepay' ? 'Cartão InfinitePay' : 'Cartão / PIX Stripe'))}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${(o.paymentMethod || '').includes('pix') ? 'PIX CNPJ • Startup Impetus (Itaú)' : (o.paymentMethod === 'stripe_connect_escrow' || o.paymentMethod === 'card_infinitepay' ? '💳 Cartão Oficial (Checkout)' : 'PIX CNPJ • Startup Impetus')}</div>
                         </td>
                         <td>
                             <div style="font-weight: 600;">${o.professionalName || 'Profissional Mão na Roda'}</div>
@@ -2005,8 +2005,10 @@
                         </td>
                         <td style="font-family: 'JetBrains Mono';">
                             <div style="font-weight: 700; color: var(--green);">R$ ${parseFloat(o.amount || 0).toFixed(2).replace('.', ',')}</div>
-                            <div style="font-size: 10.5px; color: var(--cyan); font-weight: 600;">Líq: R$ ${((parseFloat(o.amount || 0) > 0 ? (parseFloat(o.amount || 0) / 1.10) : 0) * 0.90).toFixed(2).replace('.', ',')}</div>
-                            <div style="font-size: 10px; color: var(--text-muted);">Taxa Impetus: R$ ${(parseFloat(o.amount || 0) - ((parseFloat(o.amount || 0) > 0 ? (parseFloat(o.amount || 0) / 1.10) : 0) * 0.90)).toFixed(2).replace('.', ',')}</div>
+                            ${(o.paymentMethod === 'pix_pro_mensal_itau' || (o.category || '').includes('PRO'))
+                                ? `<div style="font-size: 10.5px; color: var(--cyan); font-weight: 600;">100% Receita Impetus</div><div style="font-size: 10px; color: var(--text-muted);">Assinatura Mensal PIX</div>`
+                                : `<div style="font-size: 10.5px; color: var(--cyan); font-weight: 600;">Líq: R$ ${((parseFloat(o.amount || 0) > 0 ? (parseFloat(o.amount || 0) / 1.10) : 0) * 0.90).toFixed(2).replace('.', ',')}</div><div style="font-size: 10px; color: var(--text-muted);">Taxa Impetus: R$ ${(parseFloat(o.amount || 0) - ((parseFloat(o.amount || 0) > 0 ? (parseFloat(o.amount || 0) / 1.10) : 0) * 0.90)).toFixed(2).replace('.', ',')}</div>`
+                            }
                         </td>
                         <td>
                             <span style="font-size: 12px; color: var(--text-secondary);">${o.prazoEstimado || 'Até 30 min (Até 1km)'}</span>
@@ -2015,9 +2017,10 @@
                         <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
                         <td>
                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="forceComplete('${o.docId}')" title="Confirmar e Liberar Custódia">
-                                    🔓 Liberar
-                                </button>
+                                ${isWaitingPayment
+                                    ? `<button class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: #00E676; color: #00E676;" onclick="confirmarPixItau('${o.docId}')" title="Confirmar que o PIX caiu na conta do Itaú">✅ Confirmar PIX Itaú</button>`
+                                    : `<button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="forceComplete('${o.docId}')" title="Confirmar Conclusão e Liberar Custódia">🔓 Liberar Custódia</button>`
+                                }
                                 <button class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: var(--pink); color: var(--pink);" onclick="openSupportModal('${o.docId}')" title="Atendimento e Mensagens do Chamado">
                                     💬 Suporte
                                 </button>
@@ -2041,6 +2044,53 @@
                 (o.clientEmail || '').toLowerCase().includes(q)
             );
             renderOrders(filtered);
+        }
+
+        async function confirmarPixItau(docId) {
+            const order = (ordersData || []).find(o => o.docId === docId || o.id === docId) || {};
+            const valorCompra = parseFloat(order.amount || 0);
+            const isProOrder = (order.category && order.category.includes('PRO')) || order.paymentMethod === 'pix_pro_mensal_itau';
+            const msg = isProOrder
+                ? `Confirmar recebimento do PIX de R$ ${valorCompra.toFixed(2).replace('.', ',')} na conta Itaú e ativar o Plano Mão na Roda PRO por 30 dias?`
+                : `Confirmar recebimento do PIX de R$ ${valorCompra.toFixed(2).replace('.', ',')} na conta Itaú da Startup Impetus?\n\nIsso colocará o valor em Custódia e liberará o chamado para o prestador atender.`;
+            if (!confirm(msg)) return;
+            try {
+                await ensureMasterAuth();
+                if (isProOrder) {
+                    await db.collection('solicitacoes_servico').doc(docId).update({
+                        status: 'concluido',
+                        pagoConfirmado: true,
+                        pagoEmCustodia: false,
+                        paymentStatus: 'pago_pix_pro_itau',
+                        concluidoPeloCliente: true,
+                        concluidoPeloPrestador: true
+                    });
+                    const clientUid = order.clientUid;
+                    if (clientUid) {
+                        const proExp = new Date(Date.now() + 30 * 86400000).toISOString();
+                        await db.collection('users').doc(clientUid).set({
+                            is_pro: true,
+                            is_pro_confirmado_banco: true,
+                            is_pro_pendente: false,
+                            pro_expira_em: proExp
+                        }, { merge: true });
+                        await db.collection('prestadores').doc(clientUid).set({
+                            is_pro: true
+                        }, { merge: true }).catch(() => {});
+                    }
+                    showToast('✅ PIX PRO confirmado! Plano PRO ativado por 30 dias.');
+                } else {
+                    await db.collection('solicitacoes_servico').doc(docId).update({
+                        status: 'pendente_aceite',
+                        pagoConfirmado: true,
+                        pagoEmCustodia: true,
+                        paymentStatus: 'pago_pix_itau'
+                    });
+                    showToast('✅ PIX confirmado na conta Itaú! Chamado em Custódia e liberado para o prestador.');
+                }
+            } catch (err) {
+                alert('Erro ao confirmar PIX: ' + err.message);
+            }
         }
 
         async function forceComplete(docId) {
