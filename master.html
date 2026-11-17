@@ -2347,6 +2347,17 @@
                     ];
                 }
 
+                logsData.sort((a, b) => {
+                    const getMs = (ts) => {
+                        if (!ts) return 0;
+                        try {
+                            const d = ts.toDate ? ts.toDate() : new Date(ts);
+                            return isNaN(d.getTime()) ? 0 : d.getTime();
+                        } catch (_) { return 0; }
+                    };
+                    return getMs(b.timestamp) - getMs(a.timestamp);
+                });
+
                 renderLogs(logsData);
                 updateLogMetrics(logsData);
             }, err => {
@@ -2360,6 +2371,17 @@
                         timestamp: new Date()
                     }
                 ];
+                logsData.sort((a, b) => {
+                    const getMs = (ts) => {
+                        if (!ts) return 0;
+                        try {
+                            const d = ts.toDate ? ts.toDate() : new Date(ts);
+                            return isNaN(d.getTime()) ? 0 : d.getTime();
+                        } catch (_) { return 0; }
+                    };
+                    return getMs(b.timestamp) - getMs(a.timestamp);
+                });
+
                 renderLogs(logsData);
                 updateLogMetrics(logsData);
             });
@@ -2411,11 +2433,15 @@
                 else if (s === 'ERROR') sevClass = 'log-sev-err';
                 else if (s === 'WARNING') sevClass = 'log-sev-warn';
 
-                let timeStr = '--:--:--';
+                let timeStr = '--/-- --:--:--';
                 if (l.timestamp) {
                     try {
                         const d = l.timestamp.toDate ? l.timestamp.toDate() : new Date(l.timestamp);
-                        timeStr = d.toLocaleTimeString('pt-BR');
+                        if (!isNaN(d.getTime())) {
+                            const dt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+                            const tm = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/Sao_Paulo' });
+                            timeStr = `${dt} ${tm}`;
+                        }
                     } catch(e) {}
                 }
 
@@ -2511,6 +2537,17 @@
                     const s = (l.severity || '').toUpperCase();
                     return s !== 'CRITICAL' && s !== 'ERROR' && s !== 'WARNING';
                 });
+                logsData.sort((a, b) => {
+                    const getMs = (ts) => {
+                        if (!ts) return 0;
+                        try {
+                            const d = ts.toDate ? ts.toDate() : new Date(ts);
+                            return isNaN(d.getTime()) ? 0 : d.getTime();
+                        } catch (_) { return 0; }
+                    };
+                    return getMs(b.timestamp) - getMs(a.timestamp);
+                });
+
                 renderLogs(logsData);
                 updateLogMetrics(logsData);
                 showToast('✅ Erros limpos com sucesso! Saúde do App em 100%.');
