@@ -130,4 +130,22 @@
             document.documentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0A0B0E;color:#00E5FF;font-family:sans-serif;font-weight:bold;">Acesso protegido — Mão na Roda (Impetus Tecnologia)</div>';
         }
     }
+
+    // 7. Proteção Anti-Clonagem de Domínio (Domain Pinning)
+    try {
+        const host = (window.location.hostname || '').toLowerCase();
+        const allowedHosts = [
+            'appmaonaroda.com.br',
+            'www.appmaonaroda.com.br',
+            'maonaroda.com.br',
+            'www.maonaroda.com.br',
+            'roberta-tech.github.io',
+            'localhost',
+            '127.0.0.1'
+        ];
+        const isAllowed = !host || allowedHosts.includes(host) || host.endsWith('.firebaseapp.com') || host.endsWith('.web.app');
+        if (!isAllowed) {
+            window.location.replace('https://appmaonaroda.com.br/');
+        }
+    } catch (_) {}
 })();
