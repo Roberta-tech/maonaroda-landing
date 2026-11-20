@@ -1330,6 +1330,7 @@
                                 <button id="btnLogFilterAll" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('ALL')">Todos</button>
                                 <button id="btnLogFilterCrit" class="btn-action" style="background: transparent; color: var(--red); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('CRITICAL')">🚨 Apenas Erros</button>
                                 <button id="btnLogFilterWarn" class="btn-action" style="background: transparent; color: var(--amber); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('WARNING')">⚠️ Avisos</button>
+                                <button id="btnLogFilterCaio" class="btn-action" style="background: transparent; color: var(--pink); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;" onclick="filterLogsBySev('CAIO_FORENSE')">🕵️‍♀️ Rastrear Caio / Forense</button>
                             </div>
                             <button class="btn-action" onclick="exportLogs()">📥 Exportar JSON</button>
                             <button class="btn-action" style="border-color: rgba(255, 61, 113, 0.4); color: var(--red); font-weight: 700;" onclick="clearLogs()">🗑️ Limpar Erros no Firestore</button>
@@ -2481,23 +2482,50 @@
                         timeStr = `${dt} ${tm}`;
 
                         if (typeof l.timestamp === 'string' && !l.timestamp.endsWith('Z')) {
-                            const localParsed = new Date(l.timestamp);
-                            if (!isNaN(localParsed.getTime())) {
-                                const diffHours = Math.abs(localParsed.getTime() - trueMs) / 3600000;
-                                if (diffHours >= 1.2) {
-                                    originBadge = `<span style="background: rgba(255, 179, 0, 0.15); color: #ffb300; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">🌎 Exterior / Internacional</span>`;
+                            const wallUtcMs = Date.parse(l.timestamp + 'Z');
+                            if (!isNaN(wallUtcMs)) {
+                                const utcOffset = Math.round(((wallUtcMs - trueMs) / 3600000) * 2) / 2;
+                                let countryLabel = `🇧🇷 Brasil (UTC-3)`;
+                                let badgeStyle = `background: rgba(0, 230, 118, 0.12); color: #00E676;`;
+                                if (Math.abs(utcOffset - (-3)) <= 0.6) {
+                                    countryLabel = `🇧🇷 Brasil`;
+                                } else if (Math.abs(utcOffset - (-4)) <= 0.4) {
+                                    countryLabel = `🇺🇸 EUA (EDT) / 🇧🇷 AM (UTC-4)`;
+                                    badgeStyle = `background: rgba(255, 179, 0, 0.15); color: #ffb300;`;
+                                } else if (Math.abs(utcOffset - (-5)) <= 0.4) {
+                                    countryLabel = `🇺🇸 Estados Unidos (Costa Leste / EST)`;
+                                    badgeStyle = `background: rgba(255, 179, 0, 0.15); color: #ffb300;`;
+                                } else if (Math.abs(utcOffset - (-6)) <= 0.4) {
+                                    countryLabel = `🇺🇸 Estados Unidos (Central / CST)`;
+                                    badgeStyle = `background: rgba(255, 179, 0, 0.15); color: #ffb300;`;
+                                } else if (utcOffset <= -7 && utcOffset >= -8.5) {
+                                    countryLabel = `🇺🇸 Estados Unidos (Califórnia / PST)`;
+                                    badgeStyle = `background: rgba(255, 179, 0, 0.15); color: #ffb300;`;
+                                } else if (Math.abs(utcOffset) <= 0.4) {
+                                    countryLabel = `🇵🇹 Portugal / 🇬🇧 Reino Unido (UTC+0)`;
+                                    badgeStyle = `background: rgba(0, 229, 255, 0.15); color: #00E5FF;`;
+                                } else if (utcOffset >= 1 && utcOffset <= 2.5) {
+                                    countryLabel = `🇪🇺 Europa (UTC+${utcOffset})`;
+                                    badgeStyle = `background: rgba(0, 229, 255, 0.15); color: #00E5FF;`;
                                 } else {
-                                    originBadge = `<span style="background: rgba(0, 230, 118, 0.12); color: #00E676; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">🇧🇷 Brasil</span>`;
+                                    const sign = utcOffset >= 0 ? '+' : '';
+                                    countryLabel = `🌐 Exterior / Verificador Loja (UTC${sign}${utcOffset})`;
+                                    badgeStyle = `background: rgba(255, 179, 0, 0.15); color: #ffb300;`;
                                 }
+                                originBadge = `<span style="${badgeStyle} padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">${countryLabel}</span>`;
                             }
                         }
                     } catch(e) {}
                 }
 
                 const rawEmail = (l.userEmail || '').trim();
+                const isCaio = rawEmail.toLowerCase().includes('caio');
                 const userBadge = (!rawEmail || rawEmail === 'visitante')
                     ? `<span style="background: rgba(0, 229, 255, 0.12); color: var(--cyan); padding: 1px 6px; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 6px;">📱 Visitante no App (Sem Login)</span>`
-                    : `<span style="background: rgba(255, 46, 147, 0.14); color: var(--pink); padding: 1px 6px; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 6px;">👤 ${rawEmail}</span>`;
+                    : `<span style="background: ${isCaio ? 'rgba(255, 23, 68, 0.25)' : 'rgba(255, 46, 147, 0.14)'}; color: ${isCaio ? '#FF5252' : 'var(--pink)'}; border: ${isCaio ? '1px solid rgba(255,82,82,0.5)' : 'none'}; padding: 1px 6px; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 6px;">${isCaio ? '🕵️‍♀️ ' : '👤 '}${rawEmail}</span>`;
+
+                const cleanMsg = String(l.message || '').replace(/data:image\/[^;\s]+;base64,[A-Za-z0-9+/=]+/g, '[Foto Base64]');
+                const cleanDetails = l.details ? String(l.details).replace(/data:image\/[^;\s]+;base64,[A-Za-z0-9+/=]+/g, '[Foto Base64]') : '';
 
                 return `
                     <div class="log-entry">
@@ -2506,8 +2534,8 @@
                         <span class="log-cat">[${l.category || 'GERAL'}]</span>
                         <span class="log-msg">
                             ${userBadge}
-                            ${l.message || ''} 
-                            ${l.details ? `<span style="color: var(--text-muted); font-size: 11px;">(${l.details})</span>` : ''}
+                            ${cleanMsg} 
+                            ${cleanDetails ? `<span style="color: var(--text-muted); font-size: 11px;">(${cleanDetails})</span>` : ''}
                             ${originBadge}
                         </span>
                     </div>
@@ -2544,9 +2572,11 @@
             const btnAll = document.getElementById('btnLogFilterAll');
             const btnCrit = document.getElementById('btnLogFilterCrit');
             const btnWarn = document.getElementById('btnLogFilterWarn');
+            const btnCaio = document.getElementById('btnLogFilterCaio');
             if (btnAll) { btnAll.style.background = sev === 'ALL' ? 'var(--cyan)' : 'transparent'; btnAll.style.color = sev === 'ALL' ? '#000' : 'var(--text-secondary)'; }
             if (btnCrit) { btnCrit.style.background = sev === 'CRITICAL' ? 'var(--red)' : 'transparent'; btnCrit.style.color = sev === 'CRITICAL' ? '#fff' : 'var(--red)'; }
             if (btnWarn) { btnWarn.style.background = sev === 'WARNING' ? 'var(--amber)' : 'transparent'; btnWarn.style.color = sev === 'WARNING' ? '#000' : 'var(--amber)'; }
+            if (btnCaio) { btnCaio.style.background = sev === 'CAIO_FORENSE' ? 'var(--pink)' : 'transparent'; btnCaio.style.color = sev === 'CAIO_FORENSE' ? '#fff' : 'var(--pink)'; }
 
             if (!logsData || logsData.length === 0) return;
             if (sev === 'ALL') {
@@ -2563,6 +2593,16 @@
                 const filtered = logsData.filter(l => (l.severity || '').toUpperCase() === 'WARNING');
                 renderLogs(filtered);
                 showToast(`Filtrados: ${filtered.length} avisos.`);
+            } else if (sev === 'CAIO_FORENSE') {
+                const filtered = logsData.filter(l => {
+                    const em = (l.userEmail || '').toLowerCase();
+                    const cat = (l.category || '').toUpperCase();
+                    const msg = (l.message || '').toLowerCase();
+                    const det = (l.details || '').toLowerCase();
+                    return em.includes('caio') || cat === 'AUDITORIA_FORENSE' || msg.includes('caio') || det.includes('caio');
+                });
+                renderLogs(filtered);
+                showToast(`🕵️‍♀️ Auditoria Forense / Caio: ${filtered.length} registros encontrados.`);
             }
             const termEl = document.getElementById('logTerminal');
             if (termEl) {
