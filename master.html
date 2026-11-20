@@ -1346,10 +1346,7 @@
                         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color);">
                                 <button id="btnFilterProsReal" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 6px 14px; border-radius: 6px;" onclick="setProvidersView('app')">
-                                    🛠️ Reais do App (<span id="countProsApp">0</span>)
-                                </button>
-                                <button id="btnFilterProsCat" class="btn-action" style="background: transparent; color: var(--text-secondary); border: none; padding: 6px 14px; border-radius: 6px;" onclick="setProvidersView('catalogo')">
-                                    📖 Catálogo Base (<span id="countProsCat">371</span>)
+                                    🛠️ Cadastrados no App (<span id="countProsApp">0</span>)
                                 </button>
                             </div>
                             <div class="search-box">
@@ -1694,17 +1691,83 @@
             inputs[0].focus();
         }
 
+        let _unsubOrders = null;
+        let _unsubUsers = null;
+        let _unsubLogs = null;
+        let _dashboardInitializing = false;
+
+        function parseAnyTimestampMs(raw) {
+            if (!raw) return 0;
+            try {
+                if (typeof raw.toDate === 'function') {
+                    const d = raw.toDate();
+                    return isNaN(d.getTime()) ? 0 : d.getTime();
+                }
+                if (typeof raw === 'object' && typeof raw.seconds === 'number') {
+                    return raw.seconds * 1000;
+                }
+                const d = new Date(raw);
+                return isNaN(d.getTime()) ? 0 : d.getTime();
+            } catch (_) {
+                return 0;
+            }
+        }
+
+        function extractSmartPhone(u) {
+            if (!u) return '';
+            const direct = (u.phone_number || u.phoneNumber || u.telefone || '').toString().trim();
+            if (direct) return direct;
+            const textPool = `${u.habilidades || ''} ${u.bio || ''} ${u.palavras_chave || ''}`;
+            const match = textPool.match(/(?:\+?55\s?)?(?:\(?[1-9]{2}\)?\s?)?9?\d{4}[-\s]?\d{4}/);
+            return match ? match[0].trim() : '';
+        }
+
+        function extractGeoLink(u) {
+            if (!u) return null;
+            const loc = u.location || u.localizacao;
+            if (!loc) return null;
+            const lat = typeof loc.latitude === 'number' ? loc.latitude : (typeof loc._lat === 'number' ? loc._lat : null);
+            const lng = typeof loc.longitude === 'number' ? loc.longitude : (typeof loc._long === 'number' ? loc._long : null);
+            if (lat !== null && lng !== null) {
+                return {
+                    lat,
+                    lng,
+                    url: `https://www.google.com/maps?q=${lat},${lng}`,
+                    label: `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+                };
+            }
+            return null;
+        }
+
+        function updateLiveSyncClock() {
+            const el = document.getElementById('firestoreStatus');
+            if (!el) return;
+            const nowStr = new Date().toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'America/Sao_Paulo'
+            });
+            const curUser = firebase.apps.length ? firebase.auth().currentUser : null;
+            el.textContent = curUser
+                ? `🟢 AO VIVO (${nowStr}) • ${curUser.email}`
+                : `🟢 AO VIVO (${nowStr}) • Firestore impetus-mvp`;
+        }
+
         // Checar persistência de sessão ao carregar
         window.addEventListener('DOMContentLoaded', () => {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
             }
-            firebase.auth().onAuthStateChanged(user => {
+            firebase.auth().onAuthStateChanged(async user => {
                 if (user) {
                     sessionStorage.setItem('mnr_master_auth', 'true');
                     document.getElementById('lockScreen').style.display = 'none';
-                    initDashboard();
-                } else if (sessionStorage.getItem('mnr_master_auth') === 'true') { document.getElementById('lockScreen').style.display = 'none'; firebase.auth().signInWithEmailAndPassword('torre.master@appmaonaroda.com.br', 'ImpetusTorreMaster2026!#').catch(()=>{}); initDashboard();
+                    await initDashboard();
+                } else if (sessionStorage.getItem('mnr_master_auth') === 'true') {
+                    document.getElementById('lockScreen').style.display = 'none';
+                    await ensureMasterAuth();
+                    await initDashboard();
                 } else {
                     document.querySelectorAll('.pin-digit')[0].focus();
                 }
@@ -1743,16 +1806,19 @@
         }
 
         // Inicializar Firebase e Carregar Dados
-        function initDashboard() {
+        async function initDashboard() {
+            if (_dashboardInitializing) return;
+            _dashboardInitializing = true;
             try {
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }
+                await ensureMasterAuth();
                 db = firebase.firestore();
                 const curUser = firebase.auth().currentUser;
                 if (curUser) {
                     const email = (curUser.email || '').toLowerCase();
-                    document.getElementById('firestoreStatus').textContent = `🟢 Conectado como ${curUser.email}`;
+                    updateLiveSyncClock();
                     const adminEl = document.getElementById('googleAuthText');
                     if (adminEl) adminEl.textContent = `Admin: ${curUser.email}`;
                     const googleBtn = document.getElementById('btnGoogleAuthTopbar');
@@ -1769,7 +1835,7 @@
                         if (nameEl) nameEl.textContent = 'Tatiane';
                         if (roleEl) roleEl.textContent = 'Gestão Financeira & Faturamento';
                         if (avEl) avEl.textContent = 'TI';
-                    } else if (email.includes('roberta') || email === 'startup.impetus@gmail.com') {
+                    } else if (email.includes('roberta') || email === 'startup.impetus@gmail.com' || email === 'torre.master@appmaonaroda.com.br') {
                         if (nameEl) nameEl.textContent = 'Roberta Ferreira';
                         if (roleEl) roleEl.textContent = 'Tech Lead & Founder';
                         if (avEl) avEl.textContent = 'RF';
@@ -1779,24 +1845,13 @@
                         if (avEl) avEl.textContent = (curUser.displayName || 'A').substring(0, 2).toUpperCase();
                     }
                 } else {
-                    document.getElementById('firestoreStatus').textContent = 'Firestore Conectado (impetus-mvp)';
+                    updateLiveSyncClock();
                 }
                 
-                // Conectar Listeners em Tempo Real
+                // Conectar Listeners em Tempo Real (reiniciando conexões anteriores com segurança)
                 listenOrders();
                 listenUsers();
                 listenLogs();
-
-                // Registra Heartbeat de Conexão na Telemetria
-                db.collection('logs_sistema').add({
-                    severity: 'INFO',
-                    category: 'SESSAO_MASTER',
-                    message: 'Sessão Executiva da Torre de Controle conectada com sucesso.',
-                    details: 'Monitoramento ao vivo ativado (PIN Master 1409)',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    platform: 'Web Master',
-                    userEmail: curUser ? curUser.email : 'roberta@impetus.com'
-                }).catch(() => {});
 
                 // Carregar Dados Locais
                 loadProviders();
@@ -1804,6 +1859,8 @@
             } catch (err) {
                 console.error('Erro ao conectar ao Firebase:', err);
                 document.getElementById('firestoreStatus').textContent = 'Erro de Conexão Firestore';
+            } finally {
+                _dashboardInitializing = false;
             }
         }
 
@@ -1849,21 +1906,25 @@
         }
 
         function listenOrders() {
-            db.collection('solicitacoes_servico').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+            if (_unsubOrders) {
+                try { _unsubOrders(); } catch (_) {}
+            }
+            _unsubOrders = db.collection('solicitacoes_servico').onSnapshot(snapshot => {
                 ordersData = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     data.docId = doc.id;
                     ordersData.push(data);
                 });
+                ordersData.sort((a, b) => parseAnyTimestampMs(b.createdAt) - parseAnyTimestampMs(a.createdAt));
+                updateLiveSyncClock();
                 syncHistoricalAndLiveGA4(ordersData);
                 renderOrders(ordersData);
                 renderCustodia(ordersData);
                 updateOrderMetrics(ordersData);
-            }, err => {
-                console.warn('Erro ao escutar solicitacoes_servico:', err);
-                // Fallback de demonstração limpo se ainda não houver docs
-                renderOrders([]);
+            }, async err => {
+                console.warn('Erro ao escutar solicitacoes_servico, reconectando auth:', err);
+                await ensureMasterAuth();
             });
         }
 
@@ -2156,39 +2217,32 @@
             }
         }
 
-        // Escuta Usuários em Tempo Real
+        // Escuta Usuários em Tempo Real (ordenados do cadastro mais recente para o mais antigo)
         function listenUsers() {
-            db.collection('users').onSnapshot(snapshot => {
+            if (_unsubUsers) {
+                try { _unsubUsers(); } catch (_) {}
+            }
+            _unsubUsers = db.collection('users').onSnapshot(snapshot => {
                 usersData = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     data.docId = doc.id;
                     usersData.push(data);
                 });
+                usersData.sort((a, b) => {
+                    const msB = parseAnyTimestampMs(b.created_time || b.createdAt || b.pro_solicitado_em);
+                    const msA = parseAnyTimestampMs(a.created_time || a.createdAt || a.pro_solicitado_em);
+                    return msB - msA;
+                });
+                updateLiveSyncClock();
                 renderUsers(usersData);
                 updateUserMetrics(usersData);
                 if (ordersData && ordersData.length > 0) {
                     renderOrders(ordersData);
                 }
-            }, err => {
-                console.warn('Erro ao escutar users:', err);
-                const tbody = document.getElementById('usersTableBody');
-                if (tbody) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align: center; color: var(--amber); padding: 35px; background: rgba(255, 179, 0, 0.05); border-radius: 12px;">
-                                <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">🔐 Autenticação de Administradora Necessária</div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-                                    O banco Firestore exige confirmação da conta administradora para listar clientes cadastrados e telemetria.<br>
-                                    Clique no botão abaixo para desbloquear em 1 segundo:
-                                </div>
-                                <button class="btn-action" style="margin: 0 auto; background: var(--cyan); color: #000; font-weight: 800; border: none; padding: 10px 20px; font-size: 13.5px; border-radius: 10px; cursor: pointer;" onclick="signInWithGoogle()">
-                                    🔑 Conectar Conta Google Admin (startup.impetus@gmail.com)
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }
+            }, async err => {
+                console.warn('Erro ao escutar users, reconectando auth:', err);
+                await ensureMasterAuth();
             });
         }
 
@@ -2239,20 +2293,27 @@
                 const name = u.display_name || u.displayName || u.nome || 'Usuário Sem Nome';
                 const email = u.email || 'Não informado';
                 const rawPerfil = (u.perfil || u.role || 'cliente').toLowerCase();
-                const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro');
+                const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro') || Boolean((u.profissao || '').trim());
                 const perfilBadge = isPro 
                     ? '<span class="badge badge-green">🛠️ Prestador</span>' 
                     : '<span class="badge badge-pink">🛍️ Cliente</span>';
-                const phone = u.phone_number || u.phoneNumber || u.telefone || 'Não informado';
+                const extractedPhone = extractSmartPhone(u);
+                const phone = extractedPhone || 'Não informado';
+                const docNum = u.cpf || u.documento || u.cnpj || '';
+                const geo = extractGeoLink(u);
+                const profStr = u.profissao || u.especialidade || '';
+                const bioStr = u.bio || '';
                 const photo = u.photo_url || u.photoUrl || '';
                 const uid = u.uid || u.docId || '';
 
                 let createdStr = '--/--/----';
                 if (u.created_time || u.createdAt) {
                     try {
-                        const raw = u.created_time || u.createdAt;
-                        const d = raw.toDate ? raw.toDate() : new Date(raw);
-                        createdStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        const ms = parseAnyTimestampMs(u.created_time || u.createdAt);
+                        if (ms > 0) {
+                            const d = new Date(ms);
+                            createdStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+                        }
                     } catch(e) {}
                 }
 
@@ -2268,12 +2329,20 @@
                                 ${avatarHtml}
                                 <div>
                                     <div class="user-cell-name">${name}</div>
+                                    ${profStr ? `<div style="font-size: 11px; color: var(--cyan); font-weight: 600;">🛠️ ${profStr}</div>` : ''}
+                                    ${docNum ? `<div style="font-size: 10.5px; color: var(--text-muted); font-family: 'JetBrains Mono';">CPF/CNPJ: ${docNum}</div>` : ''}
+                                    ${bioStr ? `<div style="font-size: 10.5px; color: var(--text-secondary); max-width: 260px; white-space: normal; line-height: 1.3; margin-top: 2px;">"${bioStr}"</div>` : ''}
                                 </div>
                             </div>
                         </td>
                         <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">${email}</td>
-                        <td>${perfilBadge}</td>
-                        <td style="font-family: 'JetBrains Mono'; color: var(--text-secondary);">${phone}</td>
+                        <td>
+                            ${perfilBadge}
+                            ${geo ? `<div style="margin-top: 5px;"><a href="${geo.url}" target="_blank" style="color: #00E676; font-size: 11px; text-decoration: none; font-weight: 700;">📍 Ver GPS no Mapa</a></div>` : ''}
+                        </td>
+                        <td style="font-family: 'JetBrains Mono'; color: var(--text-secondary);">
+                            ${extractedPhone ? `<a href="https://wa.me/55${extractedPhone.replace(/\D/g, '')}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 700;">📞 ${phone}</a>` : phone}
+                        </td>
                         <td style="color: var(--text-muted); font-size: 12px;">${createdStr}</td>
                         <td><code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 12)}...</code></td>
                     </tr>
@@ -2293,9 +2362,12 @@
             renderUsers(filtered);
         }
 
-        // Escuta Logs em Tempo Real
+        // Escuta Logs em Tempo Real (unificando Timestamp e String ISO em ordem cronológica real)
         function listenLogs() {
-            db.collection('logs_sistema').orderBy('timestamp', 'desc').limit(150).onSnapshot(snapshot => {
+            if (_unsubLogs) {
+                try { _unsubLogs(); } catch (_) {}
+            }
+            _unsubLogs = db.collection('logs_sistema').onSnapshot(snapshot => {
                 logsData = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
@@ -2303,69 +2375,15 @@
                     logsData.push(data);
                 });
 
-                if (logsData.length === 0) {
-                    logsData = [
-                        {
-                            severity: 'INFO',
-                            category: 'SISTEMA',
-                            message: 'Torre de Controle Master conectada e operacional.',
-                            details: 'Sessão executiva iniciada com PIN Master 1409',
-                            timestamp: new Date()
-                        },
-                        {
-                            severity: 'INFO',
-                            category: 'GATEWAY',
-                            message: 'Camadas de pagamento: Split Nacional (Asaas / PIX D+0) e Stripe Internacional.',
-                            details: 'Custódia Escrow R$ 150 líquido / 10% ativa',
-                            timestamp: new Date(Date.now() - 1800000)
-                        },
-                        {
-                            severity: 'INFO',
-                            category: 'BANCO_DADOS',
-                            message: 'Sincronização em tempo real Firestore (impetus-mvp) ativa.',
-                            details: 'Monitoramento contínuo de usuários e chamados',
-                            timestamp: new Date(Date.now() - 3600000)
-                        }
-                    ];
-                }
+                logsData.sort((a, b) => parseAnyTimestampMs(b.timestamp) - parseAnyTimestampMs(a.timestamp));
+                logsData = logsData.slice(0, 250);
 
-                logsData.sort((a, b) => {
-                    const getMs = (ts) => {
-                        if (!ts) return 0;
-                        try {
-                            const d = ts.toDate ? ts.toDate() : new Date(ts);
-                            return isNaN(d.getTime()) ? 0 : d.getTime();
-                        } catch (_) { return 0; }
-                    };
-                    return getMs(b.timestamp) - getMs(a.timestamp);
-                });
-
+                updateLiveSyncClock();
                 renderLogs(logsData);
                 updateLogMetrics(logsData);
-            }, err => {
-                console.warn('Erro ao escutar logs_sistema:', err);
-                logsData = [
-                    {
-                        severity: 'WARNING',
-                        category: 'PERMISSAO',
-                        message: 'Telemetria do Firestore aguardando confirmação da administradora.',
-                        details: 'Clique em "Conectar Google Admin" no topo para ver os pings de sessões e acessos de clientes ao vivo.',
-                        timestamp: new Date()
-                    }
-                ];
-                logsData.sort((a, b) => {
-                    const getMs = (ts) => {
-                        if (!ts) return 0;
-                        try {
-                            const d = ts.toDate ? ts.toDate() : new Date(ts);
-                            return isNaN(d.getTime()) ? 0 : d.getTime();
-                        } catch (_) { return 0; }
-                    };
-                    return getMs(b.timestamp) - getMs(a.timestamp);
-                });
-
-                renderLogs(logsData);
-                updateLogMetrics(logsData);
+            }, async err => {
+                console.warn('Erro ao escutar logs_sistema, reconectando auth:', err);
+                await ensureMasterAuth();
             });
         }
 
@@ -2651,19 +2669,25 @@
                 grid.innerHTML = realPros.map(p => {
                     const name = p.display_name || p.displayName || p.nome || 'Prestador Parceiro';
                     const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                    const phone = p.phone_number || p.phoneNumber || p.telefone || 'Telefone não informado';
+                    const extractedPhone = extractSmartPhone(p);
+                    const phone = extractedPhone || 'Telefone não informado';
                     const email = (p.email || '').trim();
                     const role = p.profissao || p.especialidade || 'Prestador Oficial';
-                    const whatsappClean = phone.replace(/\D/g, '');
+                    const whatsappClean = extractedPhone ? '55' + extractedPhone.replace(/\D/g, '') : '';
                     const photo = p.photo_url || p.photoUrl || '';
                     const isDevAccount = email.includes('roberta') || email.includes('impetus') || email.includes('caio') || email.includes('pinto') || email.includes('teste');
                     const docNum = p.documento || p.cpf || p.cnpj || '';
                     const tipoDoc = p.tipo_documento || (docNum.length === 14 ? 'CNPJ' : (docNum.length === 11 ? 'CPF' : 'Doc'));
+                    const geo = extractGeoLink(p);
+                    const bioStr = p.bio || '';
                     let dataCadStr = '';
-                    if (p.created_time) {
+                    if (p.created_time || p.createdAt) {
                         try {
-                            const d = p.created_time.toDate ? p.created_time.toDate() : new Date(p.created_time);
-                            dataCadStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+                            const ms = parseAnyTimestampMs(p.created_time || p.createdAt);
+                            if (ms > 0) {
+                                const d = new Date(ms);
+                                dataCadStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo'});
+                            }
                         } catch(e) {}
                     }
 
@@ -2678,19 +2702,22 @@
                                         <div class="prov-name" title="${name}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
                                         <div class="prov-role" style="color: var(--cyan); font-weight: 700; font-size: 12px;">🛠️ ${role}</div>
                                         <div style="margin-top: 4px; font-size: 12.5px; font-weight: 800; color: var(--green); font-family: 'JetBrains Mono';">
-                                            💵 Valor Base: R$ ${(parseFloat(p.valor_base || 10)).toFixed(2).replace('.', ',')}
+                                            💵 Valor Base: R$ ${(parseFloat(p.valor_base || 150)).toFixed(2).replace('.', ',')}
                                         </div>
                                     </div>
                                 </div>
                                 <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); word-break: break-all;">✉️ ${email || 'Sem e-mail'}</div>
                                 <div class="prov-phone" style="margin-top: 3px;">
-                                    <a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 600; font-size: 12px;">
-                                        📞 ${phone}
-                                    </a>
+                                    ${extractedPhone
+                                        ? `<a href="https://wa.me/${whatsappClean}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 700; font-size: 12px;">📞 WhatsApp: ${phone}</a>`
+                                        : `<span style="color: var(--text-muted); font-size: 12px;">📞 ${phone}</span>`
+                                    }
                                 </div>
+                                ${bioStr ? `<div style="margin-top: 6px; font-size: 11px; color: var(--text-secondary); background: rgba(255,255,255,0.03); padding: 6px 8px; border-radius: 6px; line-height: 1.35;">"${bioStr}"</div>` : ''}
                                 <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
                                     ${isDevAccount ? '<span class="badge badge-amber" style="font-size: 10px;">🧪 CONTA DE TESTE</span>' : '<span class="badge badge-green" style="font-size: 10px;">✅ PRESTADOR REAL</span>'}
-                                    ${docNum ? `<span class="badge badge-cyan" style="font-size: 10px;">📄 ${tipoDoc}: ${docNum.substring(0, 6)}...</span>` : '<span class="badge" style="background: rgba(255,255,255,0.08); color: #888; font-size: 10px;">Sem doc</span>'}
+                                    ${docNum ? `<span class="badge badge-cyan" style="font-size: 10px;">📄 ${tipoDoc}: ${docNum}</span>` : '<span class="badge" style="background: rgba(255,255,255,0.08); color: #888; font-size: 10px;">Sem doc</span>'}
+                                    ${geo ? `<a href="${geo.url}" target="_blank" class="badge badge-green" style="font-size: 10px; text-decoration: none;">📍 Ver GPS no Mapa (${geo.label})</a>` : ''}
                                 </div>
                                 ${dataCadStr ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">📅 Cadastro: ${dataCadStr}</div>` : ''}
                             </div>
