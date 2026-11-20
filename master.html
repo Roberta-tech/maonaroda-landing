@@ -1807,42 +1807,22 @@
             }
         }
 
-        // Escuta Chamados em Tempo Real & Sincroniza Eventos GA4 (purchase / refund)
+        // Escuta Chamados em Tempo Real & Sincroniza Eventos GA4 (somente vendas efetivamente pagas)
         function syncHistoricalAndLiveGA4(orders) {
             try {
                 if (typeof gtag !== 'function') return;
-                // 1. Reconciliação única dos 2 testes reais concluídos e reembolsados na Stripe (MNR-6509 R$ 66 e MNR-4791 R$ 11)
-                if (!localStorage.getItem('mnr_ga4_reconciled_tests_v1')) {
-                    const historicalTests = [
-                        { id: 'MNR-6509', category: 'Eletricista', pro: 'Joao', amount: 66.00 },
-                        { id: 'MNR-4791', category: 'Consultoria Express', pro: 'luana martins', amount: 11.00 }
-                    ];
-                    historicalTests.forEach(t => {
-                        gtag('event', 'purchase', {
-                            transaction_id: t.id,
-                            value: t.amount,
-                            currency: 'BRL',
-                            transport_type: 'beacon',
-                            items: [{ item_id: t.id, item_name: t.category, item_category: t.pro, price: t.amount, quantity: 1 }]
-                        });
-                        gtag('event', 'refund', {
-                            transaction_id: t.id,
-                            value: t.amount,
-                            currency: 'BRL',
-                            transport_type: 'beacon',
-                            items: [{ item_id: t.id, item_name: t.category, item_category: t.pro, price: t.amount, quantity: 1 }]
-                        });
-                    });
-                    localStorage.setItem('mnr_ga4_reconciled_tests_v1', 'true');
-                }
 
-                // 2. Sincroniza qualquer novo chamado do Firestore que ainda não tenha sido enviado ao GA4
+                // Sincroniza apenas chamados efetivamente pagos (pagoConfirmado / pagoEmCustodia)
                 const trackedMap = JSON.parse(localStorage.getItem('mnr_ga4_tracked_orders') || '{}');
                 let updated = false;
                 (orders || []).forEach(o => {
                     const oid = o.id || o.docId;
                     const amt = parseFloat(o.amount || 0);
-                    if (oid && amt > 0 && !trackedMap[oid]) {
+                    const isPaidConfirmed = (o.pagoConfirmado === true || o.pagoEmCustodia === true) &&
+                        o.status !== 'aguardando_pagamento' &&
+                        o.status !== 'aguardando_pix' &&
+                        o.status !== 'cancelado';
+                    if (oid && amt > 0 && isPaidConfirmed && !trackedMap[oid]) {
                         gtag('event', 'purchase', {
                             transaction_id: oid,
                             value: amt,
