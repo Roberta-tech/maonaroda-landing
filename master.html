@@ -1134,9 +1134,22 @@
                             <span>👥 Usuários Reais Cadastrados (Coleção: users)</span>
                             <span class="badge badge-green" id="userLiveBadge">Sincronizado</span>
                         </div>
-                        <div class="search-box">
-                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <input type="text" id="userSearch" class="search-input" placeholder="Buscar por nome, e-mail ou perfil..." oninput="filterUsers()">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <button id="btnUserFilterAll" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('all')">
+                                    Todos
+                                </button>
+                                <button id="btnUserFilterClient" class="btn-action" style="background: transparent; color: var(--pink); border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('cliente')">
+                                    🛍️ Só Clientes
+                                </button>
+                                <button id="btnUserFilterPro" class="btn-action" style="background: transparent; color: var(--green); border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('prestador')">
+                                    🛠️ Só Prestadores
+                                </button>
+                            </div>
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="userSearch" class="search-input" placeholder="Buscar por nome, e-mail ou perfil..." oninput="filterUsers()">
+                            </div>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -1695,8 +1708,16 @@
         let _unsubUsers = null;
         let _unsubLogs = null;
         let _dashboardInitializing = false;
+        let _currentUserRoleFilter = 'all';
 
-        function parseAnyTimestampMs(raw) {
+        function parseAnyTimestampMs(raw, docId) {
+            if (docId) {
+                const m = String(docId).match(/^(\d{13})_/);
+                if (m) {
+                    const epoch = parseInt(m[1], 10);
+                    if (!isNaN(epoch) && epoch > 1700000000000) return epoch;
+                }
+            }
             if (!raw) return 0;
             try {
                 if (typeof raw.toDate === 'function') {
@@ -2350,19 +2371,35 @@
             }).join('');
         }
 
+        function setUserRoleFilter(role) {
+            _currentUserRoleFilter = role;
+            const bAll = document.getElementById('btnUserFilterAll');
+            const bCli = document.getElementById('btnUserFilterClient');
+            const bPro = document.getElementById('btnUserFilterPro');
+            if (bAll) { bAll.style.background = role === 'all' ? 'var(--cyan)' : 'transparent'; bAll.style.color = role === 'all' ? '#000' : 'var(--text-secondary)'; }
+            if (bCli) { bCli.style.background = role === 'cliente' ? 'var(--pink)' : 'transparent'; bCli.style.color = role === 'cliente' ? '#fff' : 'var(--pink)'; }
+            if (bPro) { bPro.style.background = role === 'prestador' ? 'var(--green)' : 'transparent'; bPro.style.color = role === 'prestador' ? '#000' : 'var(--green)'; }
+            filterUsers();
+        }
+
         function filterUsers() {
-            const q = document.getElementById('userSearch').value.toLowerCase();
+            const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
             const filtered = usersData.filter(u => {
+                const rawPerfil = (u.perfil || u.role || 'cliente').toLowerCase();
+                const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro') || Boolean((u.profissao || u.especialidade || '').trim());
+                if (_currentUserRoleFilter === 'cliente' && isPro) return false;
+                if (_currentUserRoleFilter === 'prestador' && !isPro) return false;
+                if (!q) return true;
                 const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
                 const email = (u.email || '').toLowerCase();
                 const perfil = (u.perfil || u.role || '').toLowerCase();
-                const phone = (u.phone_number || u.phoneNumber || u.telefone || '').toLowerCase();
+                const phone = extractSmartPhone(u).toLowerCase();
                 return name.includes(q) || email.includes(q) || perfil.includes(q) || phone.includes(q);
             });
             renderUsers(filtered);
         }
 
-        // Escuta Logs em Tempo Real (unificando Timestamp e String ISO em ordem cronológica real)
+        // Escuta Logs em Tempo Real (unificando Timestamp e String ISO em ordem cronológica real de Brasília)
         function listenLogs() {
             if (_unsubLogs) {
                 try { _unsubLogs(); } catch (_) {}
@@ -2375,7 +2412,7 @@
                     logsData.push(data);
                 });
 
-                logsData.sort((a, b) => parseAnyTimestampMs(b.timestamp) - parseAnyTimestampMs(a.timestamp));
+                logsData.sort((a, b) => parseAnyTimestampMs(b.timestamp, b.id || b.docId) - parseAnyTimestampMs(a.timestamp, a.id || a.docId));
                 logsData = logsData.slice(0, 250);
 
                 updateLiveSyncClock();
@@ -2434,16 +2471,33 @@
                 else if (s === 'WARNING') sevClass = 'log-sev-warn';
 
                 let timeStr = '--/-- --:--:--';
-                if (l.timestamp) {
+                const trueMs = parseAnyTimestampMs(l.timestamp, l.id || l.docId);
+                let originBadge = '';
+                if (trueMs > 0) {
                     try {
-                        const d = l.timestamp.toDate ? l.timestamp.toDate() : new Date(l.timestamp);
-                        if (!isNaN(d.getTime())) {
-                            const dt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
-                            const tm = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/Sao_Paulo' });
-                            timeStr = `${dt} ${tm}`;
+                        const d = new Date(trueMs);
+                        const dt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' });
+                        const tm = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/Sao_Paulo' });
+                        timeStr = `${dt} ${tm}`;
+
+                        if (typeof l.timestamp === 'string' && !l.timestamp.endsWith('Z')) {
+                            const localParsed = new Date(l.timestamp);
+                            if (!isNaN(localParsed.getTime())) {
+                                const diffHours = Math.abs(localParsed.getTime() - trueMs) / 3600000;
+                                if (diffHours >= 1.2) {
+                                    originBadge = `<span style="background: rgba(255, 179, 0, 0.15); color: #ffb300; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">🌎 Exterior / Internacional</span>`;
+                                } else {
+                                    originBadge = `<span style="background: rgba(0, 230, 118, 0.12); color: #00E676; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">🇧🇷 Brasil</span>`;
+                                }
+                            }
                         }
                     } catch(e) {}
                 }
+
+                const rawEmail = (l.userEmail || '').trim();
+                const userBadge = (!rawEmail || rawEmail === 'visitante')
+                    ? `<span style="background: rgba(0, 229, 255, 0.12); color: var(--cyan); padding: 1px 6px; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 6px;">📱 Visitante no App (Sem Login)</span>`
+                    : `<span style="background: rgba(255, 46, 147, 0.14); color: var(--pink); padding: 1px 6px; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 6px;">👤 ${rawEmail}</span>`;
 
                 return `
                     <div class="log-entry">
@@ -2451,8 +2505,10 @@
                         <span class="log-sev ${sevClass}">${s || 'INFO'}</span>
                         <span class="log-cat">[${l.category || 'GERAL'}]</span>
                         <span class="log-msg">
+                            ${userBadge}
                             ${l.message || ''} 
                             ${l.details ? `<span style="color: var(--text-muted); font-size: 11px;">(${l.details})</span>` : ''}
+                            ${originBadge}
                         </span>
                     </div>
                 `;
