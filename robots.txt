@@ -2,5 +2,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /master.html
 
+# Sitemap oficial indexado pelo Google Search Console
 Sitemap: https://appmaonaroda.com.br/sitemap.xml
