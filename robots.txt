@@ -1,0 +1,6 @@
+# Robots.txt oficial do Mão na Roda (appmaonaroda.com.br)
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://appmaonaroda.com.br/sitemap.xml
