@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -891,7 +891,7 @@
                 <input type="password" maxlength="1" class="pin-digit" oninput="onPinInput(this, 3)" onkeydown="onPinKey(event, 3)">
             </div>
 
-            <button class="btn-unlock" onclick="verifyPin()">Desbloquear com PIN (1409)</button>
+            <button class="btn-unlock" onclick="verifyPin()">Desbloquear Painel Master</button>
             <div id="lockError" class="lock-error"></div>
         </div>
     </div>
@@ -1582,8 +1582,8 @@
         async function ensureMasterAuth() {
             try {
                 const u = firebase.auth().currentUser;
-                if (!u || (u.email !== 'torre.master@appmaonaroda.com.br' && u.email !== 'robertaferreirap14@gmail.com' && u.email !== 'robertaferreira1982@gmail.com' && u.email !== 'startup.impetus@gmail.com')) {
-                    await firebase.auth().signInWithEmailAndPassword('torre.master@appmaonaroda.com.br', 'ImpetusTorreMaster2026!#');
+                if (!u) {
+                    console.info('Aguardando autenticação da administradora.');
                 }
             } catch(e) {
                 console.warn('ensureMasterAuth:', e);
@@ -1618,7 +1618,7 @@
                 sessionStorage.setItem('mnr_master_auth', 'true');
                 document.getElementById('lockScreen').style.display = 'none';
                 try {
-                    if (!firebase.auth().currentUser) { await firebase.auth().signInWithEmailAndPassword('torre.master@appmaonaroda.com.br', 'ImpetusTorreMaster2026!#'); }
+                    // Autenticacao interativa de administradora
                 } catch(_) {}
                 initDashboard();
                 showToast('🚀 Sessão Master autenticada com sucesso!');
