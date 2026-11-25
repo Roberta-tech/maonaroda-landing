@@ -2180,6 +2180,21 @@
             }
         }
 
+        async function confirmDeleteUser(uid, name, email) {
+            if (!uid) return;
+            const confirmed = confirm(`Tem certeza que deseja APAGAR o cadastro de:\n\n"${name}" (${email})?\n\nEsta ação removerá o usuário definitivamente do banco de dados Firestore.`);
+            if (!confirmed) return;
+            try {
+                showToast('⏳ Removendo usuário do Firestore...');
+                await ensureMasterAuth();
+                await db.collection('users').doc(uid).delete();
+                try { await db.collection('prestadores').doc(uid).delete(); } catch(_) {}
+                showToast('🗑️ Usuário removido com sucesso!');
+            } catch(e) {
+                alert('Erro ao excluir usuário: ' + e.message);
+            }
+        }
+
         async function forceComplete(docId) {
             if (!confirm('Deseja forçar a conclusão deste chamado e liberar a custódia para o profissional?')) return;
             try {
@@ -2396,7 +2411,12 @@
                             ${extractedPhone ? `<a href="https://wa.me/55${extractedPhone.replace(/\D/g, '')}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 700;">📞 ${phone}</a>` : phone}
                         </td>
                         <td style="color: var(--text-muted); font-size: 12px;">${createdStr}</td>
-                        <td><code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 12)}...</code></td>
+                        <td>
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 10)}...</code>
+                                <button onclick="confirmDeleteUser('${uid}', '${name.replace(/'/g, "\\'")}', '${email}')" style="background: rgba(255,0,128,0.15); color: #ff5252; border: 1px solid rgba(255,0,128,0.4); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Excluir este cadastro do banco">🗑️</button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -2801,7 +2821,7 @@
                     const role = p.profissao || p.especialidade || 'Prestador Oficial';
                     const whatsappClean = extractedPhone ? '55' + extractedPhone.replace(/\D/g, '') : '';
                     const photo = p.photo_url || p.photoUrl || '';
-                    const isDevAccount = email.includes('roberta') || email.includes('impetus') || email.includes('caio') || email.includes('pinto') || email.includes('teste');
+                    const isDevAccount = email.includes('teste') || email.includes('demo') || email.includes('fake');
                     const docNum = p.documento || p.cpf || p.cnpj || '';
                     const tipoDoc = p.tipo_documento || (docNum.length === 14 ? 'CNPJ' : (docNum.length === 11 ? 'CPF' : 'Doc'));
                     const geo = extractGeoLink(p);
