@@ -2158,6 +2158,28 @@
             }
         }
 
+        async function toggleUserPro(uid, makePro) {
+            if (!uid) return;
+            const action = makePro ? 'ativar o Plano PRO (30 dias)' : 'revogar o Plano PRO';
+            if (!confirm(`Deseja realmente ${action} deste profissional?`)) return;
+            try {
+                await ensureMasterAuth();
+                const proExp = makePro ? new Date(Date.now() + 30 * 86400000).toISOString() : null;
+                await db.collection('users').doc(uid).set({
+                    is_pro: makePro,
+                    is_pro_confirmado_banco: makePro,
+                    is_pro_pendente: false,
+                    pro_expira_em: proExp
+                }, { merge: true });
+                await db.collection('prestadores').doc(uid).set({
+                    is_pro: makePro
+                }, { merge: true }).catch(() => {});
+                showToast(`✅ Plano PRO ${makePro ? 'ativado por 30 dias' : 'revogado'} com sucesso!`);
+            } catch(e) {
+                alert('Erro ao alterar status PRO: ' + e.message);
+            }
+        }
+
         async function forceComplete(docId) {
             if (!confirm('Deseja forçar a conclusão deste chamado e liberar a custódia para o profissional?')) return;
             try {
@@ -2316,9 +2338,16 @@
                 const email = u.email || 'Não informado';
                 const rawPerfil = (u.perfil || u.role || 'cliente').toLowerCase();
                 const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro') || Boolean((u.profissao || '').trim());
+                const isProPlan = Boolean(u.is_pro === true || u.is_pro_confirmado_banco === true);
                 const perfilBadge = isPro 
-                    ? '<span class="badge badge-green">🛠️ Prestador</span>' 
+                    ? `<span class="badge badge-green">🛠️ Prestador</span>${isProPlan ? '<span class="badge" style="background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid #FFD700; margin-left: 4px;">⭐ PRO</span>' : ''}` 
                     : '<span class="badge badge-pink">🛍️ Cliente</span>';
+                const proToggleBtn = isPro ? `
+                    <div style="margin-top: 5px;">
+                        <button onclick="toggleUserPro('${u.uid || u.docId}', ${!isProPlan})" style="background: ${isProPlan ? 'rgba(255,0,128,0.15)' : 'rgba(0,230,118,0.15)'}; color: ${isProPlan ? '#FF0080' : '#00E676'}; border: 1px solid ${isProPlan ? '#FF0080' : '#00E676'}; border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer;">
+                            ${isProPlan ? 'Revogar PRO' : '⭐ Ativar PRO 30d'}
+                        </button>
+                    </div>` : '';
                 const extractedPhone = extractSmartPhone(u);
                 const phone = extractedPhone || 'Não informado';
                 const docNum = u.cpf || u.documento || u.cnpj || '';
@@ -2360,6 +2389,7 @@
                         <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">${email}</td>
                         <td>
                             ${perfilBadge}
+                            ${proToggleBtn}
                             ${geo ? `<div style="margin-top: 5px;"><a href="${geo.url}" target="_blank" style="color: #00E676; font-size: 11px; text-decoration: none; font-weight: 700;">📍 Ver GPS no Mapa</a></div>` : ''}
                         </td>
                         <td style="font-family: 'JetBrains Mono'; color: var(--text-secondary);">
