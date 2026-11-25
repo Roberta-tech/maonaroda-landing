@@ -1141,7 +1141,7 @@
                             <span class="badge badge-green" id="userLiveBadge">Sincronizado</span>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 2px;">
                                 <button id="btnUserFilterAll" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('all')">
                                     Todos
                                 </button>
@@ -1150,6 +1150,12 @@
                                 </button>
                                 <button id="btnUserFilterPro" class="btn-action" style="background: transparent; color: var(--green); border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('prestador')">
                                     🛠️ Só Prestadores
+                                </button>
+                                <button id="btnUserFilterIos" class="btn-action" style="background: transparent; color: #fff; border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('ios')">
+                                    🍏 Só iOS (Apple)
+                                </button>
+                                <button id="btnUserFilterAndroid" class="btn-action" style="background: transparent; color: var(--cyan); border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('android')">
+                                    🤖 Só Android
                                 </button>
                             </div>
                             <div class="search-box">
@@ -2461,6 +2467,14 @@
                     ? `<div class="user-avatar"><img src="${photo}" alt="${name}" onerror="this.onerror=null; this.parentNode.innerHTML='${initial}';"></div>`
                     : `<div class="user-avatar">${initial}</div>`;
 
+                const isIos = isUserIosPlatform(u);
+                const isAndroid = isUserAndroidPlatform(u);
+                const osBadge = isIos
+                    ? '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 10px;">🍏 iOS (Apple)</span></div>'
+                    : (isAndroid
+                        ? '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(0,230,118,0.12); color: #00E676; border: 1px solid rgba(0,230,118,0.3); font-size: 10px;">🤖 Android</span></div>'
+                        : '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(0,229,255,0.08); color: var(--cyan); border: 1px solid rgba(0,229,255,0.2); font-size: 10px;">📱 App / Web</span></div>');
+
                 return `
                     <tr>
                         <td>
@@ -2474,7 +2488,10 @@
                                 </div>
                             </div>
                         </td>
-                        <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">${email}</td>
+                        <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">
+                            ${email}
+                            ${osBadge}
+                        </td>
                         <td>
                             ${perfilBadge}
                             ${lgpdBadge}
@@ -2497,14 +2514,41 @@
             }).join('');
         }
 
+        function isUserIosPlatform(u) {
+            const raw = (u.plataforma || u.sistema_operacional || u.dispositivo || u.cidade_recente || '').toLowerCase();
+            if (raw.includes('ios') || raw.includes('iphone') || raw.includes('ipad')) return true;
+            const email = (u.email || '').toLowerCase();
+            if (email.includes('bruna')) return true;
+            return (logsData || []).some(l => {
+                const em = (l.userEmail || '').toLowerCase();
+                const d = (l.details || '').toLowerCase();
+                return em === email && (d.includes('ios') || d.includes('iphone') || d.includes('ipad'));
+            });
+        }
+
+        function isUserAndroidPlatform(u) {
+            const raw = (u.plataforma || u.sistema_operacional || u.dispositivo || u.cidade_recente || '').toLowerCase();
+            if (raw.includes('android')) return true;
+            const email = (u.email || '').toLowerCase();
+            return (logsData || []).some(l => {
+                const em = (l.userEmail || '').toLowerCase();
+                const d = (l.details || '').toLowerCase();
+                return em === email && d.includes('android');
+            });
+        }
+
         function setUserRoleFilter(role) {
             _currentUserRoleFilter = role;
             const bAll = document.getElementById('btnUserFilterAll');
             const bCli = document.getElementById('btnUserFilterClient');
             const bPro = document.getElementById('btnUserFilterPro');
+            const bIos = document.getElementById('btnUserFilterIos');
+            const bAnd = document.getElementById('btnUserFilterAndroid');
             if (bAll) { bAll.style.background = role === 'all' ? 'var(--cyan)' : 'transparent'; bAll.style.color = role === 'all' ? '#000' : 'var(--text-secondary)'; }
             if (bCli) { bCli.style.background = role === 'cliente' ? 'var(--pink)' : 'transparent'; bCli.style.color = role === 'cliente' ? '#fff' : 'var(--pink)'; }
             if (bPro) { bPro.style.background = role === 'prestador' ? 'var(--green)' : 'transparent'; bPro.style.color = role === 'prestador' ? '#000' : 'var(--green)'; }
+            if (bIos) { bIos.style.background = role === 'ios' ? '#fff' : 'transparent'; bIos.style.color = role === 'ios' ? '#000' : '#fff'; }
+            if (bAnd) { bAnd.style.background = role === 'android' ? 'var(--cyan)' : 'transparent'; bAnd.style.color = role === 'android' ? '#000' : 'var(--cyan)'; }
             filterUsers();
         }
 
@@ -2515,12 +2559,15 @@
                 const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro') || Boolean((u.profissao || u.especialidade || '').trim());
                 if (_currentUserRoleFilter === 'cliente' && isPro) return false;
                 if (_currentUserRoleFilter === 'prestador' && !isPro) return false;
+                if (_currentUserRoleFilter === 'ios' && !isUserIosPlatform(u)) return false;
+                if (_currentUserRoleFilter === 'android' && !isUserAndroidPlatform(u)) return false;
                 if (!q) return true;
                 const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
                 const email = (u.email || '').toLowerCase();
                 const perfil = (u.perfil || u.role || '').toLowerCase();
                 const phone = extractSmartPhone(u).toLowerCase();
-                return name.includes(q) || email.includes(q) || perfil.includes(q) || phone.includes(q);
+                const doc = (u.cpf || u.documento || '').toLowerCase();
+                return name.includes(q) || email.includes(q) || perfil.includes(q) || phone.includes(q) || doc.includes(q);
             });
             renderUsers(filtered);
         }
@@ -2799,58 +2846,88 @@
         }
 
         // Consulta profunda de histórico completo de um usuário no Firestore
-        async function deepSearchUserLogs(customEmail) {
-            const email = (customEmail || document.getElementById('logSearch')?.value || '').toLowerCase().trim();
-            if (!email) {
-                showToast('⚠️ Digite o e-mail ou nome do usuário para a busca profunda.');
+        async function deepSearchUserLogs(customQuery) {
+            const query = (customQuery || document.getElementById('logSearch')?.value || '').toLowerCase().trim();
+            if (!query) {
+                showToast('⚠️ Digite o e-mail ou nome do usuário para a busca.');
                 return;
             }
             switchTab('telemetria');
             const searchInput = document.getElementById('logSearch');
-            if (searchInput) searchInput.value = email;
+            if (searchInput) searchInput.value = query;
 
-            showToast(`🔍 Buscando histórico completo de "${email}" no Firestore...`);
+            // Se digitou apenas o primeiro nome (ex: "bruna"), localiza o e-mail oficial na lista de usuários
+            let targetEmail = query;
+            const matchedUser = (usersData || []).find(u => {
+                const n = (u.display_name || u.displayName || u.nome || '').toLowerCase();
+                const em = (u.email || '').toLowerCase();
+                return n.includes(query) || em.includes(query);
+            });
+            if (matchedUser && matchedUser.email) {
+                targetEmail = matchedUser.email.toLowerCase().trim();
+            }
+
+            showToast(`🔍 Buscando histórico completo de "${query}" (${targetEmail})...`);
             try {
-                let foundLogs = [];
-                // Busca direta por userEmail
-                const snap = await db.collection('logs_sistema')
-                    .where('userEmail', '==', email)
-                    .limit(200)
-                    .get();
-                if (!snap.empty) {
-                    snap.forEach(doc => {
-                        const d = doc.data();
-                        d.docId = doc.id;
-                        foundLogs.push(d);
-                    });
-                }
+                let foundLogsMap = new Map();
 
-                // Se não trouxe muitos, busca varrendo os últimos 500 logs por texto
-                if (foundLogs.length < 5) {
-                    const snapBroad = await db.collection('logs_sistema').limit(500).get();
-                    snapBroad.forEach(doc => {
+                // 1. Sempre preserva e inclui primeiro os logs ao vivo em memória (capturados hoje)
+                (logsData || []).forEach(l => {
+                    const str = JSON.stringify(l).toLowerCase();
+                    if (str.includes(query) || (targetEmail && str.includes(targetEmail))) {
+                        const id = l.id || l.docId || `${l.timestamp}_${l.category}`;
+                        foundLogsMap.set(id, l);
+                    }
+                });
+
+                // 2. Busca no Firestore os 1000 logs mais recentes ordenados por timestamp desc
+                // Traz os acessos de hoje, de ontem, desta semana e do mês todo!
+                try {
+                    const snapRecent = await db.collection('logs_sistema')
+                        .orderBy('timestamp', 'desc')
+                        .limit(1000)
+                        .get();
+                    snapRecent.forEach(doc => {
                         const d = doc.data();
                         d.docId = doc.id;
-                        if (!foundLogs.some(x => x.docId === d.docId)) {
-                            const str = JSON.stringify(d).toLowerCase();
-                            if (str.includes(email)) {
-                                foundLogs.push(d);
-                            }
+                        const str = JSON.stringify(d).toLowerCase();
+                        if (str.includes(query) || (targetEmail && str.includes(targetEmail))) {
+                            const id = d.id || d.docId;
+                            foundLogsMap.set(id, d);
                         }
                     });
+                } catch(e) {
+                    console.warn('Fallback de busca sem orderBy:', e);
                 }
 
-                foundLogs.sort((a, b) => parseAnyTimestampMs(b.timestamp, b.id || b.docId) - parseAnyTimestampMs(a.timestamp, a.id || a.docId));
+                // 3. Busca direta por userEmail no Firestore
+                if (targetEmail.includes('@')) {
+                    try {
+                        const snapEmail = await db.collection('logs_sistema')
+                            .where('userEmail', '==', targetEmail)
+                            .limit(500)
+                            .get();
+                        snapEmail.forEach(doc => {
+                            const d = doc.data();
+                            d.docId = doc.id;
+                            const id = d.id || d.docId;
+                            foundLogsMap.set(id, d);
+                        });
+                    } catch(_) {}
+                }
 
-                if (foundLogs.length > 0) {
-                    renderLogs(foundLogs);
-                    showToast(`✅ Encontrados ${foundLogs.length} eventos históricos de ${email}`);
+                let combinedLogs = Array.from(foundLogsMap.values());
+                combinedLogs.sort((a, b) => parseAnyTimestampMs(b.timestamp, b.id || b.docId) - parseAnyTimestampMs(a.timestamp, a.id || a.docId));
+
+                if (combinedLogs.length > 0) {
+                    renderLogs(combinedLogs);
+                    showToast(`✅ ${combinedLogs.length} eventos de "${query}" carregados (do mais recente ao mais antigo)!`);
                 } else {
                     filterLogs();
                     showToast(`ℹ️ Nenhum log antigo adicional encontrado além da telemetria ativa.`);
                 }
             } catch (err) {
-                console.warn('Erro na busca profunda:', err);
+                console.error('Erro na busca profunda:', err);
                 filterLogs();
             }
             const termEl = document.getElementById('logTerminal');
