@@ -2941,8 +2941,11 @@
         // Concessão / Revogação do Selo de Formação Verificada & Auditoria de Diplomas
         async function toggleUserDiploma(uid, setVerified) {
             if (!uid) return;
-            const actionText = setVerified ? 'CONCEDER o Selo de Formação Verificada (Diploma / Nível Superior)' : 'REVOGAR o Selo de Formação';
-            if (!confirm(`Deseja realmente ${actionText} para este prestador?\n\nO status refletirá imediatamente no aplicativo para todos os clientes.`)) return;
+            const u = (usersData || []).find(x => (x.uid || x.docId) === uid) || {};
+            const nomeProf = u.display_name || u.displayName || u.nome || 'este profissional';
+            const emailProf = u.email ? ` (${u.email})` : '';
+            const actionText = setVerified ? 'CONCEDER o Selo de Formação Verificada' : 'REVOGAR o Selo de Formação';
+            if (!confirm(`Deseja realmente ${actionText} EXCLUSIVAMENTE para:\n👉 ${nomeProf}${emailProf}?\n\nEsta ação alterará APENAS o perfil individual deste profissional no aplicativo.`)) return;
             try {
                 showToast('⏳ Atualizando credenciais no Firestore...');
                 await ensureMasterAuth();
