@@ -943,6 +943,12 @@
                 <span class="nav-badge" id="badgeAlertas" style="background: rgba(255, 0, 128, 0.2); color: var(--pink); border: 1px solid var(--pink);">0</span>
             </div>
 
+            <div class="nav-item" onclick="switchTab('credenciais')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                <span>Auditoria de Diplomas</span>
+                <span class="nav-badge" id="badgeCredenciais" style="background: rgba(0, 229, 255, 0.2); color: var(--cyan); border: 1px solid var(--cyan);">0</span>
+            </div>
+
             <div class="nav-item" onclick="switchTab('precos')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 <span>Tabela de Preços</span>
@@ -1326,6 +1332,13 @@
                             <span>⚡ Console de Telemetria ao Vivo (Firestore: logs_sistema)</span>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box" style="min-width: 250px;">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="logSearch" class="search-input" placeholder="Buscar usuário por e-mail, ação ou IP..." oninput="filterLogs()">
+                            </div>
+                            <button class="btn-action" style="border-color: var(--cyan); color: var(--cyan); font-weight: 700;" onclick="deepSearchUserLogs()" title="Consultar todo o histórico deste usuário no Firestore (mesmo de meses atrás)">
+                                🔍 Histórico Completo
+                            </button>
                             <div style="display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; border: 1px solid var(--border);">
                                 <button id="btnLogFilterAll" class="btn-action" style="background: var(--cyan); color: #000; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('ALL')">Todos</button>
                                 <button id="btnLogFilterCrit" class="btn-action" style="background: transparent; color: var(--red); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px;" onclick="filterLogsBySev('CRITICAL')">🚨 Apenas Erros</button>
@@ -1458,6 +1471,56 @@
                                 <tr>
                                     <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
                                         Aguardando acionamentos... Nenhuma ocorrência recente registrada.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 7: AUDITORIA DE DIPLOMAS & CREDENCIAIS DE NÍVEL SUPERIOR -->
+            <section id="tab-credenciais" class="tab-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🎓 Auditoria de Diplomas, Certificados & Nível Superior (<span id="countCredenciais">0</span> Auditados)</span>
+                            <span class="badge badge-cyan" id="credenciaisSyncBadge">Proteção LGPD Ativa 🛡️</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="credSearch" class="search-input" placeholder="Buscar prestador por nome ou profissão..." oninput="filterCredenciais()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px; padding: 14px 18px; border-radius: 12px; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.25); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 24px;">🛡️</span>
+                            <div>
+                                <strong style="color: #fff; font-size: 13.5px;">Blindagem LGPD & Verificação de Credenciais:</strong>
+                                <p style="margin: 2px 0 0; color: var(--text-muted); font-size: 12px;">Documentos e diplomas são de auditoria interna sigilosa da Impetus Tecnologia e nunca são exibidos para clientes. Apenas o selo público <strong style="color: var(--cyan);">🎓 Formação Superior Verificada</strong> é exibido no app após sua aprovação.</p>
+                            </div>
+                        </div>
+                        <span class="badge badge-green" style="font-family: 'JetBrains Mono'; font-size: 11px;">Sigilo Garantido ✅</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 200px;">Profissional</th>
+                                    <th style="min-width: 170px;">Profissão / Especialidade</th>
+                                    <th style="min-width: 180px;">Selo & Status</th>
+                                    <th style="min-width: 150px;">LGPD Consentimento</th>
+                                    <th style="min-width: 200px;">Ações Executivas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="credenciaisTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        Carregando prestadores para auditoria de credenciais...
                                     </td>
                                 </tr>
                             </tbody>
@@ -1813,6 +1876,8 @@
                 custodia: 'Custódia Financeira & Escrow',
                 telemetria: 'Telemetria & Logs do Sistema',
                 prestadores: 'Prestadores Reais Cadastrados',
+                'suporte-alertas': 'Alertas & Auditoria Sigilosa de Suporte',
+                credenciais: 'Auditoria de Diplomas & Nível Superior',
                 precos: 'Tabela Oficial de Preços (60 Categorias)'
             };
             document.getElementById('pageTitle').textContent = titles[tabId] || 'Torre de Controle';
@@ -2296,6 +2361,7 @@
                 updateLiveSyncClock();
                 renderUsers(usersData);
                 updateUserMetrics(usersData);
+                renderCredenciais(usersData);
                 if (ordersData && ordersData.length > 0) {
                     renderOrders(ordersData);
                 }
@@ -2354,13 +2420,20 @@
                 const rawPerfil = (u.perfil || u.role || 'cliente').toLowerCase();
                 const isPro = rawPerfil.includes('prestador') || rawPerfil.includes('pro') || Boolean((u.profissao || '').trim());
                 const isProPlan = Boolean(u.is_pro === true || u.is_pro_confirmado_banco === true);
+                const hasDiploma = Boolean(u.formacao_verificada === true || u.selo_formacao_ativo === true || u.status_credencial === 'aprovado');
                 const perfilBadge = isPro 
-                    ? `<span class="badge badge-green">🛠️ Prestador</span>${isProPlan ? '<span class="badge" style="background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid #FFD700; margin-left: 4px;">⭐ PRO</span>' : ''}` 
+                    ? `<span class="badge badge-green">🛠️ Prestador</span>${isProPlan ? '<span class="badge" style="background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid #FFD700; margin-left: 4px;">⭐ PRO</span>' : ''}${hasDiploma ? '<span class="badge" style="background: rgba(0, 229, 255, 0.15); color: #00E5FF; border: 1px solid #00E5FF; margin-left: 4px;">🎓 Formação Verificada</span>' : ''}` 
                     : '<span class="badge badge-pink">🛍️ Cliente</span>';
+                const lgpdBadge = u.aceite_termos_lgpd
+                    ? '<div style="margin-top: 5px;"><span class="badge badge-green" style="font-size: 10px;">✅ LGPD Aceito</span></div>'
+                    : '<div style="margin-top: 5px;"><span class="badge" style="background: rgba(255,183,77,0.15); color: #FFB74D; border: 1px solid #FFB74D; font-size: 10px;">⏳ Pendente LGPD</span></div>';
                 const proToggleBtn = isPro ? `
-                    <div style="margin-top: 5px;">
+                    <div style="margin-top: 5px; display: flex; gap: 4px; flex-wrap: wrap;">
                         <button onclick="toggleUserPro('${u.uid || u.docId}', ${!isProPlan})" style="background: ${isProPlan ? 'rgba(255,0,128,0.15)' : 'rgba(0,230,118,0.15)'}; color: ${isProPlan ? '#FF0080' : '#00E676'}; border: 1px solid ${isProPlan ? '#FF0080' : '#00E676'}; border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer;">
                             ${isProPlan ? 'Revogar PRO' : '⭐ Ativar PRO 30d'}
+                        </button>
+                        <button onclick="toggleUserDiploma('${u.uid || u.docId}', ${!hasDiploma})" style="background: ${hasDiploma ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.05)'}; color: ${hasDiploma ? '#00E5FF' : '#aaa'}; border: 1px solid ${hasDiploma ? '#00E5FF' : 'rgba(255,255,255,0.2)'}; border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer;" title="Ativar ou revogar o Selo de Formação Verificada">
+                            ${hasDiploma ? 'Revogar Diploma' : '🎓 Selo Formação'}
                         </button>
                     </div>` : '';
                 const extractedPhone = extractSmartPhone(u);
@@ -2404,6 +2477,7 @@
                         <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">${email}</td>
                         <td>
                             ${perfilBadge}
+                            ${lgpdBadge}
                             ${proToggleBtn}
                             ${geo ? `<div style="margin-top: 5px;"><a href="${geo.url}" target="_blank" style="color: #00E676; font-size: 11px; text-decoration: none; font-weight: 700;">📍 Ver GPS no Mapa</a></div>` : ''}
                         </td>
@@ -2412,8 +2486,9 @@
                         </td>
                         <td style="color: var(--text-muted); font-size: 12px;">${createdStr}</td>
                         <td>
-                            <div style="display: flex; gap: 4px; align-items: center;">
+                            <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                                 <code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 10)}...</code>
+                                <button onclick="searchUserTelemetry('${email}')" style="background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid var(--cyan); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Rastrear todas as sessões e pings deste usuário na Telemetria">📡 Sessões</button>
                                 <button onclick="confirmDeleteUser('${uid}', '${name.replace(/'/g, "\\'")}', '${email}')" style="background: rgba(255,0,128,0.15); color: #ff5252; border: 1px solid rgba(255,0,128,0.4); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Excluir este cadastro do banco">🗑️</button>
                             </div>
                         </td>
@@ -2701,6 +2776,220 @@
                 console.error('Erro ao limpar logs:', err);
                 showToast('❌ Erro ao limpar logs: ' + err.message);
             }
+        }
+
+        // Filtro em tempo real de logs e telemetria
+        function filterLogs() {
+            const query = (document.getElementById('logSearch')?.value || '').toLowerCase().trim();
+            if (!query) {
+                renderLogs(logsData);
+                return;
+            }
+            const filtered = (logsData || []).filter(l => {
+                const em = (l.userEmail || '').toLowerCase();
+                const cat = (l.category || '').toLowerCase();
+                const msg = (l.message || '').toLowerCase();
+                const det = (l.details || '').toLowerCase();
+                const ip = (l.ip || '').toLowerCase();
+                const loc = (l.location || '').toLowerCase();
+                const dev = (l.device || '').toLowerCase();
+                return em.includes(query) || cat.includes(query) || msg.includes(query) || det.includes(query) || ip.includes(query) || loc.includes(query) || dev.includes(query);
+            });
+            renderLogs(filtered);
+        }
+
+        // Consulta profunda de histórico completo de um usuário no Firestore
+        async function deepSearchUserLogs(customEmail) {
+            const email = (customEmail || document.getElementById('logSearch')?.value || '').toLowerCase().trim();
+            if (!email) {
+                showToast('⚠️ Digite o e-mail ou nome do usuário para a busca profunda.');
+                return;
+            }
+            switchTab('telemetria');
+            const searchInput = document.getElementById('logSearch');
+            if (searchInput) searchInput.value = email;
+
+            showToast(`🔍 Buscando histórico completo de "${email}" no Firestore...`);
+            try {
+                let foundLogs = [];
+                // Busca direta por userEmail
+                const snap = await db.collection('logs_sistema')
+                    .where('userEmail', '==', email)
+                    .limit(200)
+                    .get();
+                if (!snap.empty) {
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        d.docId = doc.id;
+                        foundLogs.push(d);
+                    });
+                }
+
+                // Se não trouxe muitos, busca varrendo os últimos 500 logs por texto
+                if (foundLogs.length < 5) {
+                    const snapBroad = await db.collection('logs_sistema').limit(500).get();
+                    snapBroad.forEach(doc => {
+                        const d = doc.data();
+                        d.docId = doc.id;
+                        if (!foundLogs.some(x => x.docId === d.docId)) {
+                            const str = JSON.stringify(d).toLowerCase();
+                            if (str.includes(email)) {
+                                foundLogs.push(d);
+                            }
+                        }
+                    });
+                }
+
+                foundLogs.sort((a, b) => parseAnyTimestampMs(b.timestamp, b.id || b.docId) - parseAnyTimestampMs(a.timestamp, a.id || a.docId));
+
+                if (foundLogs.length > 0) {
+                    renderLogs(foundLogs);
+                    showToast(`✅ Encontrados ${foundLogs.length} eventos históricos de ${email}`);
+                } else {
+                    filterLogs();
+                    showToast(`ℹ️ Nenhum log antigo adicional encontrado além da telemetria ativa.`);
+                }
+            } catch (err) {
+                console.warn('Erro na busca profunda:', err);
+                filterLogs();
+            }
+            const termEl = document.getElementById('logTerminal');
+            if (termEl) termEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function searchUserTelemetry(email) {
+            deepSearchUserLogs(email);
+        }
+
+        // Concessão / Revogação do Selo de Formação Verificada & Auditoria de Diplomas
+        async function toggleUserDiploma(uid, setVerified) {
+            if (!uid) return;
+            const actionText = setVerified ? 'CONCEDER o Selo de Formação Verificada (Diploma / Nível Superior)' : 'REVOGAR o Selo de Formação';
+            if (!confirm(`Deseja realmente ${actionText} para este prestador?\n\nO status refletirá imediatamente no aplicativo para todos os clientes.`)) return;
+            try {
+                showToast('⏳ Atualizando credenciais no Firestore...');
+                await ensureMasterAuth();
+                const nowIso = new Date().toISOString();
+                await db.collection('users').doc(uid).set({
+                    formacao_verificada: setVerified,
+                    selo_formacao_ativo: setVerified,
+                    status_credencial: setVerified ? 'aprovado' : 'recusado',
+                    data_auditoria_credencial: nowIso,
+                    auditado_por: 'Roberta Ferreira (Tech Lead)'
+                }, { merge: true });
+
+                // Sincroniza também na coleção de prestadores
+                try {
+                    await db.collection('prestadores').doc(uid).set({
+                        formacao_verificada: setVerified,
+                        selo_formacao_ativo: setVerified
+                    }, { merge: true });
+                } catch(_) {}
+
+                // Grava log de auditoria
+                await db.collection('logs_sistema').add({
+                    severity: 'INFO',
+                    category: 'AUDITORIA_CREDENCIAL',
+                    message: `Tech Lead Roberta ${setVerified ? 'aprovou o Selo de Formação Verificada' : 'revogou o Selo de Formação'} para o UID: ${uid}`,
+                    userEmail: 'torre.master@appmaonaroda.com.br',
+                    timestamp: nowIso
+                });
+
+                // Atualiza em memória
+                const u = (usersData || []).find(x => (x.uid || x.docId) === uid);
+                if (u) {
+                    u.formacao_verificada = setVerified;
+                    u.selo_formacao_ativo = setVerified;
+                    u.status_credencial = setVerified ? 'aprovado' : 'recusado';
+                }
+                filterUsers();
+                renderCredenciais(usersData);
+                showToast(`✅ Selo de Formação ${setVerified ? 'Concedido' : 'Revogado'} com sucesso!`);
+            } catch(e) {
+                console.error(e);
+                alert('Erro ao atualizar credencial: ' + e.message);
+            }
+        }
+
+        function renderCredenciais(users) {
+            const tbody = document.getElementById('credenciaisTableBody');
+            if (!tbody) return;
+
+            // Filtra prestadores ou pessoas com profissão preenchida
+            const pros = (users || []).filter(u => {
+                const rawPerfil = (u.perfil || u.role || '').toLowerCase();
+                const prof = (u.profissao || u.especialidade || '').trim();
+                return rawPerfil.includes('prestador') || rawPerfil.includes('pro') || prof.length > 0;
+            });
+
+            const countEl = document.getElementById('countCredenciais');
+            if (countEl) countEl.textContent = pros.length;
+            const badgeEl = document.getElementById('badgeCredenciais');
+            if (badgeEl) badgeEl.textContent = pros.filter(p => p.formacao_verificada || p.status_credencial === 'aprovado').length;
+
+            if (pros.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Nenhum prestador encontrado para auditoria.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = pros.map(u => {
+                const name = u.display_name || u.displayName || u.nome || 'Profissional Sem Nome';
+                const email = u.email || 'Não informado';
+                const prof = u.profissao || u.especialidade || 'Serviços Gerais';
+                const bio = u.bio || '';
+                const uid = u.uid || u.docId || '';
+                const isApproved = Boolean(u.formacao_verificada === true || u.status_credencial === 'aprovado');
+                const statusBadge = isApproved
+                    ? '<span class="badge" style="background: rgba(0,229,255,0.15); color: #00E5FF; border: 1px solid #00E5FF;">🎓 Formação Verificada</span>'
+                    : '<span class="badge" style="background: rgba(255,183,77,0.15); color: #FFB74D; border: 1px solid #FFB74D;">⏳ Aguardando Validação</span>';
+                const lgpdStatus = u.aceite_termos_lgpd
+                    ? '<span class="badge badge-green" style="font-size:10.5px;">✅ LGPD Aceito</span>'
+                    : '<span class="badge" style="background: rgba(255,183,77,0.15); color: #FFB74D; font-size:10.5px;">⏳ Pendente</span>';
+                
+                return `
+                    <tr>
+                        <td>
+                            <strong style="color: #fff; font-size: 13.5px;">${name}</strong>
+                            <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--cyan); margin-top: 2px;">${email}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-cyan" style="font-size: 11px;">🛠️ ${prof}</span>
+                            ${bio ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; max-width: 250px; line-height: 1.3;">"${bio}"</div>` : ''}
+                        </td>
+                        <td>
+                            ${statusBadge}
+                        </td>
+                        <td>
+                            ${lgpdStatus}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <button onclick="toggleUserDiploma('${uid}', ${!isApproved})" class="btn-action" style="padding: 4px 10px; font-size: 11px; border-color: ${isApproved ? '#ff5252' : '#00E5FF'}; color: ${isApproved ? '#ff5252' : '#00E5FF'}; font-weight: 700;">
+                                    ${isApproved ? '❌ Revogar Selo' : '✅ Aprovar Selo Verificado'}
+                                </button>
+                                <button onclick="searchUserTelemetry('${email}')" class="btn-action" style="padding: 4px 8px; font-size: 11px; border-color: var(--cyan); color: var(--cyan);" title="Rastrear sessões e logs">
+                                    📡 Sessões
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterCredenciais() {
+            const q = (document.getElementById('credSearch')?.value || '').toLowerCase().trim();
+            if (!q) {
+                renderCredenciais(usersData);
+                return;
+            }
+            const filtered = (usersData || []).filter(u => {
+                const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
+                const email = (u.email || '').toLowerCase();
+                const prof = (u.profissao || u.especialidade || '').toLowerCase();
+                return name.includes(q) || email.includes(q) || prof.includes(q);
+            });
+            renderCredenciais(filtered);
         }
 
         let excludedCatalogIds = [];
