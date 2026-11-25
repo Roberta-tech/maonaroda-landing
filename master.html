@@ -1157,6 +1157,12 @@
                                 <button id="btnUserFilterAndroid" class="btn-action" style="background: transparent; color: var(--cyan); border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('android')">
                                     🤖 Só Android
                                 </button>
+                                <button id="btnUserFilterNotifOn" class="btn-action" style="background: transparent; color: #00E676; border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('notif_on')">
+                                    🔔 Notif. Ativas
+                                </button>
+                                <button id="btnUserFilterNotifOff" class="btn-action" style="background: transparent; color: #FF5252; border: none; font-weight: 700; padding: 5px 12px; border-radius: 6px; font-size: 12px;" onclick="setUserRoleFilter('notif_off')">
+                                    🔕 Bloqueadas
+                                </button>
                             </div>
                             <div class="search-box">
                                 <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2475,6 +2481,14 @@
                         ? '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(0,230,118,0.12); color: #00E676; border: 1px solid rgba(0,230,118,0.3); font-size: 10px;">🤖 Android</span></div>'
                         : '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(0,229,255,0.08); color: var(--cyan); border: 1px solid rgba(0,229,255,0.2); font-size: 10px;">📱 App / Web</span></div>');
 
+                const notifBloqueada = Boolean(u.notificacoes_status === 'bloqueado' || (u.notificacoes_ativas === false && u.notificacoes_status));
+                const notifAtiva = Boolean(u.notificacoes_ativas === true || u.notificacoes_status === 'autorizado');
+                const notifBadge = notifBloqueada
+                    ? '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(255,82,82,0.15); color: #FF5252; border: 1px solid #FF5252; font-size: 10px;" title="Usuário desativou as notificações nas configurações do iPhone/Android">🔕 Notif: Bloqueadas</span></div>'
+                    : (notifAtiva
+                        ? '<div style="margin-top: 4px;"><span class="badge badge-green" style="font-size: 10px;" title="Notificações Autorizadas e Ativas">🔔 Notif: Ativas</span></div>'
+                        : '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); font-size: 10px;" title="Padrão do Sistema (Aguardando primeiro acesso no app)">🔔 Notif: Padrão</span></div>');
+
                 return `
                     <tr>
                         <td>
@@ -2491,6 +2505,7 @@
                         <td style="font-family: 'JetBrains Mono'; color: var(--cyan);">
                             ${email}
                             ${osBadge}
+                            ${notifBadge}
                         </td>
                         <td>
                             ${perfilBadge}
@@ -2544,11 +2559,15 @@
             const bPro = document.getElementById('btnUserFilterPro');
             const bIos = document.getElementById('btnUserFilterIos');
             const bAnd = document.getElementById('btnUserFilterAndroid');
+            const bNotifOn = document.getElementById('btnUserFilterNotifOn');
+            const bNotifOff = document.getElementById('btnUserFilterNotifOff');
             if (bAll) { bAll.style.background = role === 'all' ? 'var(--cyan)' : 'transparent'; bAll.style.color = role === 'all' ? '#000' : 'var(--text-secondary)'; }
             if (bCli) { bCli.style.background = role === 'cliente' ? 'var(--pink)' : 'transparent'; bCli.style.color = role === 'cliente' ? '#fff' : 'var(--pink)'; }
             if (bPro) { bPro.style.background = role === 'prestador' ? 'var(--green)' : 'transparent'; bPro.style.color = role === 'prestador' ? '#000' : 'var(--green)'; }
             if (bIos) { bIos.style.background = role === 'ios' ? '#fff' : 'transparent'; bIos.style.color = role === 'ios' ? '#000' : '#fff'; }
             if (bAnd) { bAnd.style.background = role === 'android' ? 'var(--cyan)' : 'transparent'; bAnd.style.color = role === 'android' ? '#000' : 'var(--cyan)'; }
+            if (bNotifOn) { bNotifOn.style.background = role === 'notif_on' ? '#00E676' : 'transparent'; bNotifOn.style.color = role === 'notif_on' ? '#000' : '#00E676'; }
+            if (bNotifOff) { bNotifOff.style.background = role === 'notif_off' ? '#FF5252' : 'transparent'; bNotifOff.style.color = role === 'notif_off' ? '#fff' : '#FF5252'; }
             filterUsers();
         }
 
@@ -2561,6 +2580,8 @@
                 if (_currentUserRoleFilter === 'prestador' && !isPro) return false;
                 if (_currentUserRoleFilter === 'ios' && !isUserIosPlatform(u)) return false;
                 if (_currentUserRoleFilter === 'android' && !isUserAndroidPlatform(u)) return false;
+                if (_currentUserRoleFilter === 'notif_on' && !(u.notificacoes_ativas === true || u.notificacoes_status === 'autorizado')) return false;
+                if (_currentUserRoleFilter === 'notif_off' && !(u.notificacoes_status === 'bloqueado' || (u.notificacoes_ativas === false && u.notificacoes_status))) return false;
                 if (!q) return true;
                 const name = (u.display_name || u.displayName || u.nome || '').toLowerCase();
                 const email = (u.email || '').toLowerCase();
