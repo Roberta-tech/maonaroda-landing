@@ -1169,6 +1169,7 @@
                                 <button type="button" class="btn-action" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; border-radius: 6px;" onclick="fillPushTemplate('reengajamento')">📝 Lembrete de Acesso</button>
                                 <button type="button" class="btn-action" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; border-radius: 6px;" onclick="fillPushTemplate('chamados')">💸 Novos Chamados</button>
                                 <button type="button" class="btn-action" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; border-radius: 6px;" onclick="fillPushTemplate('humor')">😂 Humor Casa</button>
+                                <button type="button" class="btn-action" style="background: rgba(0, 229, 255, 0.12); color: var(--cyan); border: 1px solid var(--cyan); font-size: 11px; padding: 6px 12px; border-radius: 6px; font-weight: 700;" onclick="fillPushTemplate('atualizacao')">🚀 Nova Versão / Atualizar</button>
                             </div>
                             <button id="btnSendPushCampaign" type="button" onclick="triggerPushCampaign()" style="background: linear-gradient(135deg, var(--cyan) 0%, #0091EA 100%); color: #000; font-weight: 800; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 15px var(--cyan-glow);">
                                 🚀 Disparar Push em Nuvem Agora
@@ -2333,6 +2334,9 @@
             } else if (type === 'humor') {
                 tInput.value = '🔧 Seu marido ainda não consertou? 😂';
                 bInput.value = 'Calma, mulher! No Mão na Roda tem profissionais prontos para resolver.';
+            } else if (type === 'atualizacao') {
+                tInput.value = '🚀 Nova Versão Disponível no Mão na Roda!';
+                bInput.value = 'Atualizamos o app com novas funções, mais velocidade e correções. Toque aqui para atualizar agora na sua loja de aplicativos!';
             }
         }
 
