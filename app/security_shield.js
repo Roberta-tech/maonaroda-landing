@@ -14,6 +14,48 @@
 (function () {
     'use strict';
 
+    let _lastForensicLogTs = 0;
+    function sendForensicSecurityAlert(actionDesc) {
+        try {
+            const now = Date.now();
+            if (now - _lastForensicLogTs < 8000) return;
+            _lastForensicLogTs = now;
+
+            let userEmail = 'visitante_web';
+            try {
+                if (window.firebase && typeof window.firebase.auth === 'function' && window.firebase.auth().currentUser) {
+                    userEmail = window.firebase.auth().currentUser.email || window.firebase.auth().currentUser.uid || 'autenticado_web';
+                }
+            } catch (_) {}
+
+            fetch('https://ipwho.is/?fields=ip,country,region,city')
+                .then(function (r) { return r.json(); })
+                .catch(function () { return {}; })
+                .then(function (geo) {
+                    const logId = now + '_auditoria_forense';
+                    const locInfo = geo && geo.ip ? ('IP: ' + geo.ip + ' | Local: ' + (geo.city || '') + '-' + (geo.region || '') + ', ' + (geo.country || '')) : 'Origem Web';
+                    const detailsStr = locInfo + ' | Página: ' + (window.location.pathname || '/') + ' | Navegador: ' + (navigator.userAgent || '').substring(0, 140);
+                    const payload = {
+                        fields: {
+                            id: { stringValue: logId },
+                            severity: { stringValue: 'WARNING' },
+                            category: { stringValue: 'AUDITORIA_FORENSE' },
+                            message: { stringValue: '🛡️ Bloqueio de Segurança: ' + actionDesc + ' (' + userEmail + ')' },
+                            details: { stringValue: detailsStr },
+                            userEmail: { stringValue: userEmail },
+                            platform: { stringValue: 'Web Security Shield' },
+                            timestamp: { stringValue: new Date(now).toISOString() }
+                        }
+                    };
+                    fetch('https://firestore.googleapis.com/v1/projects/impetus-mvp/databases/(default)/documents/logs_sistema?documentId=' + logId, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).catch(function () {});
+                });
+        } catch (_) {}
+    }
+
     // 1. Desativar completamente todos os métodos de console para evitar vazamento de memória e dados
     if (window.console) {
         const noop = function () {};
@@ -43,6 +85,7 @@
     document.addEventListener('keydown', function (e) {
         // F12
         if (e.keyCode === 123 || e.key === 'F12') {
+            sendForensicSecurityAlert('Tentativa de abrir DevTools (Tecla F12)');
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -56,6 +99,7 @@
         // Ctrl + Shift + C (Element Inspector)
         // Ctrl + Shift + K (Firefox Console)
         if (isCtrlOrMeta && e.shiftKey && (key === 'i' || key === 'j' || key === 'c' || key === 'k')) {
+            sendForensicSecurityAlert('Tentativa de Inspeção de Código (Ctrl+Shift+' + key.toUpperCase() + ')');
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -63,6 +107,7 @@
 
         // Ctrl + U (Exibir código-fonte original)
         if (isCtrlOrMeta && key === 'u') {
+            sendForensicSecurityAlert('Tentativa de exibir Código-Fonte (Ctrl+U)');
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -70,6 +115,7 @@
 
         // Ctrl + S (Salvar página completa / scraping)
         if (isCtrlOrMeta && key === 's') {
+            sendForensicSecurityAlert('Tentativa de Clonar/Salvar Página (Ctrl+S)');
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -89,11 +135,12 @@
         return false;
     }, { capture: true });
 
-    // 5. Detecção Ativa e Limpeza Automática Contínua de DevTools
+    // 5. Detecção Ativa e Limpeza Automática Contínua de DevTools (Otimizada sem causar reflow forçado)
     let devToolsOpen = false;
     const threshold = 160;
 
     function monitorDevTools() {
+        // Usa matchMedia e window.visualViewport quando disponível para evitar layout thrashing
         const widthDiff = window.outerWidth - window.innerWidth > threshold;
         const heightDiff = window.outerHeight - window.innerHeight > threshold;
 
@@ -111,8 +158,15 @@
         }
     }
 
-    window.addEventListener('resize', monitorDevTools);
-    setInterval(monitorDevTools, 1500);
+    window.addEventListener('resize', monitorDevTools, { passive: true });
+    // Executa em idle para não competir com a renderização crítica do mobile
+    if ('requestIdleCallback' in window) {
+        setInterval(function() {
+            window.requestIdleCallback(monitorDevTools, { timeout: 1000 });
+        }, 3000);
+    } else {
+        setInterval(monitorDevTools, 3000);
+    }
 
     // 6. Anti-Clickjacking: Impedir carregamento dentro de iframes externos maliciosos
     if (window.top !== window.self) {
@@ -122,4 +176,22 @@
             document.documentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0A0B0E;color:#00E5FF;font-family:sans-serif;font-weight:bold;">Acesso protegido — Mão na Roda (Impetus Tecnologia)</div>';
         }
     }
+
+    // 7. Proteção Anti-Clonagem de Domínio (Domain Pinning)
+    try {
+        const host = (window.location.hostname || '').toLowerCase();
+        const allowedHosts = [
+            'appmaonaroda.com.br',
+            'www.appmaonaroda.com.br',
+            'maonaroda.com.br',
+            'www.maonaroda.com.br',
+            'roberta-tech.github.io',
+            'localhost',
+            '127.0.0.1'
+        ];
+        const isAllowed = !host || allowedHosts.includes(host) || host.endsWith('.firebaseapp.com') || host.endsWith('.web.app');
+        if (!isAllowed) {
+            window.location.replace('https://appmaonaroda.com.br/');
+        }
+    } catch (_) {}
 })();
