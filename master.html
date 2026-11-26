@@ -2369,17 +2369,24 @@
                     enviado_por: firebase.auth().currentUser?.email || 'torre_master'
                 };
 
-                await db.collection('push_campaigns').add(campaignDoc);
+                try {
+                    await db.collection('push_campaigns').add(campaignDoc);
+                } catch(camErr) {
+                    console.warn('Aviso ao gravar em push_campaigns:', camErr);
+                }
 
-                // Registra na telemetria oficial do sistema
-                await db.collection('system_logs').add({
-                    category: 'NOTIFICACOES_PUSH',
-                    severity: 'info',
-                    message: `🚀 Disparo em Massa: "${title}"`,
-                    details: `Público: ${audienceLabels[audience]} | Mensagem: "${body}" | Disparado via Torre Master`,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    environment: 'MASTER_CONTROL_TOWER'
-                });
+                // Registra na telemetria oficial do sistema (coleção logs_sistema com schema validado)
+                try {
+                    await db.collection('logs_sistema').add({
+                        category: 'NOTIFICACOES_PUSH',
+                        severity: 'INFO',
+                        message: `🚀 Disparo em Massa: "${title}"`,
+                        details: `Público: ${audienceLabels[audience]} | Mensagem: "${body}" | Disparado via Torre Master`,
+                        platform: 'Torre Master'
+                    });
+                } catch(logErr) {
+                    console.warn('Aviso ao gravar logs_sistema:', logErr);
+                }
 
                 showToast('✅ Notificação em Nuvem enviada com sucesso!');
                 alert(`✅ Disparo de Notificação em Nuvem concluído!\n\nTítulo: ${title}\nMensagem: ${body}\nPúblico: ${audienceLabels[audience]}\n\nA mensagem foi registrada na nuvem e enviada para a fila do Google Cloud Messaging.`);
@@ -2402,30 +2409,37 @@
                 showToast(`🚀 Enviando push para ${name}...`);
                 await ensureMasterAuth();
 
-                await db.collection('push_campaigns').add({
-                    titulo: '🔔 Alerta Mão na Roda',
-                    mensagem: msg.trim(),
-                    publico: 'individual',
-                    target_uid: uid,
-                    target_name: name,
-                    target_fcm_token: fcmToken || '',
-                    tem_token_ativo: Boolean(fcmToken),
-                    status: 'disparado',
-                    enviado_em: firebase.firestore.FieldValue.serverTimestamp(),
-                    enviado_por: firebase.auth().currentUser?.email || 'torre_master'
-                });
+                try {
+                    await db.collection('push_campaigns').add({
+                        titulo: '🔔 Alerta Mão na Roda',
+                        mensagem: msg.trim(),
+                        publico: 'individual',
+                        target_uid: uid,
+                        target_name: name,
+                        target_fcm_token: fcmToken || '',
+                        tem_token_ativo: Boolean(fcmToken),
+                        status: 'disparado',
+                        enviado_em: firebase.firestore.FieldValue.serverTimestamp(),
+                        enviado_por: firebase.auth().currentUser?.email || 'torre_master'
+                    });
+                } catch(pushErr) {
+                    console.warn('Aviso ao gravar push individual:', pushErr);
+                }
 
-                await db.collection('system_logs').add({
-                    category: 'NOTIFICACOES_PUSH',
-                    severity: 'info',
-                    message: `🔔 Push Direto para ${name}`,
-                    details: `Mensagem: "${msg.trim()}" | UID: ${uid} | Status FCM: ${fcmToken ? '🟢 Token Ativo' : '⚪ Aguardando primeiro acesso v86'}`,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    environment: 'MASTER_CONTROL_TOWER'
-                });
+                try {
+                    await db.collection('logs_sistema').add({
+                        category: 'NOTIFICACOES_PUSH',
+                        severity: 'INFO',
+                        message: `🔔 Push Direto para ${name}`,
+                        details: `Mensagem: "${msg.trim()}" | UID: ${uid} | Status FCM: ${fcmToken ? '🟢 Token Ativo' : '⚪ Aguardando primeiro acesso v86'}`,
+                        platform: 'Torre Master'
+                    });
+                } catch(logErr) {
+                    console.warn('Aviso ao gravar logs_sistema:', logErr);
+                }
 
                 showToast(`✅ Push enviado com sucesso para ${name}!`);
-                alert(`✅ Notificação enviada para o dispositivo de ${name}!\n\nStatus do Aparelho: ${fcmToken ? '🟢 Token FCM Ativo (Entrega imediata em nuvem)' : '⚪ Aparelho sem Token FCM no momento'}`);
+                alert(`✅ Notificação enviada para o dispositivo de ${name}!\n\nStatus do Aparelho: ${fcmToken ? '🟢 Token FCM Ativo (Entrega imediata em nuvem)' : '⚪ Aparelho sem Token FCM no momento (será registrado assim que abrir a v86)'}`);
             } catch (e) {
                 alert('Erro ao disparar push individual: ' + e.message);
             }
@@ -2603,8 +2617,8 @@
                         <button onclick="toggleUserPro('${u.uid || u.docId}', ${!isProPlan})" style="background: ${isProPlan ? 'rgba(255,0,128,0.15)' : 'rgba(0,230,118,0.15)'}; color: ${isProPlan ? '#FF0080' : '#00E676'}; border: 1px solid ${isProPlan ? '#FF0080' : '#00E676'}; border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer;">
                             ${isProPlan ? 'Revogar PRO' : '⭐ Ativar PRO 30d'}
                         </button>
-                        <button onclick="toggleUserDiploma('${u.uid || u.docId}', ${!hasDiploma})" style="background: ${hasDiploma ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.05)'}; color: ${hasDiploma ? '#00E5FF' : '#aaa'}; border: 1px solid ${hasDiploma ? '#00E5FF' : 'rgba(255,255,255,0.2)'}; border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer;" title="Ativar ou revogar o Selo de Formação Verificada">
-                            ${hasDiploma ? 'Revogar Diploma' : '🎓 Selo Formação'}
+                        <button onclick="toggleUserDiploma('${u.uid || u.docId}', ${!hasDiploma})" style="background: ${hasDiploma ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.05)'}; color: ${hasDiploma ? '#00E5FF' : '#aaa'}; border: 1px solid ${hasDiploma ? '#00E5FF' : 'rgba(255,255,255,0.2)'}; border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; cursor: pointer;" title="Clique para conceder ou revogar o Selo de Formação Verificada">
+                            ${hasDiploma ? '✕ Revogar Diploma' : '+ Conceder Diploma'}
                         </button>
                     </div>` : '';
                 const extractedPhone = extractSmartPhone(u);
