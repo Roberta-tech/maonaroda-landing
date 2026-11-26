@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mão na Roda — Dossiê Executivo de Aquisição & Pitch Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090B10;
+            --card-bg: rgba(18, 23, 34, 0.85);
+            --cyan: #00E5FF;
+            --cyan-glow: rgba(0, 229, 255, 0.35);
+            --pink: #FF4081;
+            --pink-glow: rgba(255, 64, 129, 0.35);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 229, 255, 0.3);
+            --gold: #FFD700;
+            --green: #00E676;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 60px;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(9, 11, 16, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-badge {
+            background: rgba(0, 229, 255, 0.12);
+            color: var(--cyan);
+            border: 1px solid var(--cyan);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn-print {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-print:hover {
+            background: var(--cyan);
+            color: #000;
+            border-color: var(--cyan);
+        }
+
+        .slide-counter {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Slide Viewport */
+        .slide-viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            max-width: 1200px;
+            height: 85%;
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        /* Slide Headers */
+        .slide-tag {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 17px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 28px;
+            max-width: 900px;
+        }
+
+        /* Grid Cards */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+            backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 32px var(--cyan-glow);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            font-size: 30px;
+            margin-bottom: 14px;
+        }
+
+        .card-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .stat-huge {
+            font-size: 44px;
+            font-weight: 900;
+            color: var(--cyan);
+            margin-bottom: 4px;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* Interactive Calculator */
+        .calc-box {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(0, 230, 118, 0.04) 100%);
+            border: 1px solid var(--cyan);
+            border-radius: 18px;
+            padding: 26px;
+            margin-top: 6px;
+        }
+
+        .slider-control {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--cyan);
+            cursor: pointer;
+            box-shadow: 0 0 16px var(--cyan);
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Bottom Controls */
+        .bottom-bar {
+            height: 70px;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            background: rgba(9, 11, 16, 0.8);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: var(--cyan);
+            color: #000;
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            width: 28px;
+            border-radius: 6px;
+            background: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan);
+        }
+
+        .badge-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 230, 118, 0.15);
+            color: #00E676;
+            border: 1px solid #00E676;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00E676;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* PRINT STYLES FOR CRISP A4 PDF GENERATION (Ctrl + P) */
+        @media print {
+            body {
+                overflow: visible !important;
+                height: auto !important;
+                background: #FFFFFF !important;
+                color: #0F172A !important;
+            }
+            .top-bar, .bottom-bar {
+                display: none !important;
+            }
+            .slide-viewport {
+                display: block !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .slide {
+                position: relative !important;
+                opacity: 1 !important;
+                transform: none !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                padding: 40px !important;
+            }
+            .slide-title {
+                color: #0F172A !important;
+                -webkit-text-fill-color: #0F172A !important;
+            }
+            .slide-subtitle {
+                color: #475569 !important;
+            }
+            .card {
+                background: #F8FAFC !important;
+                border: 1px solid #CBD5E1 !important;
+                box-shadow: none !important;
+                color: #0F172A !important;
+            }
+            .card-title {
+                color: #0F172A !important;
+            }
+            .card-desc {
+                color: #475569 !important;
+            }
+            .stat-huge {
+                color: #0284C7 !important;
+            }
+            .stat-label {
+                color: #64748B !important;
+            }
+            .calc-box {
+                background: #F1F5F9 !important;
+                border: 2px solid #0284C7 !important;
+            }
+            input[type=range] {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="brand">
+            <span>🚀 MÃO NA RODA</span>
+            <span class="brand-badge">Ativo de M&A / Aquisição</span>
+            <span class="badge-live"><span class="pulse-dot"></span> 100% HOMOLOGADO</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF (A4)</button>
+            <div class="slide-counter" id="slideCounter">Slide 1 de 8</div>
+        </div>
+    </div>
+
+    <!-- Slide Viewport -->
+    <div class="slide-viewport">
+
+        <!-- SLIDE 1: CAPA COM TRAÇÃO -->
+        <div class="slide active" data-index="0">
+            <div class="slide-tag">✨ OPORTUNIDADE DE INVESTIMENTO & AQUISIÇÃO TECNOLÓGICA</div>
+            <h1 class="slide-title">Mão na Roda: O Uber dos Serviços Residenciais</h1>
+            <p class="slide-subtitle">
+                Plataforma hiperlocal pronta e operando com mais de <strong>2.000 downloads</strong> em menos de 1 mês de lançamento. Conecta clientes a prestadores com custódia financeira protegida (escrow), margem de <strong>20% de take-rate por chamado</strong> e assinaturas recorrentes Pro.
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="stat-huge">+2.000</div>
+                    <div class="stat-label">Downloads nas Lojas (Mês 1)</div>
+                    <p class="card-desc" style="margin-top: 8px;">Crescimento orgânico acelerado nas lojas Google Play e Apple App Store sem fechar 30 dias.</p>
+                </div>
+                <div class="card">
+                    <div class="stat-huge">R$ 30,00</div>
+                    <div class="stat-label">Margem Líquida por Chamado (20%)</div>
+                    <p class="card-desc" style="margin-top: 8px;">10% retidos do cliente (R$ 15) + 10% de comissão do prestador (R$ 15) + Assinaturas PRO.</p>
+                </div>
+                <div class="card">
+                    <div class="stat-huge">100%</div>
+                    <div class="stat-label">Pronto Chave na Mão</div>
+                    <p class="card-desc" style="margin-top: 8px;">Elimina 14 meses de desenvolvimento, testes e mais de R$ 350.000 em custos de equipe técnica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: O PROBLEMA DO MERCADO -->
+        <div class="slide" data-index="1">
+            <div class="slide-tag">🚨 A GRANDE OPORTUNIDADE DO MERCADO</div>
+            <h1 class="slide-title">Um Mercado Bilionário Ainda Preso na Informalidade</h1>
+            <p class="slide-subtitle">
+                Mais de R$ 45 bilhões são movimentados anualmente em serviços manuais no Brasil, mas 90% das contratações sofrem com atrito, insegurança e falta de garantia.
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">⏳</div>
+                    <div class="card-title">Orçamentos Demorados</div>
+                    <p class="card-desc">Clientes esperam dias para conseguir alguém para consertar uma torneira, tomada ou montar um móvel. Nenhuma previsibilidade.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💸</div>
+                    <div class="card-title">Insegurança & Risco de Golpes</div>
+                    <p class="card-desc">Prestadores perdem dinheiro com calotes e clientes têm receio de colocar pessoas desconhecidas sem verificação dentro de casa.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📉</div>
+                    <div class="card-title">Modelos Legados Falidos</div>
+                    <p class="card-desc">Plataformas antigas cobram do prestador para liberar o telefone do cliente (venda de lead), sem garantia alguma de fechamento de serviço.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: A SOLUÇÃO MÃO NA RODA -->
+        <div class="slide" data-index="2">
+            <div class="slide-tag">💡 A SOLUÇÃO PROPRIETÁRIA</div>
+            <h1 class="slide-title">On-Demand Hiperlocal com Custódia Protegida (Escrow)</h1>
+            <p class="slide-subtitle">
+                O Mão na Roda combina a conveniência da Uber com a segurança de custódia do Mercado Livre para o setor de serviços.
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">📍</div>
+                    <div class="card-title">Matching por GPS em Tempo Real</div>
+                    <p class="card-desc">O cliente vê prestadores online em tempo real no mapa. SLA rigoroso de chegada: até 1 km em 30 minutos e acima de 1 km em até 1 hora.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛡️</div>
+                    <div class="card-title">Custódia Protegida (Escrow)</div>
+                    <p class="card-desc">O cliente paga no Pix ou Cartão no ato. O dinheiro fica 100% seguro na plataforma e só é liberado após o cliente aprovar o serviço.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💎</div>
+                    <div class="card-title">Margem Dupla e Justa (20%)</div>
+                    <p class="card-desc">A plataforma retém 10% de taxa de serviço do cliente e 10% de comissão do prestador, entregando R$ 30 líquidos por chamado padrão.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: ARQUITETURA & ATIVOS INCLUSOS -->
+        <div class="slide" data-index="3">
+            <div class="slide-tag">⚙️ TECNOLOGIA ROBUSTA & ATIVOS TRANSFERÍVEIS</div>
+            <h1 class="slide-title">Ecossistema Completo Chave na Mão (Turnkey)</h1>
+            <p class="slide-subtitle">
+                Software de nível corporativo sem débitos técnicos, pronto para transferência de titularidade e operação imediata.
+            </p>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">📱 App Mobile Flutter (iOS & Android)</div>
+                    <p class="card-desc">Código único de alta performance com geolocalização atômica, filtros regex antifraude no chat, carteira de custódia e push em nuvem (FCM).</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">🏰 Torre de Controle Master (Back-Office)</div>
+                    <p class="card-desc">Painel executivo com radar de chamados em tempo real, auditoria de diplomas/certificações, telemetria e central de disparo de push marketing.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">🌐 Web App & Landing Page Institucional</div>
+                    <p class="card-desc">Portal web responsivo de alta conversão integrado com Google Analytics 4, eventos de conversão e área oficial de download.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">☁️ Backend Serverless Google Firebase</div>
+                    <p class="card-desc">Arquitetura escalável em microsserviços (Cloud Functions + Cloud Scheduler) com custo fixo inicial próximo de zero.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: UNIT ECONOMICS & SIMULADOR -->
+        <div class="slide" data-index="4">
+            <div class="slide-tag">💰 UNIT ECONOMICS & SIMULADOR INTERATIVO</div>
+            <h1 class="slide-title">Previsibilidade Financeira & Escala Exponencial</h1>
+            
+            <div class="calc-box">
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Volume de Atendimentos Mensais:</span>
+                        <span id="sliderValueText" style="color: var(--cyan); font-size: 20px; font-weight: 900;">2.500 chamados/mês</span>
+                    </div>
+                    <input type="range" id="ordersSlider" min="500" max="15000" step="500" value="2500" oninput="updateSimulation()">
+                </div>
+
+                <div class="calc-results">
+                    <div>
+                        <div class="stat-label">Volume Transacionado (GMV)</div>
+                        <div class="stat-huge" id="gmvResult" style="font-size: 28px; color: #fff;">R$ 412.500</div>
+                        <p class="card-desc">Total movimentado no app/mês.</p>
+                    </div>
+                    <div>
+                        <div class="stat-label">Take-Rate 20% (R$ 30/chamado)</div>
+                        <div class="stat-huge" id="takeRateResult" style="font-size: 28px; color: var(--cyan);">R$ 75.000</div>
+                        <p class="card-desc">10% cliente + 10% prestador.</p>
+                    </div>
+                    <div>
+                        <div class="stat-label">Assinaturas PRO (MRR)</div>
+                        <div class="stat-huge" id="mrrResult" style="font-size: 28px; color: var(--gold);">R$ 18.750</div>
+                        <p class="card-desc">Planos mensais de prestadores.</p>
+                    </div>
+                    <div>
+                        <div class="stat-label">Receita Anual Projetada (ARR)</div>
+                        <div class="stat-huge" id="arrResult" style="font-size: 28px; color: var(--green);">R$ 1.125.000</div>
+                        <p class="card-desc">Faturamento anual da empresa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: TRAÇÃO & PROJEÇÃO A 1 ANO -->
+        <div class="slide" data-index="5">
+            <div class="slide-tag">📈 TRAÇÃO & MODELAGEM DE ESCALA A 1 ANO</div>
+            <h1 class="slide-title">Potencial para Quadruplicar no Primeiro Ano</h1>
+            <p class="slide-subtitle">
+                Com mais de 2.000 downloads no mês 1, a plataforma tem funil validado para escalar em múltiplos polos regionais:
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="stat-huge" style="font-size: 32px; color: #fff;">Mês 1 (Atual)</div>
+                    <div class="stat-label">2.000+ Downloads | 400 Chamados</div>
+                    <p class="card-desc" style="margin-top: 8px;">
+                        • GMV: R$ 66.000<br>
+                        • <strong>Receita: R$ 14.500/mês</strong><br>
+                        • Validação regional concluída.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="stat-huge" style="font-size: 32px; color: var(--cyan);">Mês 6</div>
+                    <div class="stat-label">15.000 Downloads | 4.000 Chamados</div>
+                    <p class="card-desc" style="margin-top: 8px;">
+                        • GMV: R$ 660.000<br>
+                        • <strong>Receita: R$ 150.000/mês</strong><br>
+                        • Expansão para 3 cidades polo.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="stat-huge" style="font-size: 32px; color: var(--green);">Mês 12</div>
+                    <div class="stat-label">60.000+ Downloads | 16.000 Chamados</div>
+                    <p class="card-desc" style="margin-top: 8px;">
+                        • GMV: R$ 2.640.000/mês<br>
+                        • <strong>Receita: R$ 600.000/mês</strong><br>
+                        • <strong>ARR Projetado: R$ 7,2 Milhões/ano</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: POR QUE ADQUIRIR PRONTO -->
+        <div class="slide" data-index="6">
+            <div class="slide-tag">⚖️ MAKE VS. BUY (COMPRAR OU DESENVOLVER DO ZERO)</div>
+            <h1 class="slide-title">Por que Adquirir o Mão na Roda é o Melhor Negócio</h1>
+            <p class="slide-subtitle">
+                Comparativo real entre adquirir um ativo pronto e homologado vs. contratar uma software house do zero:
+            </p>
+            <div class="grid-2">
+                <div class="card" style="border-color: rgba(255, 64, 129, 0.4);">
+                    <div class="card-title" style="color: var(--pink);">❌ Criar do Zero com Software House</div>
+                    <p class="card-desc" style="font-size: 15px; margin-top: 10px; line-height: 1.7;">
+                        • Custo de R$ 250.000 a R$ 400.000 em equipe e horas técnicas.<br>
+                        • Prazo de 12 a 16 meses de atrasos, retrabalho e frustrações.<br>
+                        • Riscos críticos de bugs em geolocalização e concorrência de pagamentos.<br>
+                        • Risco 100% nas costas do comprador sem garantia de aprovação nas lojas.
+                    </p>
+                </div>
+                <div class="card" style="border-color: rgba(0, 230, 118, 0.4);">
+                    <div class="card-title" style="color: var(--green);">✅ Adquirir o Mão na Roda Hoje</div>
+                    <p class="card-desc" style="font-size: 15px; margin-top: 10px; line-height: 1.7;">
+                        • Chave na mão: pronto para operar e faturar no dia seguinte.<br>
+                        • Código moderno e unificado em Flutter + Google Firebase.<br>
+                        • Mais de 2.000 downloads e 580+ aparelhos reais já conectados.<br>
+                        • Investimento em valor de fração do custo real de desenvolvimento.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: PRÓXIMOS PASSOS & FECHAMENTO -->
+        <div class="slide" data-index="7">
+            <div class="slide-tag">🤝 FECHAMENTO DO NEGÓCIO</div>
+            <h1 class="slide-title">Próximos Passos para a Aquisição</h1>
+            <p class="slide-subtitle">
+                Processo seguro e estruturado para transferência integral da tecnologia e início das operações pelo comprador:
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">1️⃣</div>
+                    <div class="card-title">Demonstração Técnica</div>
+                    <p class="card-desc">Demonstração ao vivo do aplicativo no celular e da Torre Master gerenciando chamados em tempo real.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">2️⃣</div>
+                    <div class="card-title">NDA & Proposta Comercial</div>
+                    <p class="card-desc">Formalização do contrato de cessão e transferência integral de direitos autorais de software e propriedade intelectual.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">3️⃣</div>
+                    <div class="card-title">Handover & Treinamento</div>
+                    <p class="card-desc">Transferência de repositórios Git, contas de deploy nas lojas, Firebase e treinamento operacional completo.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="bottom-bar">
+        <button class="nav-btn" onclick="prevSlide()">← Anterior</button>
+        <div class="nav-dots" id="navDots">
+            <!-- Gerado via JS -->
+        </div>
+        <button class="nav-btn" onclick="nextSlide()">Próximo →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const navDotsContainer = document.getElementById('navDots');
+        const slideCounter = document.getElementById('slideCounter');
+
+        // Cria os pontinhos de navegação
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(i);
+            navDotsContainer.appendChild(dot);
+        });
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.toggle('active', i === currentSlide);
+            });
+            document.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentSlide);
+            });
+            slideCounter.textContent = `Slide ${currentSlide + 1} de ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlide();
+        }
+
+        // Navegação por teclado (Setas e Espaço)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            }
+        });
+
+        // Calculadora Interativa com Modelo 20% Take-rate + Assinatura Pro
+        function updateSimulation() {
+            const orders = parseInt(document.getElementById('ordersSlider').value);
+            const ticket = 165;
+            
+            // Modelo Real Mão na Roda:
+            // 10% Cliente (R$ 15) + 10% Prestador (R$ 15) = R$ 30 por chamado básico (20%)
+            const takeRate = orders * 30;
+            
+            // Assinatura Pro: estimativa conservadora de 15% da base de prestadores ativos pagando R$ 50/mês
+            const proProviders = Math.round(orders * 0.15);
+            const mrrPro = proProviders * 50;
+
+            const gmv = orders * ticket;
+            const totalMonthlyRevenue = takeRate + mrrPro;
+            const arr = totalMonthlyRevenue * 12;
+
+            document.getElementById('sliderValueText').textContent = `${orders.toLocaleString('pt-BR')} chamados/mês`;
+            document.getElementById('gmvResult').textContent = `R$ ${gmv.toLocaleString('pt-BR')}`;
+            document.getElementById('takeRateResult').textContent = `R$ ${takeRate.toLocaleString('pt-BR')}`;
+            document.getElementById('mrrResult').textContent = `R$ ${mrrPro.toLocaleString('pt-BR')}`;
+            document.getElementById('arrResult').textContent = `R$ ${arr.toLocaleString('pt-BR')}`;
+        }
+    </script>
+</body>
+</html>
