@@ -2336,6 +2336,23 @@
             }
         }
 
+        function copyFcmToken(token) {
+            if (!token) {
+                alert('Nenhum token FCM registrado neste aparelho.');
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(token).then(() => {
+                    showToast('📋 Token FCM copiado para a área de transferência!');
+                    alert(`📋 Token FCM copiado com sucesso!\n\nAgora você pode clicar em "Enviar mensagem de teste" no Firebase e colar este token:\n\n${token.substring(0, 35)}...`);
+                }).catch(() => {
+                    prompt('Copie o Token FCM abaixo (Ctrl+C):', token);
+                });
+            } else {
+                prompt('Copie o Token FCM abaixo (Ctrl+C):', token);
+            }
+        }
+
         async function triggerPushCampaign() {
             const title = (document.getElementById('pushTitleInput')?.value || '').trim();
             const body = (document.getElementById('pushBodyInput')?.value || '').trim();
@@ -2714,6 +2731,7 @@
                         <td>
                             <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                                 <code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 10)}...</code>
+                                ${u.fcm_token ? `<button onclick="copyFcmToken('${u.fcm_token}')" style="background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid var(--cyan); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Copiar Token FCM deste aparelho para colar no Firebase">📋 Token</button>` : ''}
                                 <button onclick="sendDirectUserPush('${uid}', '${name.replace(/'/g, "\\'")}', '${u.fcm_token || ''}')" style="background: rgba(0, 230, 118, 0.15); color: #00E676; border: 1px solid rgba(0, 230, 118, 0.4); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Enviar Push direto para este aparelho">🔔 Push</button>
                                 <button onclick="searchUserTelemetry('${email}')" style="background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid var(--cyan); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Rastrear todas as sessões e pings deste usuário na Telemetria">📡 Sessões</button>
                                 <button onclick="confirmDeleteUser('${uid}', '${name.replace(/'/g, "\\'")}', '${email}')" style="background: rgba(255,0,128,0.15); color: #ff5252; border: 1px solid rgba(255,0,128,0.4); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Excluir este cadastro do banco">🗑️</button>
