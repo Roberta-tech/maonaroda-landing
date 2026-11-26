@@ -11,7 +11,7 @@
             --primary-dark: #0369A1;
             --text-dark: #0F172A;
             --text-muted: #475569;
-            --border: #E2E8F0;
+            --border: #CBD5E1;
             --bg-light: #F8FAFC;
             --green: #16A34A;
         }
@@ -35,7 +35,7 @@
 
         .header-actions {
             width: 100%;
-            max-width: 900px;
+            max-width: 920px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -65,12 +65,12 @@
 
         .doc-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 920px;
             background: #FFFFFF;
             padding: 50px 60px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            border: 1px solid var(--border);
+            border: 1px solid #E2E8F0;
         }
 
         /* Typography */
@@ -97,7 +97,7 @@
             color: var(--text-muted);
             line-height: 1.6;
             padding-bottom: 24px;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid #E2E8F0;
             margin-bottom: 28px;
         }
 
@@ -109,13 +109,6 @@
             padding-left: 12px;
             border-left: 4px solid var(--primary);
             letter-spacing: -0.3px;
-        }
-
-        h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin: 20px 0 12px 0;
         }
 
         p, li {
@@ -133,7 +126,7 @@
         /* Highlight Boxes */
         .highlight-box {
             background: var(--bg-light);
-            border: 1px solid var(--border);
+            border: 1px solid #E2E8F0;
             border-radius: 8px;
             padding: 18px 22px;
             margin: 18px 0;
@@ -148,7 +141,7 @@
 
         .stat-card {
             background: #F8FAFC;
-            border: 1px solid var(--border);
+            border: 1px solid #E2E8F0;
             border-radius: 8px;
             padding: 16px;
             text-align: center;
@@ -173,45 +166,46 @@
         .table-wrapper {
             width: 100%;
             margin: 20px 0;
-            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12.5px;
             text-align: left;
             background: #FFFFFF;
-            border: 1px solid #CBD5E1;
+            border: 1px solid var(--border);
             border-radius: 6px;
-            overflow: hidden;
+            table-layout: fixed;
         }
 
         th {
             background: #F1F5F9;
             color: var(--text-dark);
             font-weight: 700;
-            padding: 10px 10px;
-            border-bottom: 2px solid #CBD5E1;
-            font-size: 12px;
+            padding: 10px 8px;
+            border-bottom: 2px solid var(--border);
+            border-right: 1px solid var(--border);
+            font-size: 11.5px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
+            letter-spacing: 0.2px;
+            text-align: center;
         }
 
         td {
-            padding: 10px 10px;
-            border-bottom: 1px solid #E2E8F0;
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
             color: #1E293B;
-            white-space: nowrap;
+            text-align: center;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
         }
 
         tr:nth-child(even) td {
             background: #F8FAFC;
-        }
-
-        tr:hover td {
-            background: #F1F5F9;
         }
 
         td.total-col, th.total-col {
@@ -219,17 +213,7 @@
             font-weight: 800;
             color: var(--primary-dark);
             text-align: right;
-        }
-
-        .badge-verified {
-            display: inline-block;
-            background: #DCFCE7;
-            color: #15803D;
-            border: 1px solid #86EFAC;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding-right: 12px;
         }
 
         /* Valuation Box */
@@ -242,7 +226,7 @@
         }
 
         .val-price {
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 900;
             color: var(--primary-dark);
             margin: 8px 0 12px 0;
@@ -254,7 +238,7 @@
             color: var(--text-muted);
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid #E2E8F0;
         }
 
         /* PRINT MEDIA STYLES */
@@ -273,10 +257,10 @@
                 max-width: 100% !important;
             }
             table {
-                font-size: 11.5px !important;
+                font-size: 11px !important;
             }
             th, td {
-                padding: 8px 6px !important;
+                padding: 6px 4px !important;
             }
             .val-box {
                 page-break-inside: avoid !important;
@@ -315,7 +299,7 @@
                 <div class="stat-lbl">Take-Rate por Atendimento</div>
             </div>
             <div class="stat-card">
-                <div class="stat-val">R$ 7,2 M</div>
+                <div class="stat-val">R$ 10 M</div>
                 <div class="stat-lbl">ARR Projetado (Mês 12)</div>
             </div>
         </div>
@@ -330,14 +314,15 @@
 
         <h2>2. Unit Economics & Motores de Receita</h2>
         <p>
-            O modelo de negócios combina monetização transacional dupla com receita recorrente (SaaS) previsível:
+            O modelo de negócios combina monetização transacional dupla com receita recorrente (SaaS) acessível e publicidade nativa de alto impacto:
         </p>
         <ul>
             <li><strong>Taxa do Cliente (10%):</strong> Cobrada no ato da contratação (R$ 15,00 em um chamado padrão de R$ 165,00).</li>
             <li><strong>Comissão do Prestador (10%):</strong> Retida na liberação da custódia (R$ 15,00 retidos do repasse de R$ 150,00).</li>
             <li><strong>Margem Líquida da Plataforma:</strong> <strong>R$ 30,00 por chamado básico (20% de Take-Rate Total)</strong> com fluxo de caixa antecipado.</li>
-            <li><strong>Assinatura Mensal PRO (Prestadores):</strong> Planos mensais de <strong>R$ 49,90 a R$ 89,90/mês</strong> para prioridade no mapa e selo de formação verificado.</li>
-            <li><strong>Receitas Adicionais:</strong> Taxa de urgência noturna (20% a 30%) e parcerias com lojas de materiais de construção.</li>
+            <li><strong>Assinatura Mensal PRO (Prestadores):</strong> Taxa única de <strong>R$ 19,90/mês</strong> por profissional para prioridade no raio do mapa e selo de formação verificado. Valor de conversão massiva.</li>
+            <li><strong>Mídia no App (Retail Media / Ads):</strong> Venda de espaços e banners patrocinados para marcas de tintas, ferramentas, home centers e seguradoras (padrão Uber Ads e iFood Ads).</li>
+            <li><strong>Taxa de Urgência Noturna:</strong> Sobretaxa de 20% a 30% em atendimentos de emergência em feriados e madrugadas.</li>
         </ul>
 
         <h2>3. Tração de Lançamento (Mês 1)</h2>
@@ -347,12 +332,12 @@
             </p>
         </div>
 
-        <h2>4. Projeção Financeira de Escala a 12 Meses</h2>
+        <h2>4. Projeção Financeira de Escala a 12 Meses (Cenário Regional)</h2>
         <p>
-            Com a retenção via notificações push automáticas 2x ao dia e a expansão para polos regionais vizinhos, a projeção de escala quadriplicada apresenta números expressivos:
+            Com a alta aderência da assinatura PRO a R$ 19,90, monetização de anúncios e expansão para 4 polos regionais:
         </p>
 
-        <!-- TABELA 100% AJUSTADA PARA IMPRESSÃO SEM CORTES -->
+        <!-- TABELA 100% AJUSTADA COM LARGURA FIXA E TOTAL SEM CORTE -->
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -362,7 +347,7 @@
                         <th style="width: 13%;">Chamados</th>
                         <th style="width: 15%;">Volume (GMV)</th>
                         <th style="width: 15%;">Take-Rate 20%</th>
-                        <th style="width: 15%;">Assinaturas PRO</th>
+                        <th style="width: 15%;">Assinatura PRO</th>
                         <th class="total-col" style="width: 15%;">Total / Mês</th>
                     </tr>
                 </thead>
@@ -373,8 +358,8 @@
                         <td>400</td>
                         <td>R$ 66.000</td>
                         <td>R$ 12.000</td>
-                        <td>R$ 2.500</td>
-                        <td class="total-col">R$ 14.500</td>
+                        <td>R$ 2.985</td>
+                        <td class="total-col">R$ 16.485</td>
                     </tr>
                     <tr>
                         <td>Mês 3</td>
@@ -382,35 +367,35 @@
                         <td>1.500</td>
                         <td>R$ 247.500</td>
                         <td>R$ 45.000</td>
-                        <td>R$ 10.000</td>
-                        <td class="total-col">R$ 55.000</td>
+                        <td>R$ 11.940</td>
+                        <td class="total-col">R$ 62.940</td>
                     </tr>
                     <tr>
                         <td>Mês 6</td>
-                        <td>15.000</td>
-                        <td>4.000</td>
-                        <td>R$ 660.000</td>
-                        <td>R$ 120.000</td>
-                        <td>R$ 30.000</td>
-                        <td class="total-col">R$ 150.000</td>
+                        <td>18.000</td>
+                        <td>5.000</td>
+                        <td>R$ 825.000</td>
+                        <td>R$ 150.000</td>
+                        <td>R$ 39.800</td>
+                        <td class="total-col">R$ 209.800</td>
                     </tr>
                     <tr>
                         <td>Mês 9</td>
-                        <td>30.000</td>
-                        <td>8.000</td>
-                        <td>R$ 1.320.000</td>
-                        <td>R$ 240.000</td>
-                        <td>R$ 60.000</td>
-                        <td class="total-col">R$ 300.000</td>
+                        <td>40.000</td>
+                        <td>10.000</td>
+                        <td>R$ 1.650.000</td>
+                        <td>R$ 300.000</td>
+                        <td>R$ 79.600</td>
+                        <td class="total-col">R$ 424.600</td>
                     </tr>
                     <tr style="background: #F1F5F9; font-weight: 700;">
                         <td><strong>Mês 12</strong></td>
-                        <td><strong>60.000+</strong></td>
-                        <td><strong>16.000</strong></td>
-                        <td><strong>R$ 2.640.000</strong></td>
-                        <td><strong>R$ 480.000</strong></td>
-                        <td><strong>R$ 120.000</strong></td>
-                        <td class="total-col" style="font-size: 14px;"><strong>R$ 600.000</strong></td>
+                        <td><strong>75.000+</strong></td>
+                        <td><strong>20.000</strong></td>
+                        <td><strong>R$ 3.300.000</strong></td>
+                        <td><strong>R$ 600.000</strong></td>
+                        <td><strong>R$ 149.250</strong></td>
+                        <td class="total-col" style="font-size: 13.5px;"><strong>R$ 834.250</strong></td>
                     </tr>
                 </tbody>
             </table>
@@ -418,16 +403,17 @@
 
         <div class="highlight-box">
             <ul style="margin: 0; padding-left: 20px;">
-                <li><strong>Receita Bruta no Mês 12:</strong> <strong>R$ 600.000,00 / mês</strong></li>
-                <li><strong>ARR (Receita Anual Recorrente Projetada):</strong> <strong>R$ 7.200.000,00 / ano</strong></li>
-                <li><strong>GMV Anual Transacionado:</strong> <strong>R$ 31.680.000,00 / ano</strong></li>
-                <li><strong>Margem Operacional Líquida (EBITDA Projetado):</strong> <strong>~75%</strong> (graças à infraestrutura serverless sem servidores fixos).</li>
+                <li><strong>Receita Mensal no Mês 12:</strong> <strong>R$ 834.250,00 / mês</strong></li>
+                <li><strong>ARR (Receita Anual Recorrente Projetada):</strong> <strong>R$ 10.011.000,00 / ano (R$ 10 Milhões de Reais)</strong></li>
+                <li><strong>GMV Anual Transacionado:</strong> <strong>R$ 39.600.000,00 / ano</strong></li>
+                <li><strong>Margem Operacional Líquida (EBITDA Projetado):</strong> <strong>~76%</strong> (graças à infraestrutura serverless sem servidores fixos).</li>
             </ul>
         </div>
 
         <h2>5. O que está Incluso na Aquisição (Turnkey Asset)</h2>
         <ul>
-            <li><strong>Aplicativo Mobile Multiplataforma (Flutter):</strong> Código-fonte completo para Android e iOS com geolocalização atômica, filtros regex antifraude no chat e integração nativa com Google Cloud Messaging (FCM).</li>
+            <li><strong>Aplicativo Mobile Multiplataforma (Flutter):</strong> Código-fonte completo para Android e iOS com geolocalização atômica, filtros regex antifraude no chat, carteira de custódia e integração com Google Cloud Messaging (FCM).</li>
+            <li><strong>Módulos de Monetização Nativos:</strong> Sistema de Assinatura PRO (R$ 19,90) e painel para inserção de banners publicitários (Retail Media).</li>
             <li><strong>Torre de Controle Master:</strong> Painel administrativo com radar de chamados em tempo real, auditoria de diplomas/prestadores e central de notificações push com modelos de marketing.</li>
             <li><strong>Infraestrutura em Nuvem Serverless:</strong> Google Firebase, Firestore estruturado com regras de segurança auditadas, Cloud Functions e Cloud Scheduler para disparos automáticos diários.</li>
             <li><strong>Web App & Landing Page Oficial:</strong> Portal institucional responsivo de alta conversão integrado com Google Analytics 4.</li>
@@ -437,16 +423,16 @@
         <h2>6. Estrutura da Proposta de Aquisição & Valuation</h2>
         <div class="val-box">
             <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; color: var(--primary-dark); letter-spacing: 1px;">
-                VALOR DE AQUISIÇÃO INTEGRAL DO ATIVO
+                VALOR DE AQUISIÇÃO INTEGRAL DO ATIVO (25% DO VALOR DE MERCADO)
             </div>
-            <div class="val-price">R$ 2.000.000,00</div>
+            <div class="val-price">R$ 2.500.000,00</div>
             <p style="font-size: 14px; color: #1E293B; margin-bottom: 12px;">
-                <strong>Dois Milhões de Reais</strong> para cessão e transferência integral de 100% da tecnologia, código-fonte, infraestrutura, base de usuários e marca.
+                <strong>Dois Milhões e Quinhentos Mil Reais</strong> para cessão e transferência integral de 100% da tecnologia, código-fonte, infraestrutura, base de usuários e marca.
             </p>
             <ul style="margin: 0; padding-left: 18px; font-size: 13.5px; color: #334155;">
-                <li><strong>Desconto Estratégico de Entrada:</strong> O valor pedido representa apenas <strong>27,7% da Receita Anual Recorrente Projetada (ARR de R$ 7,2 Milhões no Ano 1)</strong>.</li>
-                <li><strong>Múltiplo de Apenas 0,28x ARR:</strong> Em transações normais de tecnologia, marketplaces com tecnologia proprietária negociam entre 3x a 5x ARR. O comprador adquire a preço de oportunidade e captura mais de <strong>R$ 5 Milhões em valorização patrimonial líquida</strong> no primeiro ano.</li>
-                <li><strong>Payback Acelerado:</strong> Com a margem líquida de ~75% sustentada pela arquitetura serverless, o retorno do capital ocorre em curto prazo com fluxo de caixa previsível.</li>
+                <li><strong>Exatamente 25% da Projeção de Mercado:</strong> Frente à receita anual recorrente de <strong>R$ 10.011.000,00 (Dez Milhões)</strong> projetada para o Mês 12, o valor pedido de R$ 2,5M representa matematicamente <strong>24,97% (~25%) do ARR</strong>.</li>
+                <li><strong>Múltiplo de Apenas 0,25x ARR:</strong> Em transações de tecnologia e marketplaces com escala comprovada, o valuation médio varia entre 3x a 5x ARR (R$ 30M a R$ 50M). O comprador adquire a preço de oportunidade e captura mais de <strong>R$ 7,5 Milhões em valorização patrimonial líquida</strong> logo no primeiro ano.</li>
+                <li><strong>Payback Acelerado:</strong> Com a margem líquida de ~76% sustentada pela arquitetura serverless, o retorno do capital ocorre em menos de 10 meses de operação em velocidade de cruzeiro.</li>
             </ul>
         </div>
 
