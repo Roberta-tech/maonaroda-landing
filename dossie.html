@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mão na Roda — Dossiê Executivo de Aquisição & Investment Memorandum</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0284C7;
+            --primary-dark: #0369A1;
+            --text-dark: #0F172A;
+            --text-muted: #475569;
+            --border: #E2E8F0;
+            --bg-light: #F8FAFC;
+            --green: #16A34A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #F1F5F9;
+            color: var(--text-dark);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-actions {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        }
+
+        .doc-container {
+            width: 100%;
+            max-width: 900px;
+            background: #FFFFFF;
+            padding: 50px 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border);
+        }
+
+        /* Typography */
+        .confidential-tag {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #EF4444;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 32px 0 16px 0;
+            padding-left: 12px;
+            border-left: 4px solid var(--primary);
+            letter-spacing: -0.3px;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 20px 0 12px 0;
+        }
+
+        p, li {
+            font-size: 14px;
+            line-height: 1.65;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        /* Highlight Boxes */
+        .highlight-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin: 18px 0;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* PERFECT RESPONSIVE TABLE FOR PRINT (NO CUTOFF) */
+        .table-wrapper {
+            width: 100%;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+            background: #FFFFFF;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #F1F5F9;
+            color: var(--text-dark);
+            font-weight: 700;
+            padding: 10px 10px;
+            border-bottom: 2px solid #CBD5E1;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #E2E8F0;
+            color: #1E293B;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) td {
+            background: #F8FAFC;
+        }
+
+        tr:hover td {
+            background: #F1F5F9;
+        }
+
+        td.total-col, th.total-col {
+            background: #EFF6FF !important;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-align: right;
+        }
+
+        .badge-verified {
+            display: inline-block;
+            background: #DCFCE7;
+            color: #15803D;
+            border: 1px solid #86EFAC;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* Valuation Box */
+        .val-box {
+            background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+            border: 2px solid #38BDF8;
+            border-radius: 10px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .val-price {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            margin: 8px 0 12px 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* PRINT MEDIA STYLES */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                padding: 0 !important;
+            }
+            .header-actions {
+                display: none !important;
+            }
+            .doc-container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            table {
+                font-size: 11.5px !important;
+            }
+            th, td {
+                padding: 8px 6px !important;
+            }
+            .val-box {
+                page-break-inside: avoid !important;
+            }
+            .highlight-grid {
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-actions">
+        <div>
+            <span style="font-weight: 800; font-size: 18px; color: var(--primary);">MÃO NA RODA</span>
+            <span style="font-size: 13px; color: var(--text-muted); margin-left: 8px;">Dossiê Executivo de Aquisição</span>
+        </div>
+        <button class="btn-print" onclick="window.print()">🖨️ Salvar em PDF / Imprimir (A4)</button>
+    </div>
+
+    <div class="doc-container">
+        
+        <div class="confidential-tag">DOCUMENTO CONFIDENCIAL — PROPOSTA DE AQUISIÇÃO & M&A</div>
+        <h1>Mão na Roda: O Uber dos Serviços Residenciais</h1>
+        <div class="subtitle">
+            Dossiê de Oportunidade de Investimento, Modelagem Financeira a 12 Meses e Transferência de Ativo Tecnológico Homologado em Produção.
+        </div>
+
+        <div class="highlight-grid">
+            <div class="stat-card">
+                <div class="stat-val">+2.000</div>
+                <div class="stat-lbl">Downloads nas Lojas (Mês 1)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">20%</div>
+                <div class="stat-lbl">Take-Rate por Atendimento</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">R$ 7,2 M</div>
+                <div class="stat-lbl">ARR Projetado (Mês 12)</div>
+            </div>
+        </div>
+
+        <h2>1. Sumário Executivo</h2>
+        <p>
+            O <strong>Mão na Roda</strong> é um marketplace transacional hiperlocal projetado para transformar o mercado fragmentado de serviços emergenciais e manutenções residenciais e comerciais no Brasil.
+        </p>
+        <p>
+            Diferente de classificados tradicionais (GetNinjas, OLX), a plataforma opera no modelo <strong>Uber dos Serviços</strong>: conexão em tempo real por geolocalização, tempo de resposta controlado por SLA rigoroso (chegada em 30 min a 1 hora) e <strong>custódia financeira protegida (escrow)</strong> com liberação do pagamento somente após a validação do cliente.
+        </p>
+
+        <h2>2. Unit Economics & Motores de Receita</h2>
+        <p>
+            O modelo de negócios combina monetização transacional dupla com receita recorrente (SaaS) previsível:
+        </p>
+        <ul>
+            <li><strong>Taxa do Cliente (10%):</strong> Cobrada no ato da contratação (R$ 15,00 em um chamado padrão de R$ 165,00).</li>
+            <li><strong>Comissão do Prestador (10%):</strong> Retida na liberação da custódia (R$ 15,00 retidos do repasse de R$ 150,00).</li>
+            <li><strong>Margem Líquida da Plataforma:</strong> <strong>R$ 30,00 por chamado básico (20% de Take-Rate Total)</strong> com fluxo de caixa antecipado.</li>
+            <li><strong>Assinatura Mensal PRO (Prestadores):</strong> Planos mensais de <strong>R$ 49,90 a R$ 89,90/mês</strong> para prioridade no mapa e selo de formação verificado.</li>
+            <li><strong>Receitas Adicionais:</strong> Taxa de urgência noturna (20% a 30%) e parcerias com lojas de materiais de construção.</li>
+        </ul>
+
+        <h2>3. Tração de Lançamento (Mês 1)</h2>
+        <div class="highlight-box">
+            <p style="margin: 0;">
+                Em menos de 30 dias de lançamento e sem grande verba de marketing, a plataforma já ultrapassou a marca de <strong>+2.000 downloads nas lojas oficiais (Google Play e Apple App Store)</strong>, com mais de <strong>580 dispositivos ativos e tokens de notificação em nuvem registrados</strong> no Google Play Services.
+            </p>
+        </div>
+
+        <h2>4. Projeção Financeira de Escala a 12 Meses</h2>
+        <p>
+            Com a retenção via notificações push automáticas 2x ao dia e a expansão para polos regionais vizinhos, a projeção de escala quadriplicada apresenta números expressivos:
+        </p>
+
+        <!-- TABELA 100% AJUSTADA PARA IMPRESSÃO SEM CORTES -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 14%;">Mês</th>
+                        <th style="width: 13%;">Downloads</th>
+                        <th style="width: 13%;">Chamados</th>
+                        <th style="width: 15%;">Volume (GMV)</th>
+                        <th style="width: 15%;">Take-Rate 20%</th>
+                        <th style="width: 15%;">Assinaturas PRO</th>
+                        <th class="total-col" style="width: 15%;">Total / Mês</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mês 1 (Atual)</strong></td>
+                        <td><strong>2.000+</strong></td>
+                        <td>400</td>
+                        <td>R$ 66.000</td>
+                        <td>R$ 12.000</td>
+                        <td>R$ 2.500</td>
+                        <td class="total-col">R$ 14.500</td>
+                    </tr>
+                    <tr>
+                        <td>Mês 3</td>
+                        <td>6.000</td>
+                        <td>1.500</td>
+                        <td>R$ 247.500</td>
+                        <td>R$ 45.000</td>
+                        <td>R$ 10.000</td>
+                        <td class="total-col">R$ 55.000</td>
+                    </tr>
+                    <tr>
+                        <td>Mês 6</td>
+                        <td>15.000</td>
+                        <td>4.000</td>
+                        <td>R$ 660.000</td>
+                        <td>R$ 120.000</td>
+                        <td>R$ 30.000</td>
+                        <td class="total-col">R$ 150.000</td>
+                    </tr>
+                    <tr>
+                        <td>Mês 9</td>
+                        <td>30.000</td>
+                        <td>8.000</td>
+                        <td>R$ 1.320.000</td>
+                        <td>R$ 240.000</td>
+                        <td>R$ 60.000</td>
+                        <td class="total-col">R$ 300.000</td>
+                    </tr>
+                    <tr style="background: #F1F5F9; font-weight: 700;">
+                        <td><strong>Mês 12</strong></td>
+                        <td><strong>60.000+</strong></td>
+                        <td><strong>16.000</strong></td>
+                        <td><strong>R$ 2.640.000</strong></td>
+                        <td><strong>R$ 480.000</strong></td>
+                        <td><strong>R$ 120.000</strong></td>
+                        <td class="total-col" style="font-size: 14px;"><strong>R$ 600.000</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight-box">
+            <ul style="margin: 0; padding-left: 20px;">
+                <li><strong>Receita Bruta no Mês 12:</strong> <strong>R$ 600.000,00 / mês</strong></li>
+                <li><strong>ARR (Receita Anual Recorrente Projetada):</strong> <strong>R$ 7.200.000,00 / ano</strong></li>
+                <li><strong>GMV Anual Transacionado:</strong> <strong>R$ 31.680.000,00 / ano</strong></li>
+                <li><strong>Margem Operacional Líquida (EBITDA Projetado):</strong> <strong>~75%</strong> (graças à infraestrutura serverless sem servidores fixos).</li>
+            </ul>
+        </div>
+
+        <h2>5. O que está Incluso na Aquisição (Turnkey Asset)</h2>
+        <ul>
+            <li><strong>Aplicativo Mobile Multiplataforma (Flutter):</strong> Código-fonte completo para Android e iOS com geolocalização atômica, filtros regex antifraude no chat e integração nativa com Google Cloud Messaging (FCM).</li>
+            <li><strong>Torre de Controle Master:</strong> Painel administrativo com radar de chamados em tempo real, auditoria de diplomas/prestadores e central de notificações push com modelos de marketing.</li>
+            <li><strong>Infraestrutura em Nuvem Serverless:</strong> Google Firebase, Firestore estruturado com regras de segurança auditadas, Cloud Functions e Cloud Scheduler para disparos automáticos diários.</li>
+            <li><strong>Web App & Landing Page Oficial:</strong> Portal institucional responsivo de alta conversão integrado com Google Analytics 4.</li>
+            <li><strong>Base de Ativos e Usuários:</strong> Mais de 2.000 downloads e mais de 580 dispositivos ativos registrados.</li>
+        </ul>
+
+        <h2>6. Estrutura da Proposta de Aquisição & Valuation</h2>
+        <div class="val-box">
+            <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; color: var(--primary-dark); letter-spacing: 1px;">
+                VALOR DE AQUISIÇÃO INTEGRAL DO ATIVO
+            </div>
+            <div class="val-price">R$ 2.000.000,00</div>
+            <p style="font-size: 14px; color: #1E293B; margin-bottom: 12px;">
+                <strong>Dois Milhões de Reais</strong> para cessão e transferência integral de 100% da tecnologia, código-fonte, infraestrutura, base de usuários e marca.
+            </p>
+            <ul style="margin: 0; padding-left: 18px; font-size: 13.5px; color: #334155;">
+                <li><strong>Desconto Estratégico de Entrada:</strong> O valor pedido representa apenas <strong>27,7% da Receita Anual Recorrente Projetada (ARR de R$ 7,2 Milhões no Ano 1)</strong>.</li>
+                <li><strong>Múltiplo de Apenas 0,28x ARR:</strong> Em transações normais de tecnologia, marketplaces com tecnologia proprietária negociam entre 3x a 5x ARR. O comprador adquire a preço de oportunidade e captura mais de <strong>R$ 5 Milhões em valorização patrimonial líquida</strong> no primeiro ano.</li>
+                <li><strong>Payback Acelerado:</strong> Com a margem líquida de ~75% sustentada pela arquitetura serverless, o retorno do capital ocorre em curto prazo com fluxo de caixa previsível.</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            Mão na Roda. Todos os direitos reservados.
+        </div>
+
+    </div>
+
+</body>
+</html>
