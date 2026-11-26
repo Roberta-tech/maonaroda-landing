@@ -2468,6 +2468,18 @@
                     } catch(e) {}
                 }
 
+                let ultimoAcessoStr = '';
+                const uAccess = u.ultimo_acesso || u.ultimo_acesso_data || u.last_active_time || u.updated_at;
+                if (uAccess) {
+                    try {
+                        const ms = parseAnyTimestampMs(uAccess);
+                        if (ms > 0) {
+                            const d = new Date(ms);
+                            ultimoAcessoStr = d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+                        }
+                    } catch(e) {}
+                }
+
                 const initial = (name.trim().charAt(0) || 'U').toUpperCase();
                 const avatarHtml = (photo && photo.startsWith('http'))
                     ? `<div class="user-avatar"><img src="${photo}" alt="${name}" onerror="this.onerror=null; this.parentNode.innerHTML='${initial}';"></div>`
@@ -2516,7 +2528,10 @@
                         <td style="font-family: 'JetBrains Mono'; color: var(--text-secondary);">
                             ${extractedPhone ? `<a href="https://wa.me/55${extractedPhone.replace(/\D/g, '')}" target="_blank" style="color: var(--green); text-decoration: none; font-weight: 700;">📞 ${phone}</a>` : phone}
                         </td>
-                        <td style="color: var(--text-muted); font-size: 12px;">${createdStr}</td>
+                        <td style="font-size: 11.5px; white-space: nowrap;">
+                            ${ultimoAcessoStr ? `<div style="color: #00E676; font-weight: bold; margin-bottom: 2px;" title="Último acesso detectado no app">🟢 Acesso: ${ultimoAcessoStr}</div>` : ''}
+                            <div style="color: var(--text-muted); font-size: 11px;">📅 Cadastro: ${createdStr}</div>
+                        </td>
                         <td>
                             <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                                 <code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 10)}...</code>
