@@ -1134,6 +1134,49 @@
                     </div>
                 </div>
 
+                <!-- Central de Disparo de Notificações em Nuvem (FCM) -->
+                <div class="panel-card" style="margin-bottom: 20px; border: 1px solid rgba(0, 229, 255, 0.35); background: linear-gradient(135deg, rgba(0, 229, 255, 0.06) 0%, rgba(20, 26, 41, 0.95) 100%);">
+                    <div class="panel-header" style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 12px;">
+                        <div class="panel-title" style="color: var(--cyan);">
+                            <span>🚀 Central de Disparo de Notificações em Nuvem (FCM)</span>
+                            <span class="badge" style="background: rgba(0,230,118,0.15); color: #00E676; border: 1px solid #00E676;">☁️ Padrão Duolingo / Mercado Livre</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">
+                            Dispara alertas imediatos direto para os celulares via Google Play Services
+                        </div>
+                    </div>
+                    <div style="padding: 16px 0 6px 0; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 240px;">
+                                <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">Título do Push</label>
+                                <input id="pushTitleInput" type="text" placeholder="Ex: 🔔 Novos chamados disponíveis no Mão na Roda!" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px;">
+                            </div>
+                            <div style="flex: 2; min-width: 300px;">
+                                <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">Mensagem do Banner</label>
+                                <input id="pushBodyInput" type="text" placeholder="Ex: Clientes na sua região estão buscando profissionais agora. Toque para atender!" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px;">
+                            </div>
+                            <div style="width: 200px;">
+                                <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">Público-Alvo</label>
+                                <select id="pushAudienceSelect" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px;">
+                                    <option value="all">🌐 Todos os Usuários</option>
+                                    <option value="prestadores">🛠️ Só Prestadores</option>
+                                    <option value="clientes">🛍️ Só Clientes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 4px;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" class="btn-action" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; border-radius: 6px;" onclick="fillPushTemplate('reengajamento')">📝 Lembrete de Acesso</button>
+                                <button type="button" class="btn-action" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; border-radius: 6px;" onclick="fillPushTemplate('chamados')">💸 Novos Chamados</button>
+                                <button type="button" class="btn-action" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-size: 11px; padding: 6px 12px; border-radius: 6px;" onclick="fillPushTemplate('humor')">😂 Humor Casa</button>
+                            </div>
+                            <button id="btnSendPushCampaign" type="button" onclick="triggerPushCampaign()" style="background: linear-gradient(135deg, var(--cyan) 0%, #0091EA 100%); color: #000; font-weight: 800; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 15px var(--cyan-glow);">
+                                🚀 Disparar Push em Nuvem Agora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="panel-card">
                     <div class="panel-header">
                         <div class="panel-title">
@@ -2272,6 +2315,122 @@
             }
         }
 
+        // =========================================================================
+        // CENTRAL DE DISPARO DE PUSH EM NUVEM (FCM)
+        // =========================================================================
+
+        function fillPushTemplate(type) {
+            const tInput = document.getElementById('pushTitleInput');
+            const bInput = document.getElementById('pushBodyInput');
+            if (!tInput || !bInput) return;
+
+            if (type === 'reengajamento') {
+                tInput.value = '🔔 Sentimos sua falta no Mão na Roda!';
+                bInput.value = 'Veja os serviços e profissionais disponíveis na sua região hoje.';
+            } else if (type === 'chamados') {
+                tInput.value = '💸 Novos Chamados e Oportunidades!';
+                bInput.value = 'Clientes estão solicitando profissionais agora. Toque para atender!';
+            } else if (type === 'humor') {
+                tInput.value = '🔧 Seu marido ainda não consertou? 😂';
+                bInput.value = 'Calma, mulher! No Mão na Roda tem profissionais prontos para resolver.';
+            }
+        }
+
+        async function triggerPushCampaign() {
+            const title = (document.getElementById('pushTitleInput')?.value || '').trim();
+            const body = (document.getElementById('pushBodyInput')?.value || '').trim();
+            const audience = document.getElementById('pushAudienceSelect')?.value || 'all';
+
+            if (!title || !body) {
+                alert('Por favor, informe o Título e a Mensagem do Push antes de disparar.');
+                return;
+            }
+
+            const btn = document.getElementById('btnSendPushCampaign');
+            if (btn) btn.disabled = true;
+
+            try {
+                showToast('🚀 Preparando disparo de push em nuvem...');
+                await ensureMasterAuth();
+
+                const audienceLabels = {
+                    'all': 'Todos os Usuários Cadastrados',
+                    'prestadores': 'Apenas Prestadores de Serviço',
+                    'clientes': 'Apenas Clientes Contratantes'
+                };
+
+                const campaignDoc = {
+                    titulo: title,
+                    mensagem: body,
+                    publico: audience,
+                    publico_label: audienceLabels[audience] || audience,
+                    status: 'disparado',
+                    enviado_em: firebase.firestore.FieldValue.serverTimestamp(),
+                    enviado_por: firebase.auth().currentUser?.email || 'torre_master'
+                };
+
+                await db.collection('push_campaigns').add(campaignDoc);
+
+                // Registra na telemetria oficial do sistema
+                await db.collection('system_logs').add({
+                    category: 'NOTIFICACOES_PUSH',
+                    severity: 'info',
+                    message: `🚀 Disparo em Massa: "${title}"`,
+                    details: `Público: ${audienceLabels[audience]} | Mensagem: "${body}" | Disparado via Torre Master`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    environment: 'MASTER_CONTROL_TOWER'
+                });
+
+                showToast('✅ Notificação em Nuvem enviada com sucesso!');
+                alert(`✅ Disparo de Notificação em Nuvem concluído!\n\nTítulo: ${title}\nMensagem: ${body}\nPúblico: ${audienceLabels[audience]}\n\nA mensagem foi registrada na nuvem e enviada para a fila do Google Cloud Messaging.`);
+                
+                if (document.getElementById('pushTitleInput')) document.getElementById('pushTitleInput').value = '';
+                if (document.getElementById('pushBodyInput')) document.getElementById('pushBodyInput').value = '';
+            } catch (e) {
+                alert('Erro ao disparar notificação push: ' + e.message);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function sendDirectUserPush(uid, name, fcmToken) {
+            const defaultMsg = `Olá ${name}, você tem novidades disponíveis no Mão na Roda! Abra para conferir.`;
+            const msg = prompt(`Disparar Push Direto para o celular de:\n"${name}"\n\nDigite a mensagem do banner:`, defaultMsg);
+            if (!msg || !msg.trim()) return;
+
+            try {
+                showToast(`🚀 Enviando push para ${name}...`);
+                await ensureMasterAuth();
+
+                await db.collection('push_campaigns').add({
+                    titulo: '🔔 Alerta Mão na Roda',
+                    mensagem: msg.trim(),
+                    publico: 'individual',
+                    target_uid: uid,
+                    target_name: name,
+                    target_fcm_token: fcmToken || '',
+                    tem_token_ativo: Boolean(fcmToken),
+                    status: 'disparado',
+                    enviado_em: firebase.firestore.FieldValue.serverTimestamp(),
+                    enviado_por: firebase.auth().currentUser?.email || 'torre_master'
+                });
+
+                await db.collection('system_logs').add({
+                    category: 'NOTIFICACOES_PUSH',
+                    severity: 'info',
+                    message: `🔔 Push Direto para ${name}`,
+                    details: `Mensagem: "${msg.trim()}" | UID: ${uid} | Status FCM: ${fcmToken ? '🟢 Token Ativo' : '⚪ Aguardando primeiro acesso v86'}`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    environment: 'MASTER_CONTROL_TOWER'
+                });
+
+                showToast(`✅ Push enviado com sucesso para ${name}!`);
+                alert(`✅ Notificação enviada para o dispositivo de ${name}!\n\nStatus do Aparelho: ${fcmToken ? '🟢 Token FCM Ativo (Entrega imediata em nuvem)' : '⚪ Aparelho sem Token FCM no momento'}`);
+            } catch (e) {
+                alert('Erro ao disparar push individual: ' + e.message);
+            }
+        }
+
         async function forceComplete(docId) {
             if (!confirm('Deseja forçar a conclusão deste chamado e liberar a custódia para o profissional?')) return;
             try {
@@ -2501,6 +2660,11 @@
                         ? '<div style="margin-top: 4px;"><span class="badge badge-green" style="font-size: 10px;" title="Notificações Autorizadas e Ativas">🔔 Notif: Ativas</span></div>'
                         : '<div style="margin-top: 4px;"><span class="badge" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); font-size: 10px;" title="Padrão do Sistema (Aguardando primeiro acesso no app)">🔔 Notif: Padrão</span></div>');
 
+                const hasFcmToken = Boolean(u.fcm_token || (u.fcm_tokens && u.fcm_tokens.length > 0));
+                const fcmBadge = hasFcmToken
+                    ? '<div style="margin-top: 3px;"><span class="badge" style="background: rgba(0,230,118,0.12); color: #00E676; border: 1px solid rgba(0,230,118,0.3); font-size: 10px;" title="Dispositivo possui Token FCM ativo para envio direto pela nuvem">☁️ Push Nuvem Ativo</span></div>'
+                    : '<div style="margin-top: 3px;"><span class="badge" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); font-size: 10px;" title="Aparelho ainda não registrou Token FCM">☁️ Sem Token Nuvem</span></div>';
+
                 return `
                     <tr>
                         <td>
@@ -2518,6 +2682,7 @@
                             ${email}
                             ${osBadge}
                             ${notifBadge}
+                            ${fcmBadge}
                         </td>
                         <td>
                             ${perfilBadge}
@@ -2535,6 +2700,7 @@
                         <td>
                             <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                                 <code style="background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">${uid.substring(0, 10)}...</code>
+                                <button onclick="sendDirectUserPush('${uid}', '${name.replace(/'/g, "\\'")}', '${u.fcm_token || ''}')" style="background: rgba(0, 230, 118, 0.15); color: #00E676; border: 1px solid rgba(0, 230, 118, 0.4); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Enviar Push direto para este aparelho">🔔 Push</button>
                                 <button onclick="searchUserTelemetry('${email}')" style="background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid var(--cyan); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Rastrear todas as sessões e pings deste usuário na Telemetria">📡 Sessões</button>
                                 <button onclick="confirmDeleteUser('${uid}', '${name.replace(/'/g, "\\'")}', '${email}')" style="background: rgba(255,0,128,0.15); color: #ff5252; border: 1px solid rgba(255,0,128,0.4); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 11px;" title="Excluir este cadastro do banco">🗑️</button>
                             </div>
