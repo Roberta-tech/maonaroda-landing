@@ -937,6 +937,12 @@
                 <span class="nav-badge" id="badgeProv">0</span>
             </div>
 
+            <div class="nav-item" onclick="switchTab('homologacao-lgpd')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span>Homologação & Selo LGPD</span>
+                <span class="nav-badge" id="badgeHomologacao" style="background: rgba(255, 215, 0, 0.2); color: #FFD700; border: 1px solid #FFD700;">0</span>
+            </div>
+
             <div class="nav-item" onclick="switchTab('suporte-alertas')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 <span>Alertas & Auditoria</span>
@@ -1585,6 +1591,61 @@
                 </div>
             </section>
 
+            <!-- ABA DE HOMOLOGAÇÃO DE PRESTADORES & SELO LGPD COM ANTECEDENTES CRIMINAIS -->
+            <section id="tab-homologacao-lgpd" class="tab-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🛡️ Central de Homologação de Prestadores & Checagem LGPD (<span id="countHomologacao">0</span> Registrados)</span>
+                            <span class="badge badge-amber" id="homologacaoPendingBadge">0 Pendentes de Análise</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input type="text" id="homologSearch" class="search-input" placeholder="Buscar prestador por nome, email ou CPF..." oninput="filterHomologacoes()">
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn-action" style="padding: 6px 12px; font-size: 11px;" onclick="setHomologFilter('ALL')">Todos</button>
+                                <button class="btn-action" style="padding: 6px 12px; font-size: 11px; background: rgba(255, 179, 0, 0.2); border-color: #FFB300; color: #FFB300;" onclick="setHomologFilter('PENDENTES')">⏳ Pendentes</button>
+                                <button class="btn-action" style="padding: 6px 12px; font-size: 11px; background: rgba(0, 230, 118, 0.2); border-color: #00E676; color: #00E676;" onclick="setHomologFilter('APROVADOS')">✅ Com Selo Ouro</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px; padding: 14px 18px; border-radius: 12px; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.25); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 24px;">⚖️</span>
+                            <div>
+                                <strong style="color: #FFD700; font-size: 13.5px;">Auditoria de Segurança, Identidade e Antecedentes Criminais (LGPD & TST Tema 12):</strong>
+                                <p style="margin: 2px 0 0; color: var(--text-muted); font-size: 12px;">Conforme a LGPD (Lei 13.709/18, Art. 7º, IX e Art. 11, II, 'e') e jurisprudência pacificada do TST (Tema Repetitivo 12), prestadores com ingresso em domicílios alheios devem comprovar identidade e antecedentes criminais. Ao aprovar, o prestador recebe o Selo Ouro Verificado em todo o aplicativo.</p>
+                            </div>
+                        </div>
+                        <span class="badge badge-green" style="font-family: 'JetBrains Mono'; font-size: 11px;">Blindagem Ativa 🛡️</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 180px;">Prestador</th>
+                                    <th style="min-width: 120px;">Documento</th>
+                                    <th style="min-width: 280px;">Documentos Anexados (Clique p/ Ampliar)</th>
+                                    <th style="min-width: 140px;">Status / Data</th>
+                                    <th style="min-width: 220px;">Ações da Administradora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="homologacaoTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        Carregando solicitações de homologação...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
 
@@ -1932,6 +1993,7 @@
                 custodia: 'Custódia Financeira & Escrow',
                 telemetria: 'Telemetria & Logs do Sistema',
                 prestadores: 'Prestadores Reais Cadastrados',
+                'homologacao-lgpd': 'Central de Homologação de Prestadores & Checagem LGPD',
                 'suporte-alertas': 'Alertas & Auditoria Sigilosa de Suporte',
                 credenciais: 'Auditoria de Diplomas & Nível Superior',
                 precos: 'Tabela Oficial de Preços (60 Categorias)'
@@ -1995,6 +2057,7 @@
                 listenOrders();
                 listenUsers();
                 listenLogs();
+                initHomologacoesListener();
 
                 // Carregar Dados Locais
                 loadProviders();
@@ -2568,6 +2631,7 @@
                 renderUsers(usersData);
                 updateUserMetrics(usersData);
                 renderCredenciais(usersData);
+                renderHomologacoes();
                 if (ordersData && ordersData.length > 0) {
                     renderOrders(ordersData);
                 }
@@ -4258,7 +4322,288 @@
             }
         }
 
+        // =========================================================================
+        // CENTRAL DE HOMOLOGAÇÃO DE PRESTADORES & CHECAGEM LGPD COM ANTECEDENTES
+        // =========================================================================
+        let verificacoesData = [];
+        let currentHomologFilter = 'ALL';
+
+        function initHomologacoesListener() {
+            try {
+                db.collection('verificacoes_prestadores').onSnapshot(snap => {
+                    verificacoesData = [];
+                    snap.forEach(doc => {
+                        verificacoesData.push({ docId: doc.id, ...doc.data() });
+                    });
+                    renderHomologacoes();
+                }, err => {
+                    console.warn('Erro ao escutar verificacoes_prestadores:', err);
+                });
+            } catch(e) {
+                console.warn('Erro initHomologacoesListener:', e);
+            }
+        }
+
+        function renderHomologacoes() {
+            const tbody = document.getElementById('homologacaoTableBody');
+            if (!tbody) return;
+
+            const map = new Map();
+
+            // 1. Dos registros em verificacoes_prestadores
+            (verificacoesData || []).forEach(v => {
+                const uid = v.uid || v.docId;
+                if (uid) map.set(uid, { ...v, uid: uid });
+            });
+
+            // 2. Dos registros em usersData
+            (usersData || []).forEach(u => {
+                const uid = u.uid || u.docId;
+                if (!uid) return;
+                const hasDocs = Boolean(u.doc_identidade_frente || u.doc_antecedentes_criminais || u.status_verificacao || u.selo_verificado);
+                if (hasDocs) {
+                    const existing = map.get(uid) || {};
+                    map.set(uid, {
+                        uid: uid,
+                        nome: existing.nome || u.display_name || u.displayName || u.nome || 'Prestador Parceiro',
+                        email: existing.email || u.email || 'Não informado',
+                        telefone: existing.telefone || u.phone_number || u.telefone || 'Não informado',
+                        cpf: existing.cpf || u.cpf || u.documento || '',
+                        status: existing.status || u.status_verificacao || (u.selo_verificado ? 'aprovado' : 'pendente_envio'),
+                        selo_verificado: existing.selo_verificado !== undefined ? existing.selo_verificado : Boolean(u.selo_verificado),
+                        motivo_rejeicao: existing.motivo_rejeicao || u.motivo_rejeicao_verificacao || '',
+                        doc_identidade_frente: existing.doc_identidade_frente || u.doc_identidade_frente || '',
+                        doc_identidade_verso: existing.doc_identidade_verso || u.doc_identidade_verso || '',
+                        doc_selfie_liveness: existing.doc_selfie_liveness || u.doc_selfie_liveness || '',
+                        doc_antecedentes_criminais: existing.doc_antecedentes_criminais || u.doc_antecedentes_criminais || '',
+                        doc_comprovante_residencia: existing.doc_comprovante_residencia || u.doc_comprovante_residencia || '',
+                        observacoes: existing.observacoes || '',
+                        enviado_em: existing.enviado_em || u.documentos_enviados_em || '',
+                    });
+                }
+            });
+
+            let list = Array.from(map.values());
+
+            const countEl = document.getElementById('countHomologacao');
+            if (countEl) countEl.textContent = list.length;
+            const pendentesCount = list.filter(item => item.status === 'em_analise' || item.status === 'pendente').length;
+            const badgeEl = document.getElementById('badgeHomologacao');
+            if (badgeEl) badgeEl.textContent = pendentesCount;
+            const badgePending = document.getElementById('homologacaoPendingBadge');
+            if (badgePending) badgePending.textContent = `${pendentesCount} Pendentes de Análise`;
+
+            // Filtro de status
+            if (currentHomologFilter === 'PENDENTES') {
+                list = list.filter(item => item.status === 'em_analise' || item.status === 'pendente');
+            } else if (currentHomologFilter === 'APROVADOS') {
+                list = list.filter(item => item.selo_verificado === true || item.status === 'aprovado');
+            }
+
+            // Filtro de busca textual
+            const q = (document.getElementById('homologSearch')?.value || '').toLowerCase().trim();
+            if (q) {
+                list = list.filter(item => 
+                    (item.nome || '').toLowerCase().includes(q) ||
+                    (item.email || '').toLowerCase().includes(q) ||
+                    (item.cpf || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Nenhuma solicitação de homologação encontrada com os filtros atuais.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(item => {
+                const uid = item.uid;
+                const nome = item.nome || 'Prestador';
+                const email = item.email || '';
+                const telefone = item.telefone || '';
+                const cpf = item.cpf || 'Não informado';
+                const isApproved = item.selo_verificado === true || item.status === 'aprovado';
+                const isEmAnalise = item.status === 'em_analise' || item.status === 'pendente';
+                const isRejeitado = item.status === 'rejeitado';
+
+                let statusBadge = '<span class="badge" style="background: rgba(255,183,77,0.15); color: #FFB74D; border: 1px solid #FFB74D;">⏳ Em Análise</span>';
+                if (isApproved) {
+                    statusBadge = '<span class="badge" style="background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid #FFD700;">🛡️ Selo Ouro Verificado</span>';
+                } else if (isRejeitado) {
+                    statusBadge = '<span class="badge" style="background: rgba(255,0,128,0.15); color: var(--pink); border: 1px solid var(--pink);">⚠️ Revisão Solicitada</span>';
+                }
+
+                const dataEnvio = item.enviado_em ? new Date(item.enviado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Data não registrada';
+
+                // Botões de documentos
+                const btnDoc = (label, icon, b64) => {
+                    if (!b64) return `<button class="btn-action" style="padding: 3px 6px; font-size: 10px; opacity: 0.35;" disabled title="Não anexado">${icon} ${label}</button>`;
+                    return `<button class="btn-action" style="padding: 3px 6px; font-size: 10px; background: rgba(0,229,255,0.1); border-color: var(--cyan); color: var(--cyan);" onclick="abrirModalImagem('${label} - ${nome.replace(/'/g, "\\'")}', '${b64}')" title="Clique para ampliar">${icon} ${label}</button>`;
+                };
+
+                const docsHtml = `
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        ${btnDoc('RG Frente', '📄', item.doc_identidade_frente)}
+                        ${btnDoc('RG Verso', '📄', item.doc_identidade_verso)}
+                        ${btnDoc('Prova de Vida', '🤳', item.doc_selfie_liveness)}
+                        ${btnDoc('Antecedentes', '⚖️', item.doc_antecedentes_criminais)}
+                        ${btnDoc('Residência', '🏠', item.doc_comprovante_residencia)}
+                    </div>
+                    ${item.observacoes ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; font-style: italic;">Obs: ${item.observacoes}</div>` : ''}
+                `;
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 700; color: #fff;">${nome}</div>
+                            <div style="font-size: 11px; color: var(--cyan);">${email}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${telefone}</div>
+                        </td>
+                        <td>
+                            <div style="font-family: 'JetBrains Mono'; font-size: 12px; color: #fff;">${cpf}</div>
+                        </td>
+                        <td>
+                            ${docsHtml}
+                        </td>
+                        <td>
+                            ${statusBadge}
+                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 3px;">${dataEnvio}</div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                ${!isApproved ? `
+                                    <button class="btn-action" style="padding: 5px 9px; font-size: 11px; background: rgba(0, 230, 118, 0.2); border-color: #00E676; color: #00E676;" onclick="aprovarHomologacaoPrestador('${uid}', '${nome.replace(/'/g, "\\'")}')">
+                                        ✅ Aprovar Selo Ouro
+                                    </button>
+                                ` : `
+                                    <button class="btn-action" style="padding: 5px 9px; font-size: 11px; background: rgba(255, 215, 0, 0.15); border-color: #FFD700; color: #FFD700;" onclick="showToast('Selo Ouro já ativo para este prestador')">
+                                        🛡️ Selo Ouro Ativo
+                                    </button>
+                                `}
+                                <button class="btn-action" style="padding: 5px 9px; font-size: 11px; background: rgba(255, 0, 128, 0.15); border-color: var(--pink); color: var(--pink);" onclick="reprovarHomologacaoPrestador('${uid}', '${nome.replace(/'/g, "\\'")}')">
+                                    ❌ Revisão
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterHomologacoes() {
+            renderHomologacoes();
+        }
+
+        function setHomologFilter(filter) {
+            currentHomologFilter = filter;
+            renderHomologacoes();
+        }
+
+        async function aprovarHomologacaoPrestador(uid, nome) {
+            if (!confirm(`Deseja homologar o cadastro de ${nome} e conceder o SELO OURO VERIFICADO (LGPD)?\n\nO prestador passará a ter máxima prioridade de atendimento no mapa.`)) return;
+            try {
+                showToast('⏳ Concedendo Selo Verificado no Firestore...');
+                await ensureMasterAuth();
+                const now = new Date().toISOString();
+                const batch = db.batch();
+                batch.set(db.collection('users').doc(uid), {
+                    selo_verificado: true,
+                    status_verificacao: 'aprovado',
+                    homologado_em: now,
+                    homologado_por: 'Torre Master Admin'
+                }, { merge: true });
+
+                batch.set(db.collection('verificacoes_prestadores').doc(uid), {
+                    selo_verificado: true,
+                    status: 'aprovado',
+                    status_verificacao: 'aprovado',
+                    homologado_em: now,
+                    homologado_por: 'Torre Master Admin'
+                }, { merge: true });
+
+                batch.set(db.collection('prestadores').doc(uid), {
+                    selo_verificado: true,
+                    status_verificacao: 'aprovado'
+                }, { merge: true });
+
+                await batch.commit();
+
+                await db.collection('logs_sistema').add({
+                    categoria: 'HOMOLOGACAO_PRESTADOR',
+                    tipo: 'SUCCESS',
+                    mensagem: `Prestador ${nome} homologado com Selo Ouro Verificado (LGPD)`,
+                    uid: uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showToast(`🎉 Selo Ouro concedido com sucesso para ${nome}!`);
+            } catch(e) {
+                alert('Erro ao aprovar prestador: ' + e.message);
+            }
+        }
+
+        async function reprovarHomologacaoPrestador(uid, nome) {
+            const motivo = prompt(`Informe o motivo da recusa ou revisão para ${nome} (ex: Foto do RG cortada, Certidão desatualizada):`, 'Certidão de antecedentes ou documento ilegível. Por favor, reenvie.');
+            if (!motivo) return;
+            try {
+                showToast('⏳ Registrando recusa no Firestore...');
+                await ensureMasterAuth();
+                const now = new Date().toISOString();
+                const batch = db.batch();
+                batch.set(db.collection('users').doc(uid), {
+                    selo_verificado: false,
+                    status_verificacao: 'rejeitado',
+                    motivo_rejeicao_verificacao: motivo,
+                    reprovado_em: now
+                }, { merge: true });
+
+                batch.set(db.collection('verificacoes_prestadores').doc(uid), {
+                    selo_verificado: false,
+                    status: 'rejeitado',
+                    status_verificacao: 'rejeitado',
+                    motivo_rejeicao: motivo,
+                    reprovado_em: now
+                }, { merge: true });
+
+                await batch.commit();
+
+                showToast(`⚠️ Revisão solicitada para ${nome}.`);
+            } catch(e) {
+                alert('Erro ao reprovar: ' + e.message);
+            }
+        }
+
+        function abrirModalImagem(titulo, base64Data) {
+            if (!base64Data) {
+                alert('Documento não anexado pelo prestador.');
+                return;
+            }
+            const modal = document.getElementById('imageViewerModal');
+            const titleEl = document.getElementById('imageViewerTitle');
+            const imgEl = document.getElementById('imageViewerImg');
+            if (titleEl) titleEl.textContent = titulo;
+            if (imgEl) imgEl.src = base64Data;
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function fecharModalImagem() {
+            const modal = document.getElementById('imageViewerModal');
+            if (modal) modal.style.display = 'none';
+        }
+
     </script>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE DOCUMENTOS (LGPD) -->
+    <div id="imageViewerModal" style="display: none; position: fixed; inset: 0; background: rgba(5,6,10,0.9); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target === this) fecharModalImagem()">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 750px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <strong id="imageViewerTitle" style="color: #fff; font-size: 15px;">Visualizar Documento</strong>
+                <button onclick="fecharModalImagem()" style="background: transparent; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer;">✕</button>
+            </div>
+            <div style="padding: 20px; text-align: center; overflow-y: auto; display: flex; align-items: center; justify-content: center;">
+                <img id="imageViewerImg" src="" style="max-width: 100%; max-height: 70vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 
