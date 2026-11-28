@@ -4377,6 +4377,11 @@
                         doc_selfie_liveness: existing.doc_selfie_liveness || u.doc_selfie_liveness || '',
                         doc_antecedentes_criminais: existing.doc_antecedentes_criminais || u.doc_antecedentes_criminais || '',
                         doc_comprovante_residencia: existing.doc_comprovante_residencia || u.doc_comprovante_residencia || '',
+                        doc_formacao_academica: existing.doc_formacao_academica || u.doc_formacao_academica || '',
+                        doc_experiencia_vinculo: existing.doc_experiencia_vinculo || u.doc_experiencia_vinculo || '',
+                        descricao_formacao: existing.descricao_formacao || u.descricao_formacao || '',
+                        descricao_experiencia: existing.descricao_experiencia || u.descricao_experiencia || '',
+                        selo_formacao_experiencia: existing.selo_formacao_experiencia !== undefined ? existing.selo_formacao_experiencia : Boolean(u.selo_formacao_experiencia),
                         observacoes: existing.observacoes || '',
                         enviado_em: existing.enviado_em || u.documentos_enviados_em || '',
                     });
@@ -4448,6 +4453,12 @@
                         ${btnDoc('Antecedentes', '⚖️', item.doc_antecedentes_criminais)}
                         ${btnDoc('Residência', '🏠', item.doc_comprovante_residencia)}
                     </div>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;">
+                        ${btnDoc('🎓 Diploma / Formação', '🎓', item.doc_formacao_academica)}
+                        ${btnDoc('💼 Vínculo / CTPS', '💼', item.doc_experiencia_vinculo)}
+                    </div>
+                    ${item.descricao_formacao ? `<div style="font-size: 11px; color: #FFD700; margin-top: 4px;">🎓 <strong>Formação:</strong> ${item.descricao_formacao}</div>` : ''}
+                    ${item.descricao_experiencia ? `<div style="font-size: 11px; color: var(--cyan); margin-top: 2px;">💼 <strong>Experiência:</strong> ${item.descricao_experiencia}</div>` : ''}
                     ${item.observacoes ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; font-style: italic;">Obs: ${item.observacoes}</div>` : ''}
                 `;
 
@@ -4499,7 +4510,7 @@
         }
 
         async function aprovarHomologacaoPrestador(uid, nome) {
-            if (!confirm(`Deseja homologar o cadastro de ${nome} e conceder o SELO OURO VERIFICADO (LGPD)?\n\nO prestador passará a ter máxima prioridade de atendimento no mapa.`)) return;
+            if (!confirm(`Deseja homologar o cadastro de ${nome} e conceder o SELO OURO: FORMAÇÃO & EXPERIÊNCIA VERIFICADA?\n\nO prestador comprovou qualificação com diploma/certificado ou vínculo empregatício e terá máxima prioridade no mapa.`)) return;
             try {
                 showToast('⏳ Concedendo Selo Verificado no Firestore...');
                 await ensureMasterAuth();
@@ -4507,6 +4518,9 @@
                 const batch = db.batch();
                 batch.set(db.collection('users').doc(uid), {
                     selo_verificado: true,
+                    selo_formacao_experiencia: true,
+                    formacao_verificada: true,
+                    experiencia_verificada: true,
                     status_verificacao: 'aprovado',
                     homologado_em: now,
                     homologado_por: 'Torre Master Admin'
@@ -4514,6 +4528,9 @@
 
                 batch.set(db.collection('verificacoes_prestadores').doc(uid), {
                     selo_verificado: true,
+                    selo_formacao_experiencia: true,
+                    formacao_verificada: true,
+                    experiencia_verificada: true,
                     status: 'aprovado',
                     status_verificacao: 'aprovado',
                     homologado_em: now,
@@ -4522,6 +4539,9 @@
 
                 batch.set(db.collection('prestadores').doc(uid), {
                     selo_verificado: true,
+                    selo_formacao_experiencia: true,
+                    formacao_verificada: true,
+                    experiencia_verificada: true,
                     status_verificacao: 'aprovado'
                 }, { merge: true });
 
